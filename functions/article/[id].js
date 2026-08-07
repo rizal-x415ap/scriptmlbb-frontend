@@ -43,22 +43,19 @@ export async function onRequest(context) {
     // 1. Replace <title> tag
     html = html.replace(/<title>.*?<\/title>/i, `<title>${escapeHtml(title)} — Script MLBB</title>`)
 
-    // 2. Inject Open Graph, Twitter Card & Meta Tags before </head>
-    const metaTags = `
-      <meta name="description" content="${escapeHtml(excerpt)}" />
-      <meta property="og:site_name" content="Script MLBB" />
-      <meta property="og:type" content="article" />
-      <meta property="og:title" content="${escapeHtml(title)} — Script MLBB" />
-      <meta property="og:description" content="${escapeHtml(excerpt)}" />
-      <meta property="og:image" content="${escapeHtml(absoluteCover)}" />
-      <meta property="og:url" content="${escapeHtml(url.href)}" />
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="${escapeHtml(title)} — Script MLBB" />
-      <meta name="twitter:description" content="${escapeHtml(excerpt)}" />
-      <meta name="twitter:image" content="${escapeHtml(absoluteCover)}" />
-    `
+    // 2. Replace meta description tag in place
+    html = html.replace(/<meta\s+name="description"\s+content=".*?"\s*\/?>/i, `<meta name="description" content="${escapeHtml(excerpt)}" />`)
 
-    html = html.replace('</head>', `${metaTags}\n</head>`)
+    // 3. Replace Open Graph tags in place
+    html = html.replace(/<meta\s+property="og:type"\s+content=".*?"\s*\/?>/i, `<meta property="og:type" content="article" />`)
+    html = html.replace(/<meta\s+property="og:title"\s+content=".*?"\s*\/?>/i, `<meta property="og:title" content="${escapeHtml(title)} — Script MLBB" />`)
+    html = html.replace(/<meta\s+property="og:description"\s+content=".*?"\s*\/?>/i, `<meta property="og:description" content="${escapeHtml(excerpt)}" />`)
+    html = html.replace(/<meta\s+property="og:image"\s+content=".*?"\s*\/?>/i, `<meta property="og:image" content="${escapeHtml(absoluteCover)}" />`)
+
+    // 4. Replace Twitter Card tags in place
+    html = html.replace(/<meta\s+name="twitter:title"\s+content=".*?"\s*\/?>/i, `<meta name="twitter:title" content="${escapeHtml(title)} — Script MLBB" />`)
+    html = html.replace(/<meta\s+name="twitter:description"\s+content=".*?"\s*\/?>/i, `<meta name="twitter:description" content="${escapeHtml(excerpt)}" />`)
+    html = html.replace(/<meta\s+name="twitter:image"\s+content=".*?"\s*\/?>/i, `<meta name="twitter:image" content="${escapeHtml(absoluteCover)}" />`)
 
     return new Response(html, {
       headers: {

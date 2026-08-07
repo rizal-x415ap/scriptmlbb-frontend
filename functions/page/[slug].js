@@ -36,21 +36,20 @@ export async function onRequest(context) {
 
     let html = await response.text()
 
+    // 1. Replace <title> tag
     html = html.replace(/<title>.*?<\/title>/i, `<title>${escapeHtml(title)} — Script MLBB</title>`)
 
-    const metaTags = `
-      <meta name="description" content="${escapeHtml(description)}" />
-      <meta property="og:site_name" content="Script MLBB" />
-      <meta property="og:type" content="website" />
-      <meta property="og:title" content="${escapeHtml(title)} — Script MLBB" />
-      <meta property="og:description" content="${escapeHtml(description)}" />
-      <meta property="og:url" content="${escapeHtml(url.href)}" />
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="${escapeHtml(title)} — Script MLBB" />
-      <meta name="twitter:description" content="${escapeHtml(description)}" />
-    `
+    // 2. Replace meta description tag in place
+    html = html.replace(/<meta\s+name="description"\s+content=".*?"\s*\/?>/i, `<meta name="description" content="${escapeHtml(description)}" />`)
 
-    html = html.replace('</head>', `${metaTags}\n</head>`)
+    // 3. Replace Open Graph tags in place
+    html = html.replace(/<meta\s+property="og:type"\s+content=".*?"\s*\/?>/i, `<meta property="og:type" content="website" />`)
+    html = html.replace(/<meta\s+property="og:title"\s+content=".*?"\s*\/?>/i, `<meta property="og:title" content="${escapeHtml(title)} — Script MLBB" />`)
+    html = html.replace(/<meta\s+property="og:description"\s+content=".*?"\s*\/?>/i, `<meta property="og:description" content="${escapeHtml(description)}" />`)
+
+    // 4. Replace Twitter Card tags in place
+    html = html.replace(/<meta\s+name="twitter:title"\s+content=".*?"\s*\/?>/i, `<meta name="twitter:title" content="${escapeHtml(title)} — Script MLBB" />`)
+    html = html.replace(/<meta\s+name="twitter:description"\s+content=".*?"\s*\/?>/i, `<meta name="twitter:description" content="${escapeHtml(description)}" />`)
 
     return new Response(html, {
       headers: {
