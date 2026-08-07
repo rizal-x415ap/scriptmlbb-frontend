@@ -38,10 +38,11 @@ export async function onRequest(context) {
     const coverImage = article.cover_image || article.app_icon || `${url.origin}/favicon.svg`
     const absoluteCover = coverImage.startsWith('http') ? coverImage : `${url.origin}${coverImage.startsWith('/') ? '' : '/'}${coverImage}`
 
-    let html = await response.text()
+    const title = article.title || 'Script MLBB'
+    const finalTitle = title.toLowerCase().includes('script mlbb') ? title : `${title} — Script MLBB`
 
     // 1. Replace <title> tag
-    html = html.replace(/<title>.*?<\/title>/i, `<title>${escapeHtml(title)} — Script MLBB</title>`)
+    html = html.replace(/<title>.*?<\/title>/i, `<title>${escapeHtml(finalTitle)}</title>`)
 
     // 2. Replace meta description tag in place
     html = html.replace(/<meta\s+name="description"\s+content=".*?"\s*\/?>/i, `<meta name="description" content="${escapeHtml(excerpt)}" />`)

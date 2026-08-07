@@ -100,8 +100,20 @@ export function setSeoMeta({
   const defaultTitle = siteSettings.siteTitle || `${brandName} // Blog & Artikel Software`
   const defaultDescription = siteSettings.siteDescription || 'Blog artikel teknis, arsitektur web modern, dan catatan rekayasa perangkat lunak.'
 
-  // 1. Page Title
-  const finalTitle = title ? `${title} — ${brandName}` : defaultTitle
+  // 1. Page Title Calculation
+  let finalTitle = ''
+  if (title && title.trim()) {
+    const cleanTitle = title.trim()
+    if (cleanTitle.toLowerCase() === brandName.toLowerCase()) {
+      finalTitle = brandName
+    } else if (cleanTitle.toLowerCase().includes(brandName.toLowerCase())) {
+      finalTitle = cleanTitle
+    } else {
+      finalTitle = `${cleanTitle} — ${brandName}`
+    }
+  } else {
+    finalTitle = siteSettings.siteTitle || brandName
+  }
   document.title = finalTitle
 
   // 2. Meta Description & Keywords

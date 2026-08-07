@@ -183,7 +183,7 @@ const loadHomeFeed = async () => {
 
     // Set Home Page SEO & WebSite Schema
     setSeoMeta({
-      title: siteSettings.siteTitle || 'Script MLBB — Blog & Portal Informasi Software',
+      title: 'Script MLBB',
       description: siteSettings.siteDescription || 'Portal informasi artikel teknis, catatan arsitektur sistem, dan panduan software modern.',
       url: '/',
       type: 'website',

@@ -34,10 +34,11 @@ export async function onRequest(context) {
     const rawDescription = page.meta_description || page.excerpt || page.title || 'Halaman Script MLBB'
     const description = cleanTextSnippet(rawDescription, 160)
 
-    let html = await response.text()
+    const title = page.title || 'Script MLBB'
+    const finalTitle = title.toLowerCase().includes('script mlbb') ? title : `${title} — Script MLBB`
 
     // 1. Replace <title> tag
-    html = html.replace(/<title>.*?<\/title>/i, `<title>${escapeHtml(title)} — Script MLBB</title>`)
+    html = html.replace(/<title>.*?<\/title>/i, `<title>${escapeHtml(finalTitle)}</title>`)
 
     // 2. Replace meta description tag in place
     html = html.replace(/<meta\s+name="description"\s+content=".*?"\s*\/?>/i, `<meta name="description" content="${escapeHtml(description)}" />`)
