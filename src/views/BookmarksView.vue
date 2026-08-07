@@ -2,9 +2,15 @@
 import { onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { bookmarkedArticles, removeBookmark } from '../services/bookmarkStore.js'
+import { setSeoMeta } from '../services/seo.js'
 
 onMounted(() => {
-  document.title = 'Artikel Disimpan - Script MLBB'
+  setSeoMeta({
+    title: 'Koleksi Artikel Tersimpan',
+    description: 'Koleksi artikel favorit dan panduan teknis yang Anda simpan di peramban.',
+    url: '/bookmarks',
+    type: 'website'
+  })
 })
 
 const getFormattedDate = (dateStr) => {
