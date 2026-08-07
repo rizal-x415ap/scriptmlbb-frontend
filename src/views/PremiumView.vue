@@ -19,7 +19,7 @@ const errorMessage = ref('')
 const successMessage = ref('')
 
 const whatsappBuyUrl = computed(() => {
-  return siteSettings.premiumBuyUrl || 'https://wa.me/6281234567890?text=Halo%20Admin,%20saya%20mau%20beli%20token%20premium%20blog'
+  return siteSettings.premiumBuyUrl || 'https://wa.me/6285262335849?text=Min%20Saya%20mau%20beli%20token%20Script%20MLBB'
 })
 
 const priceText = computed(() => {
