@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { ApiService } from '../services/api.js'
 import { siteSettings } from '../services/settingsStore.js'
@@ -24,6 +24,10 @@ const searchInput = ref(props.searchQuery || '')
 const selectedCategory = ref('All')
 const selectedYear = ref('All')
 const sortBy = ref('newest')
+
+watch(() => props.searchQuery, (newVal) => {
+  searchInput.value = newVal || ''
+})
 
 const categories = computed(() => {
   const set = new Set(['All'])

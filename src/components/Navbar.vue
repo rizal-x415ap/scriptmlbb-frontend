@@ -1,10 +1,11 @@
 <script setup>
 import { ref } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { siteSettings } from '../services/settingsStore.js'
 import { bookmarkedArticles } from '../services/bookmarkStore.js'
 
 const route = useRoute()
+const router = useRouter()
 const isMobileMenuOpen = ref(false)
 const searchQuery = ref('')
 
@@ -12,6 +13,16 @@ const emit = defineEmits(['search'])
 
 const handleSearchInput = () => {
   emit('search', searchQuery.value)
+  if (searchQuery.value.trim() && route.path !== '/archive') {
+    router.push('/archive')
+  }
+}
+
+const handleSearchSubmit = () => {
+  emit('search', searchQuery.value)
+  if (route.path !== '/archive') {
+    router.push('/archive')
+  }
 }
 
 const navLinks = [
@@ -51,7 +62,7 @@ const navLinks = [
         </RouterLink>
 
         <!-- Search Bar (Desktop) -->
-        <div class="hidden md:flex items-center flex-1 max-w-sm mx-4">
+        <form @submit.prevent="handleSearchSubmit" class="hidden md:flex items-center flex-1 max-w-sm mx-4">
           <div class="relative w-full">
             <input
               v-model="searchQuery"
@@ -60,11 +71,13 @@ const navLinks = [
               placeholder="Cari artikel, script skin..."
               class="w-full pl-9 pr-4 py-1.5 text-sm bg-[#fafafa] border border-[#dfdfdf] rounded-[6px] text-[#171717] placeholder-[#707070] focus:outline-none focus:border-[#2563eb] focus:bg-[#ffffff] transition-all"
             />
-            <svg class="w-4 h-4 text-[#707070] absolute left-3 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-            </svg>
+            <button type="submit" class="absolute left-3 top-2.5 text-[#707070] hover:text-[#2563eb] transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </button>
           </div>
-        </div>
+        </form>
 
         <!-- Desktop Navigation -->
         <nav class="hidden md:flex items-center gap-6">
@@ -128,7 +141,7 @@ const navLinks = [
 
       <!-- Mobile Search & Drawer -->
       <div v-if="isMobileMenuOpen" class="md:hidden py-4 border-t border-[#dfdfdf] space-y-3">
-        <div class="px-2">
+        <form @submit.prevent="handleSearchSubmit" class="px-2">
           <input
             v-model="searchQuery"
             @input="handleSearchInput"
@@ -136,7 +149,7 @@ const navLinks = [
             placeholder="Cari artikel, script skin..."
             class="w-full px-3 py-2 text-sm bg-[#fafafa] border border-[#dfdfdf] rounded-[6px] text-[#171717] placeholder-[#707070] focus:outline-none focus:border-[#2563eb]"
           />
-        </div>
+        </form>
         <div class="space-y-1">
           <RouterLink
             v-for="link in navLinks"
