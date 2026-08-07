@@ -1,7 +1,17 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { isPremium, premiumToken, premiumExpiresAt, activateToken, clearPremium } from '../services/premiumStore.js'
 import { siteSettings } from '../services/settingsStore.js'
+import { setSeoMeta } from '../services/seo.js'
+
+onMounted(() => {
+  setSeoMeta({
+    title: 'Akses Premium & Token Berlangganan',
+    description: 'Nikmati pengalaman membaca tanpa iklan, unduh file langsung tanpa iklan pendek, dan akses fitur eksklusif.',
+    url: '/premium',
+    type: 'website'
+  })
+})
 
 const tokenInput = ref('')
 const isSubmitting = ref(false)

@@ -6,6 +6,7 @@ import { siteSettings } from '../services/settingsStore.js'
 import { isBookmarked as checkIsBookmarked, toggleBookmark as toggleBookmarkStore } from '../services/bookmarkStore.js'
 import { isArticleLiked, addLikedArticle, removeLikedArticle } from '../services/likedStore.js'
 import ArticleCardSkeleton from '../components/ArticleCardSkeleton.vue'
+import { setSeoMeta } from '../services/seo.js'
 
 const props = defineProps({
   searchQuery: {
@@ -183,6 +184,15 @@ const copyRssFeed = () => {
     isRssCopied.value = false
   }, 2500)
 }
+
+onMounted(() => {
+  setSeoMeta({
+    title: siteSettings.archiveTitle || 'Arsip Artikel & Catatan Teknis',
+    description: siteSettings.archiveSubtitle || 'Filter seluruh koleksi artikel teknis, catatan arsitektur sistem, dan panduan software.',
+    url: '/archive',
+    type: 'website'
+  })
+})
 </script>
 
 <template>

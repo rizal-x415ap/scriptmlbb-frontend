@@ -7,6 +7,7 @@ import { isPremium } from '../services/premiumStore.js'
 import SkeletonLoader from '../components/SkeletonLoader.vue'
 import ArticleCardSkeleton from '../components/ArticleCardSkeleton.vue'
 import AdSlot from '../components/AdSlot.vue'
+import { setSeoMeta, getAbsoluteUrl } from '../services/seo.js'
 
 const props = defineProps({
   searchQuery: {
@@ -179,6 +180,21 @@ const loadHomeFeed = async () => {
     if (Array.isArray(data?.topics)) {
       dynamicTopics.value = data.topics
     }
+
+    // Set Home Page SEO & WebSite Schema
+    setSeoMeta({
+      title: siteSettings.siteTitle || 'Script MLBB — Blog & Portal Informasi Software',
+      description: siteSettings.siteDescription || 'Portal informasi artikel teknis, catatan arsitektur sistem, dan panduan software modern.',
+      url: '/',
+      type: 'website',
+      jsonLdSchema: {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        'name': siteSettings.brandLogoText || 'Script MLBB',
+        'url': getAbsoluteUrl('/'),
+        'description': siteSettings.siteDescription || 'Portal informasi artikel teknis dan arsitektur web modern.'
+      }
+    })
   } finally {
     isDone = true
     clearTimeout(timer)

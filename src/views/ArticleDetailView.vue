@@ -141,6 +141,65 @@ const formattedContent = computed(() => {
   return sanitizeHtml(raw)
 })
 
+const updateArticleSeo = (data) => {
+  if (!data) return
+
+  const title = data.title || ''
+  const description = data.excerpt || cleanExcerptText(data.content, 160)
+  const image = data.cover_image || data.app_icon || siteSettings.brandLogoUrl
+  const categoryName = getCategoryName(data.category)
+  const author = getAuthorName(data.author) || siteSettings.authorName || 'Admin'
+  const articleUrl = `/article/${data.slug || data.id}`
+
+  // Build JSON-LD BlogPosting Schema for Google Rich Snippets
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    'mainEntityOfPage': {
+      '@type': 'WebPage',
+      '@id': getAbsoluteUrl(articleUrl)
+    },
+    'headline': title,
+    'description': description,
+    'image': [getAbsoluteUrl(image)],
+    'datePublished': data.published_at || data.created_at || new Date().toISOString(),
+    'dateModified': data.updated_at || data.published_at || new Date().toISOString(),
+    'author': {
+      '@type': 'Person',
+      'name': author
+    },
+    'publisher': {
+      '@type': 'Organization',
+      'name': siteSettings.brandLogoText || 'Script MLBB',
+      'logo': {
+        '@type': 'ImageObject',
+        'url': getAbsoluteUrl(siteSettings.faviconUrl || '/favicon.svg')
+      }
+    }
+  }
+
+  if (data.rating_average) {
+    articleSchema.aggregateRating = {
+      '@type': 'AggregateRating',
+      'ratingValue': String(data.rating_average),
+      'reviewCount': String(data.ratings_count || 1)
+    }
+  }
+
+  setSeoMeta({
+    title,
+    description,
+    image,
+    url: articleUrl,
+    type: 'article',
+    publishedTime: data.published_at || data.created_at,
+    modifiedTime: data.updated_at || data.published_at,
+    authorName: author,
+    sectionCategory: categoryName,
+    jsonLdSchema: articleSchema
+  })
+}
+
 const loadArticle = async () => {
   let isDone = false
   const timer = setTimeout(() => {
@@ -155,6 +214,7 @@ const loadArticle = async () => {
     likesCount.value = data?.likes_count || 0
     if (data) {
       isLiked.value = isArticleLiked(data.id) || isArticleLiked(data.slug)
+      updateArticleSeo(data)
     }
   } finally {
     isDone = true

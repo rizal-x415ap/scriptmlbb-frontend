@@ -7,6 +7,7 @@ import { siteSettings } from '../services/settingsStore.js'
 import SkeletonLoader from '../components/SkeletonLoader.vue'
 import AdSlot from '../components/AdSlot.vue'
 import { sanitizeHtml } from '../utils/sanitize.js'
+import { setSeoMeta } from '../services/seo.js'
 
 const route = useRoute()
 const code = computed(() => route.params.code)
@@ -23,6 +24,13 @@ const errorMessage = ref('')
 let metaRobotsEl = null
 
 onMounted(async () => {
+  setSeoMeta({
+    title: 'Halaman Unduh File SafeLink',
+    description: 'Menyiapkan tautan unduhan aman secara otomatis.',
+    url: `/go/${code.value}`,
+    type: 'website'
+  })
+
   // SEO Noindex, Nofollow Tag Enforcement
   metaRobotsEl = document.querySelector('meta[name="robots"]')
   if (!metaRobotsEl) {

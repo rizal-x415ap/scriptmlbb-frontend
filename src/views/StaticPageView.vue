@@ -3,6 +3,8 @@ import { ref, watch, onMounted, computed } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { ApiService } from '../services/api'
 import { sanitizeHtml } from '../utils/sanitize'
+import { setSeoMeta, cleanExcerptText, getAbsoluteUrl } from '../services/seo'
+import { siteSettings } from '../services/settingsStore'
 
 const route = useRoute()
 
@@ -25,7 +27,28 @@ const fetchPageDetail = async () => {
     const data = await ApiService.getPageBySlug(slug)
     if (data) {
       page.value = data
-      document.title = `${data.title} - Script MLBB`
+      const description = data.meta_description || data.excerpt || cleanExcerptText(data.content, 160)
+      const pageUrl = `/page/${data.slug}`
+
+      const webPageSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        'name': data.title,
+        'description': description,
+        'url': getAbsoluteUrl(pageUrl),
+        'publisher': {
+          '@type': 'Organization',
+          'name': siteSettings.brandLogoText || 'Script MLBB'
+        }
+      }
+
+      setSeoMeta({
+        title: data.title,
+        description: description,
+        url: pageUrl,
+        type: 'website',
+        jsonLdSchema: webPageSchema
+      })
     } else {
       errorMessage.value = 'Halaman tidak ditemukan.'
     }
