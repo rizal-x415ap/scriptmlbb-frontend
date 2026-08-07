@@ -4,7 +4,7 @@
  * Direct API connection to Laravel 12 Backend Endpoint: http://127.0.0.1:8000/api/v1
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/v1'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.rizaldev.my.id/api/v1'
 const API_KEY = import.meta.env.VITE_API_KEY || 'sk_blog_sec_8f93e41b2a7605d1c904e12b7f3298a4'
 
 /**
