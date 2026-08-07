@@ -1,0 +1,1358 @@
+<script setup>
+import { ref, computed, reactive, onMounted, watch } from 'vue'
+import { useRoute, RouterLink } from 'vue-router'
+import { ApiService } from '../services/api.js'
+import { siteSettings } from '../services/settingsStore.js'
+import { isBookmarked as checkIsBookmarked, toggleBookmark as toggleBookmarkStore } from '../services/bookmarkStore.js'
+import { isArticleLiked, addLikedArticle, removeLikedArticle } from '../services/likedStore.js'
+import ArticleDetailSkeleton from '../components/ArticleDetailSkeleton.vue'
+import AdSlot from '../components/AdSlot.vue'
+import { isPremium } from '../services/premiumStore.js'
+import { sanitizeHtml } from '../utils/sanitize.js'
+
+const route = useRoute()
+
+// Get article ID from router param
+const articleId = computed(() => route.params.id || 'featured-1')
+
+// Async Loading State (Smart Skeleton - Only shows if request takes > 150ms)
+const isLoading = ref(false)
+const article = ref(null)
+
+// Interactive Like & Bookmark state
+const isLiked = ref(false)
+const likesCount = ref(0)
+const isBookmarked = computed(() => article.value ? checkIsBookmarked(article.value.id || article.value.slug) : false)
+const isCopied = ref(false)
+
+// Helpers for API Data Normalization (Laravel API returns category & author objects)
+const getCategoryName = (cat) => {
+  if (!cat) return ''
+  return typeof cat === 'object' ? (cat.name || '') : cat
+}
+
+const getAuthorName = (author) => {
+  if (!author) return ''
+  return typeof author === 'object' ? (author.name || '') : author
+}
+
+const getAuthorAvatar = (author) => {
+  if (!author) return ''
+  return typeof author === 'object' ? (author.avatar || '') : author
+}
+
+const getFormattedDate = (date) => {
+  if (!date) return ''
+  if (typeof date === 'string' && date.includes('T')) {
+    return new Date(date).toLocaleDateString('id-ID', { month: 'short', day: '2-digit', year: 'numeric' })
+  }
+  return date
+}
+
+const formatViews = (val) => {
+  const num = Number(val) || 0
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1).replace('.0', '') + 'm'
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1).replace('.0', '') + 'k'
+  }
+  return num.toString()
+}
+
+const formatDownloads = (val) => {
+  const num = Math.max(0, (Number(val) || 0) - 15)
+  if (num > 0) {
+    return num.toLocaleString('id-ID') + '+'
+  }
+  return '1.000+'
+}
+
+// Clean any JSON-stringified comment content
+const getCleanCommentContent = (rawContent) => {
+  if (!rawContent) return ''
+  if (typeof rawContent === 'object' && rawContent.content) {
+    return rawContent.content
+  }
+  if (typeof rawContent === 'string' && rawContent.trim().startsWith('{')) {
+    try {
+      const parsed = JSON.parse(rawContent)
+      if (parsed && parsed.content) {
+        return parsed.content
+      }
+    } catch {
+      // Return raw string if not valid JSON
+    }
+  }
+  return rawContent
+}
+
+const activeSection = ref('')
+const tocItems = ref([])
+
+const scrollToSection = (id) => {
+  activeSection.value = id
+  const el = document.getElementById(id)
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}
+
+// Render dynamic HTML / Markdown content & Auto-Generate TOC from <h2> headings
+const formattedContent = computed(() => {
+  if (!article.value || !article.value.content) {
+    tocItems.value = []
+    return ''
+  }
+
+  let raw = article.value.content
+  const extractedToc = []
+  let counter = 0
+
+  // 1. Convert Markdown ## to <h2> tags if present
+  raw = raw.replace(/^##\s+(.*$)/gim, '<h2>$1</h2>')
+  raw = raw.replace(/^###\s+(.*$)/gim, '<h3>$1</h3>')
+
+  // 2. Parse ALL <h2> tags (both native HTML <h2> and converted Markdown ##)
+  raw = raw.replace(/<h2([^>]*)>(.*?)<\/h2>/gim, (match, attrs, titleHtml) => {
+    counter++
+    const sectionId = `heading-h2-${counter}`
+    const cleanTitle = titleHtml.replace(/<[^>]+>/g, '').trim()
+    extractedToc.push({ id: sectionId, label: cleanTitle })
+    return `<h2 id="${sectionId}" class="text-xl sm:text-2xl font-semibold text-[#171717] pt-6 pb-2 border-b border-[#dfdfdf] my-6 scroll-mt-24">${titleHtml}</h2>`
+  })
+
+  // 3. Format blockquotes and code blocks
+  raw = raw
+    .replace(/^>\s+(.*$)/gim, '<blockquote class="border-l-2 border-[#3ecf8e] pl-6 py-2 italic text-[#171717] bg-[#fafafa] rounded-r-[6px] my-6">$1</blockquote>')
+    .replace(/```([\s\S]*?)```/gim, '<div class="rounded-[6px] bg-[#1c1c1c] text-[#fafafa] p-6 border border-white/10 overflow-x-auto my-6 font-mono text-sm"><pre><code>$1</code></pre></div>')
+
+  // 4. Auto-inject loading="lazy" & decoding="async" to all inline article content <img> tags
+  raw = raw.replace(/<img([^>]+)>/gim, (match, attrs) => {
+    if (attrs.includes('loading=')) return match
+    return `<img${attrs} loading="lazy" decoding="async" class="rounded-[8px] max-w-full h-auto my-4 shadow-sm" />`
+  })
+
+  tocItems.value = extractedToc
+  if (extractedToc.length > 0 && (!activeSection.value || !extractedToc.some(i => i.id === activeSection.value))) {
+    activeSection.value = extractedToc[0].id
+  }
+
+  return sanitizeHtml(raw)
+})
+
+const loadArticle = async () => {
+  let isDone = false
+  const timer = setTimeout(() => {
+    if (!isDone) {
+      isLoading.value = true
+    }
+  }, 150)
+
+  try {
+    const data = await ApiService.getArticleById(articleId.value)
+    article.value = data
+    likesCount.value = data?.likes_count || 0
+    if (data) {
+      isLiked.value = isArticleLiked(data.id) || isArticleLiked(data.slug)
+    }
+  } finally {
+    isDone = true
+    clearTimeout(timer)
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  loadArticle()
+})
+
+watch(() => route.params.id, () => {
+  loadArticle()
+})
+
+const toggleLike = async () => {
+  if (!article.value) return
+
+  const targetKey = article.value.id || article.value.slug
+
+  if (!isLiked.value) {
+    // Like action
+    isLiked.value = true
+    likesCount.value++
+    addLikedArticle(targetKey)
+
+    try {
+      const res = await ApiService.likeArticle(targetKey)
+      if (res && res.likes_count !== undefined) {
+        likesCount.value = res.likes_count
+      }
+    } catch (err) {
+      console.error('Gagal memperbarui jumlah suka ke DB:', err)
+    }
+  } else {
+    // Unlike action
+    isLiked.value = false
+    likesCount.value = Math.max(0, likesCount.value - 1)
+    removeLikedArticle(targetKey)
+  }
+}
+
+const toggleBookmark = () => {
+  if (article.value) {
+    toggleBookmarkStore(article.value)
+  }
+}
+
+const copyShareLink = () => {
+  navigator.clipboard?.writeText?.(window.location.href)
+  isCopied.value = true
+  setTimeout(() => {
+    isCopied.value = false
+  }, 2000)
+}
+
+const isPlayStoreStyle = computed(() => {
+  if (!article.value) return false
+  if (article.value.template === 'playstore') return true
+  const cat = getCategoryName(article.value.category).toLowerCase()
+  const title = (article.value.title || '').toLowerCase()
+  const slug = (article.value.slug || '').toLowerCase()
+  return cat.includes('script') || cat.includes('aplikasi') || title.includes('mod') || title.includes('script') || title.includes('playstore') || slug.includes('playstore') || slug.includes('mlbb')
+})
+
+const appScreenshotsList = computed(() => {
+  if (article.value && Array.isArray(article.value.app_screenshots) && article.value.app_screenshots.length > 0) {
+    return article.value.app_screenshots.map(s => typeof s === 'object' ? s.url : s)
+  }
+  return []
+})
+
+const appFeaturesList = computed(() => {
+  if (article.value && Array.isArray(article.value.app_features) && article.value.app_features.length > 0) {
+    return article.value.app_features
+  }
+  return []
+})
+
+const parsedDownloadLinks = computed(() => {
+  if (!article.value) return []
+
+  let links = []
+  if (Array.isArray(article.value.download_links) && article.value.download_links.length > 0) {
+    links = article.value.download_links.map(l => ({
+      name: l.name || l.label || 'Link Unduhan File',
+      url: l.url || article.value.app_download_url || '#'
+    }))
+  } else if (article.value?.app_download_url) {
+    links = [{ name: 'Server Unduhan Utama', url: article.value.app_download_url }]
+  }
+
+  // If user is Premium -> return direct URLs
+  if (isPremium.value) {
+    return links
+  }
+
+  // If user is Non-Premium -> map URLs to shortlink `/go/:code` where available
+  const shortLinksMap = {}
+  if (Array.isArray(article.value.short_links)) {
+    article.value.short_links.forEach(s => {
+      shortLinksMap[s.original_url] = s.code
+    })
+  }
+
+  return links.map(link => {
+    const code = shortLinksMap[link.url]
+    return {
+      ...link,
+      url: code ? `/go/${code}` : link.url,
+      isShortener: !!code
+    }
+  })
+})
+
+// Comments State
+const getCuteAvatar = (name) => {
+  const seed = encodeURIComponent(name || 'Anonymous User')
+  return `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`
+}
+
+// Helper to parse comment if content or object is stored as raw JSON string
+const parseCommentData = (commentObj) => {
+  if (!commentObj) return { author_name: 'Pengguna', content: '', rating: 5 }
+
+  let name = commentObj.author_name || commentObj.name || 'Pengguna'
+  let email = commentObj.author_email || commentObj.email || ''
+  let text = commentObj.content || ''
+  let rating = Number(commentObj.rating) || 5
+
+  if (typeof commentObj === 'string' && commentObj.trim().startsWith('{')) {
+    try {
+      const parsed = JSON.parse(commentObj)
+      name = parsed.author_name || parsed.name || name
+      email = parsed.author_email || parsed.email || email
+      text = parsed.content || text
+      rating = Number(parsed.rating) || rating
+    } catch (e) {}
+  } else if (typeof commentObj.content === 'string' && commentObj.content.trim().startsWith('{')) {
+    try {
+      const parsed = JSON.parse(commentObj.content)
+      name = parsed.author_name || parsed.name || name
+      email = parsed.author_email || parsed.email || email
+      text = parsed.content || text
+      rating = Number(parsed.rating) || rating
+    } catch (e) {}
+  }
+
+  return {
+    id: commentObj.id || Date.now(),
+    author_name: name,
+    author_email: email,
+    content: text,
+    rating: rating,
+    created_at: commentObj.created_at || new Date().toISOString(),
+    replies: Array.isArray(commentObj.replies) ? commentObj.replies.map(parseCommentData) : []
+  }
+}
+
+// Scoped Article Comments list (Strictly from API database response)
+const articleComments = computed(() => {
+  if (article.value && Array.isArray(article.value.comments)) {
+    return article.value.comments.map(parseCommentData)
+  }
+  return []
+})
+
+// Star Rating State for Review Submission
+const selectedRating = ref(5)
+const hoverRating = ref(0)
+
+const ratingLabels = {
+  1: '1.0 ★ Buruk / Tidak Bekerja',
+  2: '2.0 ★ Kurang Memuaskan',
+  3: '3.0 ★ Cukup / Standar',
+  4: '4.0 ★ Sangat Baik',
+  5: '5.0 ★ Sempurna / Rekomendasi VIP'
+}
+
+// Compute dynamic rating stats strictly from API database comments
+const ratingStats = computed(() => {
+  const totalCount = articleComments.value.length
+  if (totalCount === 0) {
+    return {
+      average: '5.0',
+      total: 0,
+      distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+      getPercent: () => 0
+    }
+  }
+
+  let sum = 0
+  const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+
+  articleComments.value.forEach(c => {
+    const r = Number(c.rating) || 5
+    if (r >= 1 && r <= 5) {
+      distribution[r]++
+      sum += r
+    }
+  })
+
+  const avg = (sum / totalCount).toFixed(1)
+
+  return {
+    average: avg,
+    total: totalCount,
+    distribution: distribution,
+    getPercent: (star) => {
+      return Math.round((distribution[star] / totalCount) * 100)
+    }
+  }
+})
+
+// Filter 4-star and 5-star reviews strictly from API database comments
+const featuredReviews = computed(() => {
+  return articleComments.value
+    .filter(c => (Number(c.rating) || 5) >= 4)
+    .map(c => ({
+      id: c.id,
+      author_name: c.author_name,
+      rating: c.rating,
+      content: c.content,
+      is_verified: true
+    }))
+})
+
+// Comment Form State (Mandatory Name & Email)
+const commentAuthorInput = ref('')
+const commentEmailInput = ref('')
+const commentTextInput = ref('')
+const commentSubmitMessage = ref('')
+const commentErrorMessage = ref('')
+const isSubmittingComment = ref(false)
+
+// User Reply State
+const activeReplyParentId = ref(null)
+const replyAuthorInput = ref('')
+const replyEmailInput = ref('')
+const replyTextInput = ref('')
+const isSubmittingReply = ref(false)
+
+const scrollToDownloadSection = () => {
+  const elem = document.getElementById('download-section')
+  if (elem) {
+    const yOffset = -140 // Generous top clearance offset so sticky header never overlaps
+    const y = elem.getBoundingClientRect().top + window.pageYOffset + yOffset
+    window.scrollTo({ top: y, behavior: 'smooth' })
+  }
+}
+
+// Comment Deletion Modal State
+const deletingCommentId = ref(null)
+const deleteEmailInput = ref('')
+const deleteErrorMessage = ref('')
+const deleteSuccessMessage = ref('')
+const isDeletingComment = ref(false)
+
+const openReplyForm = (parentId) => {
+  activeReplyParentId.value = activeReplyParentId.value === parentId ? null : parentId
+  replyAuthorInput.value = ''
+  replyEmailInput.value = ''
+  replyTextInput.value = ''
+}
+
+const handleAddComment = async (parentId = null) => {
+  const authorName = parentId ? replyAuthorInput.value.trim() : commentAuthorInput.value.trim()
+  const authorEmail = parentId ? replyEmailInput.value.trim() : commentEmailInput.value.trim()
+  const contentText = parentId ? replyTextInput.value.trim() : commentTextInput.value.trim()
+
+  if (!authorName || !authorEmail || !contentText) {
+    if (!parentId) commentErrorMessage.value = 'Silakan isi Nama, Email, dan Teks Komentar Anda.'
+    return
+  }
+
+  if (parentId) isSubmittingReply.value = true
+  else isSubmittingComment.value = true
+
+  commentSubmitMessage.value = ''
+  commentErrorMessage.value = ''
+
+  try {
+    const payload = {
+      author_name: authorName,
+      author_email: authorEmail,
+      content: contentText,
+      rating: parentId ? null : selectedRating.value
+    }
+    if (parentId !== null && parentId !== undefined) {
+      const numericId = Number(parentId)
+      if (!isNaN(numericId) && numericId > 0 && numericId < 2000000000) {
+        payload.parent_id = numericId
+      }
+    }
+
+    const response = await ApiService.submitComment(article.value.id || article.value.slug, payload)
+
+    const savedCommentObj = (response && response.data) ? response.data : {
+      id: Date.now(),
+      parent_id: parentId,
+      author_name: authorName,
+      author_email: authorEmail,
+      content: contentText,
+      rating: parentId ? null : selectedRating.value,
+      created_at: new Date().toISOString(),
+      status: 'approved',
+      replies: []
+    }
+
+    if (!savedCommentObj.rating && !parentId) {
+      savedCommentObj.rating = selectedRating.value
+    }
+
+    if (!Array.isArray(article.value.comments)) {
+      article.value.comments = []
+    }
+
+    if (parentId) {
+      // Append reply under parent comment
+      const parentObj = article.value.comments.find(c => c.id === parentId || Number(c.id) === Number(parentId))
+      if (parentObj) {
+        if (!Array.isArray(parentObj.replies)) parentObj.replies = []
+        parentObj.replies.push(savedCommentObj)
+      }
+      activeReplyParentId.value = null
+      replyAuthorInput.value = ''
+      replyEmailInput.value = ''
+      replyTextInput.value = ''
+    } else {
+      // Add root comment
+      article.value.comments.unshift(savedCommentObj)
+      commentAuthorInput.value = ''
+      commentEmailInput.value = ''
+      commentTextInput.value = ''
+      commentSubmitMessage.value = '✓ Komentar berhasil diterbitkan!'
+    }
+  } catch (err) {
+    const errorMsg = err.message || 'Gagal mengirim komentar. Silakan periksa kembali data Anda.'
+    if (parentId) {
+      alert(`⚠️ ${errorMsg}`)
+    } else {
+      commentErrorMessage.value = errorMsg
+    }
+  } finally {
+    isSubmittingComment.value = false
+    isSubmittingReply.value = false
+  }
+
+  setTimeout(() => {
+    commentSubmitMessage.value = ''
+    commentErrorMessage.value = ''
+  }, 4000)
+}
+
+const openDeleteModal = (commentId) => {
+  deletingCommentId.value = commentId
+  deleteEmailInput.value = ''
+  deleteErrorMessage.value = ''
+  deleteSuccessMessage.value = ''
+}
+
+const closeDeleteModal = () => {
+  deletingCommentId.value = null
+  deleteEmailInput.value = ''
+  deleteErrorMessage.value = ''
+}
+
+const handleConfirmDelete = async () => {
+  if (!deleteEmailInput.value.trim() || !deletingCommentId.value) return
+
+  isDeletingComment.value = true
+  deleteErrorMessage.value = ''
+  deleteSuccessMessage.value = ''
+
+  try {
+    await ApiService.deleteComment(deletingCommentId.value, deleteEmailInput.value.trim())
+
+    // Remove comment from local reactive array
+    if (article.value && Array.isArray(article.value.comments)) {
+      const rootIndex = article.value.comments.findIndex(c => c.id === deletingCommentId.value)
+      if (rootIndex !== -1) {
+        article.value.comments.splice(rootIndex, 1)
+      } else {
+        article.value.comments.forEach(c => {
+          if (Array.isArray(c.replies)) {
+            const replyIdx = c.replies.findIndex(r => r.id === deletingCommentId.value)
+            if (replyIdx !== -1) {
+              c.replies.splice(replyIdx, 1)
+            }
+          }
+        })
+      }
+    }
+
+    deleteSuccessMessage.value = '✓ Comment deleted successfully!'
+    setTimeout(() => {
+      closeDeleteModal()
+    }, 1200)
+  } catch (err) {
+    deleteErrorMessage.value = err.message || 'Email verification failed. Make sure you enter the exact email used when commenting.'
+  } finally {
+    isDeletingComment.value = false
+  }
+}
+</script>
+
+<template>
+  <div class="space-y-8 py-4">
+
+    <!-- Skeleton Loading State for Article Detail -->
+    <ArticleDetailSkeleton v-if="isLoading" />
+
+    <!-- Article Content -->
+    <template v-else-if="article">
+      <!-- Top Back Navigation & Action Bar (Clean Single Row on Mobile & Desktop) -->
+      <div class="flex flex-row items-center justify-between gap-2 border-b border-[#dfdfdf] pb-3.5">
+        <RouterLink
+          to="/"
+          class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#707070] hover:text-[#171717] transition-colors group shrink-0"
+        >
+          <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1 text-[#2563eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span class="hidden sm:inline">Kembali ke Beranda</span>
+          <span class="sm:hidden">Kembali</span>
+        </RouterLink>
+
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <!-- Like Button -->
+          <button
+            @click="toggleLike"
+            class="px-2.5 sm:px-3.5 py-1.5 rounded-[8px] border text-xs font-semibold flex items-center gap-1 transition-all shadow-2xs cursor-pointer"
+            :class="isLiked ? 'bg-rose-600 border-rose-600 text-white' : 'bg-rose-50/80 border-rose-200/90 text-rose-600 hover:bg-rose-100/80 hover:border-rose-300'"
+          >
+            <svg class="w-3.5 h-3.5" :fill="isLiked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            <span>{{ likesCount }} Suka</span>
+          </button>
+
+          <!-- Bookmark Button -->
+          <button
+            @click="toggleBookmark"
+            class="p-1.5 sm:p-2 rounded-[8px] border text-xs transition-all shadow-2xs cursor-pointer"
+            :class="isBookmarked ? 'bg-amber-500 border-amber-500 text-white' : 'bg-amber-50/80 border-amber-200/90 text-amber-600 hover:bg-amber-100/80 hover:border-amber-300'"
+            aria-label="Simpan artikel"
+          >
+            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" :fill="isBookmarked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
+          </button>
+
+          <!-- Share Button -->
+          <button
+            @click="copyShareLink"
+            class="px-2.5 sm:px-3.5 py-1.5 rounded-[8px] border text-xs font-semibold transition-all shadow-2xs flex items-center gap-1 cursor-pointer"
+            :class="isCopied ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-blue-50/80 border-blue-200/90 text-blue-600 hover:bg-blue-100/80 hover:border-blue-300'"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+            <span class="hidden sm:inline">{{ isCopied ? 'Tautan Disalin!' : 'Bagikan' }}</span>
+            <span class="sm:hidden">{{ isCopied ? 'Disalin' : 'Bagikan' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Asymmetric 8:4 Grid Layout (8 Cols Main Content & Thumbnail : 4 Cols Sidebar Widgets) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+
+        <!-- Left Track: Header, Thumbnail & Rich Text Content (8 Columns) -->
+        <main class="lg:col-span-8 space-y-8">
+
+          <!-- ========================================== -->
+          <!-- PLAY STORE STYLE APP DETAIL POST TEMPLATE -->
+          <!-- ========================================== -->
+          <div v-if="isPlayStoreStyle" class="space-y-8">
+            
+            <!-- Unified Master App Hero Card (Play Store Info + Integrated 1:1 Square Thumbnail) -->
+            <div class="stitch-card p-6 sm:p-8 bg-[#ffffff]">
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
+                
+                <!-- LEFT SIDE (lg:col-span-7): App Icon, Title, Developer, Metrics & CTA Download Button -->
+                <div class="lg:col-span-7 space-y-5">
+                  <div class="space-y-3">
+                    <!-- ROW 1: App Icon (Left) & Title (Right) -->
+                    <div class="flex items-center gap-3.5 sm:gap-5">
+                      <img
+                        :src="article.app_icon || article.cover_image"
+                        :alt="article.title"
+                        class="w-16 h-16 sm:w-20 sm:h-20 rounded-[20%] object-cover border border-[#dfdfdf] shadow-md shrink-0 bg-[#171717] aspect-square"
+                      />
+                      <h1 class="text-lg sm:text-2xl font-bold text-[#171717] leading-snug flex-1 min-w-0">
+                        {{ article.title }}
+                      </h1>
+                    </div>
+
+                    <!-- ROW 2 (Below): Developer Name & Badges in its own full-width row -->
+                    <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 pt-1 text-xs sm:text-sm">
+                      <span class="font-semibold text-[#2563eb]">
+                        {{ article.app_developer || getAuthorName(article.author) }}
+                      </span>
+                      <span class="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-[#059669] bg-[#ecfdf5] px-2.5 py-0.5 rounded-full border border-[#a7f3d0]">
+                        ✓ Work Classic / Rank
+                      </span>
+                      <span class="text-[11px] sm:text-xs text-[#707070] font-mono">• No Password</span>
+                    </div>
+                  </div>
+
+                  <!-- Play Store Metrics Row (Rating, Reviews, Downloads, File Size, Safety) -->
+                  <div class="grid grid-cols-4 divide-x divide-[#dfdfdf] border-y border-[#dfdfdf] py-3 text-center bg-[#fafafa]/80 rounded-[8px]">
+                    <div class="space-y-0.5 px-1">
+                      <div class="flex items-center justify-center gap-1 text-sm font-bold text-[#171717]">
+                        <span>{{ ratingStats.average }}</span>
+                        <span class="text-amber-500 text-xs">★</span>
+                      </div>
+                      <div class="text-[10px] sm:text-[11px] text-[#707070] font-medium">{{ ratingStats.total }} ulasan</div>
+                    </div>
+                    <div class="space-y-0.5 px-1">
+                      <div class="flex items-center justify-center gap-1 text-sm font-bold text-[#171717]">
+                        <span>{{ formatDownloads(article.views_count) }}</span>
+                      </div>
+                      <div class="text-[10px] sm:text-[11px] text-[#707070] font-medium">Unduhan</div>
+                    </div>
+                    <div class="space-y-0.5 px-1">
+                      <div class="flex items-center justify-center gap-1 text-sm font-bold text-[#171717]">
+                        <span>{{ article.app_size || '-' }}</span>
+                      </div>
+                      <div class="text-[10px] sm:text-[11px] text-[#707070] font-medium">Ukuran File</div>
+                    </div>
+                    <div class="space-y-0.5 px-1">
+                      <div class="flex items-center justify-center gap-1 text-sm font-bold text-[#171717]">
+                        <span class="border border-[#171717] px-1 py-0.2 rounded text-[10px]">3+</span>
+                      </div>
+                      <div class="text-[10px] sm:text-[11px] text-[#707070] font-medium">Semua Umur</div>
+                    </div>
+                  </div>
+
+                  <!-- Play Store Primary Download CTA Button Bar -->
+                  <div class="flex flex-col sm:flex-row items-center gap-3">
+                    <a
+                      href="#download-section"
+                      @click.prevent="scrollToDownloadSection"
+                      class="w-full sm:w-auto flex-1 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-semibold py-3 px-6 rounded-[8px] text-center text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer group"
+                    >
+                      <!-- Down Arrow Circle Indicator Icon -->
+                      <svg class="w-5 h-5 group-hover:translate-y-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                      </svg>
+                      <span>Link Download Script</span>
+                    </a>
+                    <button
+                      @click="copyShareLink"
+                      class="w-full sm:w-auto px-4 py-3 border border-[#dfdfdf] rounded-[8px] text-xs font-semibold text-[#707070] hover:text-[#171717] hover:bg-[#fafafa] transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                      </svg>
+                      <span>{{ isCopied ? 'Tautan Disalin!' : 'Bagikan' }}</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- RIGHT SIDE (lg:col-span-5): Integrated 1:1 Square Thumbnail Photo -->
+                <div class="lg:col-span-5 w-full shrink-0">
+                  <div class="w-full aspect-square rounded-[10px] overflow-hidden border border-[#dfdfdf] bg-[#171717] relative">
+                    <img
+                      :src="article.cover_image"
+                      :alt="article.title"
+                      class="w-full h-full object-cover"
+                    />
+                    <!-- Floating Views Badge (Pojok Kanan Atas) -->
+                    <div class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold bg-[#171717]/85 text-white backdrop-blur-md border border-white/20 flex items-center gap-1.5 shadow-md z-10 pointer-events-none">
+                      <svg class="w-3.5 h-3.5 text-[#2563eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      <span>{{ formatViews(article.views_count) }} Dilihat</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- About This App & Feature Highlights -->
+            <div class="stitch-card p-6 sm:p-8 space-y-5">
+              <div class="flex items-center justify-between border-b border-[#dfdfdf] pb-3">
+                <h2 class="text-lg font-bold text-[#171717]">Tentang Script Ini</h2>
+                <span v-if="article.app_version" class="text-xs text-[#2563eb] font-semibold flex items-center gap-1">
+                  <span>Versi {{ article.app_version }}</span>
+                  <span>→</span>
+                </span>
+              </div>
+
+              <!-- Main Article / App Description Content Body -->
+              <div class="max-w-[65ch] space-y-6 text-[#171717] text-base leading-[1.75] article-content-body pt-2" v-html="formattedContent">
+              </div>
+
+              <!-- In-Article Middle Ad Slot (Tengah-Tengah Artikel) -->
+              <AdSlot
+                v-if="!isPremium"
+                :enabled="siteSettings.showArticleMiddleAd !== false"
+                :scriptContent="siteSettings.articleMiddleAdScript"
+                label="IKLAN TENGAH ARTIKEL"
+                type="in-article"
+              />
+
+              <!-- App Technical Specs & Download Links Box -->
+              <div id="download-section" class="mt-8 p-5 sm:p-6 bg-[#fafafa] rounded-[12px] border border-[#dfdfdf] space-y-5 sm:space-y-6 scroll-mt-36">
+                <!-- Header Title (Using Article Title across top) -->
+                <div class="border-b border-[#dfdfdf] pb-3">
+                  <h2 class="text-base font-bold text-[#171717] line-clamp-1">
+                  Download  {{ article.title }}
+                  </h2>
+                </div>
+
+                <!-- Grid Layout: On Desktop (lg:), Left is Poster & Specs (7 cols), Right is Download Links List (5 cols) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                  
+                  <!-- LEFT COLUMN (Desktop lg:col-span-7): Poster 3:5 on Left + Badges & Specs on Right -->
+                  <div class="lg:col-span-7 flex flex-row items-start gap-3 sm:gap-5">
+                    <!-- LEFT SIDE: 3:5 Aspect Ratio Poster Thumbnail Image -->
+                    <div class="w-24 sm:w-36 aspect-[3/5] rounded-[10px] overflow-hidden border border-[#dfdfdf] shadow-xs bg-[#171717] shrink-0 relative">
+                      <img
+                        :src="article.app_poster_35 || article.cover_image"
+                        :alt="article.title"
+                        class="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    <!-- RIGHT SIDE: Feature Badges & Technical Specs -->
+                    <div class="flex-1 space-y-2 sm:space-y-3 min-w-0 w-full text-left">
+                      <!-- Tags / Feature Pills -->
+                      <div class="flex flex-wrap gap-1 sm:gap-1.5">
+                        <span
+                          v-for="(feature, fIdx) in appFeaturesList"
+                          :key="fIdx"
+                          class="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-medium bg-[#ffffff] text-[#1d4ed8] border border-[#2563eb]/25"
+                        >
+                          {{ feature.startsWith('✓') ? feature : '✓ ' + feature }}
+                        </span>
+                      </div>
+
+                      <!-- Clean Green Date Badge (Square corners, small text) -->
+                      <div>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] sm:text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                          Diperbarui pada {{ getFormattedDate(article.published_at) }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- RIGHT COLUMN (Desktop lg:col-span-5): Compact Download Links List on Far Right -->
+                  <div class="lg:col-span-5 pt-4 lg:pt-0 border-t lg:border-t-0 border-[#dfdfdf] space-y-3">
+                    <h4 class="text-xs font-bold text-[#171717] uppercase tracking-wider font-mono">LINK UNDUHAN FILE</h4>
+
+                    <div class="divide-y divide-[#dfdfdf]/70 border border-[#dfdfdf] rounded-[8px] bg-[#ffffff] text-xs max-h-[220px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 hover:scrollbar-thumb-gray-300">
+                      
+                      <!-- Dynamic Download Links Loop -->
+                      <template v-for="(link, lIdx) in parsedDownloadLinks" :key="lIdx">
+                        <RouterLink
+                          v-if="link.isShortener"
+                          :to="link.url"
+                          class="flex items-center gap-2.5 p-2.5 sm:p-3 hover:bg-[#2563eb]/5 transition-colors group min-w-0"
+                        >
+                          <svg class="w-4 h-4 text-[#2563eb] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                          <span class="font-medium text-[#171717] group-hover:text-[#2563eb] transition-colors truncate">
+                            {{ link.name }}
+                          </span>
+                        </RouterLink>
+                        <a
+                          v-else
+                          :href="link.url || '#'"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="flex items-center gap-2.5 p-2.5 sm:p-3 hover:bg-[#2563eb]/5 transition-colors group min-w-0"
+                        >
+                          <svg class="w-4 h-4 text-[#2563eb] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                          <span class="font-medium text-[#171717] group-hover:text-[#2563eb] transition-colors truncate">
+                            {{ link.name }}
+                          </span>
+                        </a>
+                      </template>
+
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Rating & Reviews Play Store Section -->
+            <div class="stitch-card p-6 sm:p-8 space-y-6">
+              <h3 class="text-lg font-bold text-[#171717]">Rating & Ulasan Pengguna</h3>
+              
+              <div class="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-[#dfdfdf]">
+                <div class="text-center shrink-0 space-y-1">
+                  <div class="text-5xl font-black text-[#171717]">{{ ratingStats.average }}</div>
+                  <div class="flex justify-center text-amber-500 text-sm gap-0.5">
+                    <span v-for="s in 5" :key="s" :class="s <= Math.round(Number(ratingStats.average)) ? 'text-amber-500' : 'text-[#dfdfdf]'">★</span>
+                  </div>
+                  <div class="text-xs text-[#707070] font-mono">{{ ratingStats.total }} ulasan</div>
+                </div>
+
+                <!-- Rating Distribution Bars -->
+                <div class="flex-1 w-full space-y-1.5 text-xs">
+                  <div v-for="star in [5, 4, 3, 2, 1]" :key="star" class="flex items-center gap-2">
+                    <span class="w-3 text-right font-mono text-[#707070]">{{ star }}</span>
+                    <div class="flex-1 h-2 bg-[#dfdfdf] rounded-full overflow-hidden">
+                      <div class="h-full bg-[#2563eb] rounded-full transition-all duration-500" :style="{ width: ratingStats.getPercent(star) + '%' }"></div>
+                    </div>
+                    <span class="w-8 text-left font-mono text-[10px] text-[#707070]">{{ ratingStats.getPercent(star) }}%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Featured 4 & 5 Star Reviews List (Otomatis 1 Ulasan Bawaan + DB Reviews 4★ & 5★) -->
+              <div class="space-y-3 pt-2">
+                <div class="text-xs font-bold text-[#171717] font-mono uppercase tracking-wider">
+                  ULASAN UNGGULAN VERIFIKASI ({{ featuredReviews.length }})
+                </div>
+
+                <div class="space-y-3">
+                  <div
+                    v-for="(rev, rIdx) in featuredReviews"
+                    :key="rev.id || rIdx"
+                    class="p-4 bg-[#fafafa] rounded-[10px] border border-[#dfdfdf] space-y-2"
+                  >
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2.5">
+                        <img
+                          :src="getCuteAvatar(rev.author_name)"
+                          :alt="rev.author_name"
+                          class="w-8 h-8 rounded-full bg-[#2563eb]/10 border border-[#2563eb]/30 object-contain p-0.5 shrink-0"
+                        />
+                        <div>
+                          <div class="text-xs font-bold text-[#171717]">{{ rev.author_name }}</div>
+                          <div class="text-[10px] text-emerald-600 font-mono flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            Pengguna Terverifikasi
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex text-amber-500 text-xs gap-0.5 font-bold">
+                        <span v-for="s in 5" :key="s" :class="s <= rev.rating ? 'text-amber-500' : 'text-[#dfdfdf]'">★</span>
+                      </div>
+                    </div>
+                    <p class="text-xs text-[#404040] leading-relaxed">
+                      {{ rev.content }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- In-Article End Ad Slot for Play Store Template -->
+            <AdSlot
+              v-if="!isPremium"
+              :enabled="siteSettings.showArticleEndAd !== false"
+              :scriptContent="siteSettings.articleEndAdScript"
+              label="IKLAN AKHIR ARTIKEL"
+              type="in-article"
+            />
+          </div>
+
+          <!-- DEFAULT EDITORIAL ARTICLE TEMPLATE (FOR STANDARD ARTICLES) -->
+          <template v-else>
+            <!-- Article Header Block -->
+            <header class="space-y-5">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-[#2563eb]/10 border border-[#2563eb]/20">
+                <span class="font-mono-eyebrow text-[#1d4ed8] font-semibold">{{ getCategoryName(article.category) }}</span>
+              </div>
+
+              <h1 class="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-[#171717] leading-[1.15]">
+                {{ article.title }}
+              </h1>
+
+              <p class="text-base sm:text-lg text-[#707070] leading-relaxed">
+                {{ article.subtitle }}
+              </p>
+
+              <!-- Author Metadata Row -->
+              <div class="flex items-center gap-3.5 pt-4 border-t border-[#dfdfdf]">
+                <img :src="getAuthorAvatar(article.author)" :alt="getAuthorName(article.author)" loading="lazy" decoding="async" width="44" height="44" class="w-11 h-11 rounded-full object-cover border border-[#dfdfdf]" />
+                <div>
+                  <div class="font-semibold text-[#171717] text-sm sm:text-base">{{ getAuthorName(article.author) }}</div>
+                  <div class="text-xs text-[#707070] flex items-center gap-2">
+                    <span>{{ article.author?.title || 'Penulis' }}</span>
+                    <span>•</span>
+                    <span>{{ getFormattedDate(article.published_at || article.date) }}</span>
+                    <span>•</span>
+                    <span class="font-mono text-[#1d4ed8] font-semibold">{{ article.read_time }}</span>
+                  </div>
+                </div>
+              </div>
+            </header>
+
+            <!-- Main Thumbnail Image Container with Floating Views Badge -->
+            <div class="w-full h-72 sm:h-96 rounded-[12px] overflow-hidden border border-[#dfdfdf] bg-[#1c1c1c] shadow-sm relative">
+              <img :src="article.cover_image" :alt="article.title" fetchpriority="high" decoding="async" width="800" height="450" class="w-full h-full object-cover" />
+              <!-- Floating Views Badge (Pojok Kanan Atas) -->
+              <div class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold bg-[#171717]/85 text-white backdrop-blur-md border border-white/20 flex items-center gap-1.5 shadow-md z-10 pointer-events-none">
+                <svg class="w-3.5 h-3.5 text-[#2563eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <span>{{ formatViews(article.views_count) }} Dilihat</span>
+              </div>
+            </div>
+
+            <!-- In-Article Middle Ad Slot for Standard Template -->
+            <AdSlot
+              v-if="!isPremium"
+              :enabled="siteSettings.showArticleMiddleAd !== false"
+              :scriptContent="siteSettings.articleMiddleAdScript"
+              label="IKLAN TENGAH ARTIKEL"
+              type="in-article"
+            />
+
+            <!-- Rich Text Article Content Body -->
+            <div class="max-w-[65ch] space-y-6 text-[#171717] text-base sm:text-lg leading-[1.75] article-content-body" v-html="formattedContent">
+            </div>
+
+            <!-- In-Article End Ad Slot for Standard Template -->
+            <AdSlot
+              v-if="!isPremium"
+              :enabled="siteSettings.showArticleEndAd !== false"
+              :scriptContent="siteSettings.articleEndAdScript"
+              label="IKLAN AKHIR ARTIKEL"
+              type="in-article"
+            />
+          </template>
+
+          <!-- Comments Thread Section -->
+          <section class="pt-10 border-t border-[#dfdfdf] space-y-8">
+            <div class="flex items-center justify-between">
+              <h3 class="text-2xl font-medium text-[#171717] tracking-tight">
+                Diskusi & Ulasan ({{ articleComments.length }})
+              </h3>
+              <span class="font-mono-eyebrow text-[#1d4ed8] font-semibold">UTAS ULAAN</span>
+            </div>
+
+            <!-- Add Comment / Review Form -->
+            <div class="stitch-card p-6 space-y-4 bg-[#fafafa]">
+              <h4 class="text-sm font-semibold text-[#171717]">Tulis Ulasan & Rating Anda</h4>
+
+              <!-- Interactive Star Rating Picker -->
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 bg-[#ffffff] border border-[#dfdfdf] rounded-[6px]">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-semibold text-[#171717]">Beri Rating:</span>
+                  <div class="flex items-center gap-1 cursor-pointer">
+                    <button
+                      v-for="star in 5"
+                      :key="star"
+                      type="button"
+                      @click="selectedRating = star"
+                      @mouseenter="hoverRating = star"
+                      @mouseleave="hoverRating = 0"
+                      class="text-xl transition-transform hover:scale-125 focus:outline-none"
+                    >
+                      <span :class="(hoverRating || selectedRating) >= star ? 'text-amber-500' : 'text-[#dfdfdf]'">★</span>
+                    </button>
+                  </div>
+                </div>
+                <span class="text-xs font-mono font-medium text-[#2563eb]">
+                  {{ ratingLabels[hoverRating || selectedRating] }}
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <input
+                  v-model="commentAuthorInput"
+                  type="text"
+                  placeholder="Nama Anda *"
+                  required
+                  class="px-3.5 py-2 text-xs bg-[#ffffff] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb]"
+                />
+                <input
+                  v-model="commentEmailInput"
+                  type="email"
+                  placeholder="Email Anda (Rahasia/Verifikasi) *"
+                  required
+                  class="px-3.5 py-2 text-xs bg-[#ffffff] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb]"
+                />
+              </div>
+
+              <div class="text-[11px] text-[#707070] flex items-center gap-1.5 font-mono">
+                <span>🔒</span>
+                <span>Email Anda hanya digunakan untuk verifikasi ulasan dan <strong>TIDAK AKAN PERNAH</strong> ditampilkan ke publik.</span>
+              </div>
+
+              <textarea
+                v-model="commentTextInput"
+                rows="3"
+                placeholder="Tuliskan ulasan atau pengalaman Anda menggunakan aplikasi / script ini..."
+                required
+                class="w-full p-3.5 text-xs bg-[#ffffff] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb] resize-none"
+              ></textarea>
+
+              <p v-if="commentSubmitMessage" class="text-xs font-semibold text-[#1d4ed8]">
+                {{ commentSubmitMessage }}
+              </p>
+              <p v-if="commentErrorMessage" class="text-xs font-semibold text-red-600">
+                {{ commentErrorMessage }}
+              </p>
+
+              <div class="flex justify-end">
+                <button
+                  @click="handleAddComment(null)"
+                  :disabled="isSubmittingComment"
+                  class="stitch-button-primary px-4 py-2 text-xs font-semibold flex items-center gap-1.5"
+                >
+                  <span v-if="isSubmittingComment" class="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+                  <span>{{ isSubmittingComment ? 'Mengirim...' : 'Kirim Ulasan & Rating' }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Comments Thread List -->
+            <div v-if="articleComments.length > 0" class="space-y-4">
+              <div
+                v-for="comment in articleComments"
+                :key="comment.id"
+                class="stitch-card p-5 bg-[#ffffff] space-y-4 hover:border-[#2563eb]/40 transition-colors"
+              >
+                <!-- Root Comment -->
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between text-xs">
+                    <div class="flex items-center gap-3">
+                      <img
+                        :src="getCuteAvatar(comment.author_name || comment.author || 'User')"
+                        :alt="comment.author_name || comment.author"
+                        loading="lazy"
+                        decoding="async"
+                        width="40"
+                        height="40"
+                        class="w-10 h-10 rounded-full bg-[#2563eb]/10 border border-[#2563eb]/30 object-contain p-0.5"
+                      />
+                      <div>
+                        <div class="flex items-center gap-2">
+                          <span class="font-semibold text-[#171717] text-sm">{{ comment.author_name || comment.author }}</span>
+                          <span v-if="comment.is_author_reply" class="font-mono-eyebrow text-[#1d4ed8] bg-[#2563eb]/10 px-2 py-0.5 rounded text-[10px]">PENULIS</span>
+                          <div v-if="comment.rating" class="flex items-center text-amber-500 text-xs">
+                            <span v-for="s in comment.rating" :key="s">★</span>
+                          </div>
+                        </div>
+                        <div class="text-[#707070] text-[11px] font-mono">{{ getFormattedDate(comment.created_at || comment.date) }}</div>
+                      </div>
+                    </div>
+
+                    <!-- Action Controls -->
+                    <div class="flex items-center gap-2 font-mono text-[11px]">
+                      <button
+                        @click="openReplyForm(comment.id)"
+                        class="text-[#1d4ed8] hover:underline font-semibold flex items-center gap-1"
+                      >
+                        <span>💬</span>
+                        <span>Balas</span>
+                      </button>
+                      <span class="text-[#dfdfdf]">•</span>
+                      <button
+                        @click="openDeleteModal(comment.id)"
+                        class="text-red-500 hover:text-red-700 hover:underline font-medium flex items-center gap-1"
+                      >
+                        <span>🗑️</span>
+                        <span>Hapus</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <p class="text-sm text-[#707070] pt-1 leading-relaxed pl-1">
+                    {{ getCleanCommentContent(comment.content) }}
+                  </p>
+                </div>
+
+                <!-- Inline User Reply Form -->
+                <div v-if="activeReplyParentId === comment.id" class="ml-6 sm:ml-9 bg-[#fafafa] p-4 rounded-[8px] border border-[#2563eb]/30 space-y-3">
+                  <div class="flex items-center justify-between text-xs font-semibold text-[#171717]">
+                    <span>Membalas {{ comment.author_name || comment.author }}</span>
+                    <button @click="activeReplyParentId = null" class="text-[#707070] hover:text-black text-xs font-mono">✕ Batal</button>
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <input
+                      v-model="replyAuthorInput"
+                      type="text"
+                      placeholder="Nama Anda *"
+                      class="px-3 py-1.5 text-xs bg-[#ffffff] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb]"
+                    />
+                    <input
+                      v-model="replyEmailInput"
+                      type="email"
+                      placeholder="Email Anda (Rahasia) *"
+                      class="px-3 py-1.5 text-xs bg-[#ffffff] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb]"
+                    />
+                  </div>
+                  <textarea
+                    v-model="replyTextInput"
+                    rows="2"
+                    placeholder="Tulis balasan Anda (Teks biasa)..."
+                    class="w-full p-2.5 text-xs bg-[#ffffff] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb] resize-none"
+                  ></textarea>
+                  <div class="flex justify-end">
+                    <button
+                      @click="handleAddComment(comment.id)"
+                      :disabled="isSubmittingReply"
+                      class="stitch-button-primary px-3.5 py-1.5 text-xs font-semibold flex items-center gap-1.5"
+                    >
+                      <span v-if="isSubmittingReply" class="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+                      <span>{{ isSubmittingReply ? 'Mengirim...' : 'Kirim Balasan' }}</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Nested Replies -->
+                <div v-if="comment.replies && comment.replies.length > 0" class="ml-6 sm:ml-9 border-l-2 border-[#2563eb]/30 pl-4 sm:pl-6 space-y-3 pt-2">
+                  <div v-for="reply in comment.replies" :key="reply.id" class="bg-[#fafafa] p-3.5 rounded-[8px] border border-[#dfdfdf]/60 space-y-1.5">
+                    <div class="flex items-center justify-between text-xs">
+                      <div class="flex items-center gap-2.5">
+                        <img
+                          :src="getCuteAvatar(reply.author_name || reply.author || 'User')"
+                          :alt="reply.author_name || reply.author"
+                          class="w-7 h-7 rounded-full bg-[#2563eb]/10 border border-[#2563eb]/30 object-contain p-0.5"
+                        />
+                        <span class="font-semibold text-[#171717]">
+                          {{ (reply.author_name === 'Admin' || reply.author_name === 'Admin (Author)' || reply.is_author_reply) ? (siteSettings.authorName || reply.author_name || reply.author) : (reply.author_name || reply.author) }}
+                        </span>
+                        <!-- Verified Badge Icon for Author Reply -->
+                        <span
+                          v-if="reply.is_author_reply || reply.author_name === siteSettings.authorName || reply.author_name === 'Rizal Efendi' || reply.author_name === 'Admin (Author)'"
+                          class="inline-flex items-center text-[#2563eb] shrink-0"
+                          title="Penulis Terverifikasi"
+                        >
+                          <svg class="w-4 h-4 text-[#2563eb]" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                          </svg>
+                        </span>
+                      </div>
+                      <div class="flex items-center gap-2 font-mono text-[10px]">
+                        <span class="text-[#707070]">{{ getFormattedDate(reply.created_at || reply.date) }}</span>
+                        <span class="text-[#dfdfdf]">•</span>
+                        <button
+                          @click="openDeleteModal(reply.id)"
+                          class="text-red-500 hover:underline font-medium"
+                        >
+                          Hapus
+                        </button>
+                      </div>
+                    </div>
+                    <p class="text-xs sm:text-sm text-[#707070] pl-9 leading-relaxed">
+                      {{ getCleanCommentContent(reply.content) }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div v-else class="stitch-card p-8 text-center text-[#707070] text-sm space-y-1">
+              <div class="text-2xl">💬</div>
+              <div class="font-medium text-[#171717]">Belum ada komentar pada artikel ini.</div>
+              <div class="text-xs text-[#707070]">Jadilah yang pertama berbagi pandangan dan memulai diskusi!</div>
+            </div>
+          </section>
+
+          <!-- Comment Deletion Email Verification Modal -->
+          <div
+            v-if="deletingCommentId"
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          >
+            <div class="bg-white rounded-[12px] p-6 max-w-md w-full border border-[#dfdfdf] shadow-2xl space-y-4">
+              <div class="flex items-center justify-between border-b border-[#dfdfdf] pb-3">
+                <h3 class="text-base font-semibold text-[#171717] flex items-center gap-2">
+                  <span>🔐</span>
+                  <span>Konfirmasi Hapus Komentar</span>
+                </h3>
+                <button @click="deletingCommentId = null" class="text-[#707070] hover:text-black font-mono">✕</button>
+              </div>
+
+              <p class="text-xs text-[#707070] leading-relaxed">
+                Untuk keamanan, silakan masukkan <strong>Email yang Anda gunakan saat menulis komentar ini</strong> untuk memverifikasi kepemilikan.
+              </p>
+
+              <input
+                v-model="deleteEmailInput"
+                type="email"
+                placeholder="Email Anda *"
+                class="w-full px-3.5 py-2 text-xs bg-[#fafafa] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb]"
+                @keyup.enter="handleConfirmDelete"
+              />
+
+              <p v-if="deleteErrorMessage" class="text-xs font-medium text-red-600">
+                {{ deleteErrorMessage }}
+              </p>
+              <p v-if="deleteSuccessMessage" class="text-xs font-semibold text-[#1d4ed8] bg-[#2563eb]/10 p-2.5 rounded border border-[#2563eb]/30">
+                {{ deleteSuccessMessage }}
+              </p>
+
+              <div class="flex justify-end gap-2 pt-2 border-t border-[#dfdfdf]">
+                <button
+                  @click="closeDeleteModal"
+                  class="px-4 py-2 text-xs font-medium text-[#707070] bg-[#fafafa] border border-[#dfdfdf] rounded-[6px] hover:text-[#171717] transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  @click="handleConfirmDelete"
+                  :disabled="isDeletingComment"
+                  class="px-4 py-2 text-xs font-semibold bg-red-600 text-white rounded-[6px] hover:bg-red-700 transition-colors flex items-center gap-1.5"
+                >
+                  <span v-if="isDeletingComment" class="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+                  <span>{{ isDeletingComment ? 'Memverifikasi...' : 'Hapus Komentar' }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </main>
+
+        <!-- Right Track: Sidebar Widgets (4 Columns) -->
+        <aside class="lg:col-span-4 space-y-6 sticky top-20">
+
+          <!-- Author Profile & Bio Card -->
+          <div class="stitch-card p-6 space-y-4">
+            <div class="flex items-center gap-3.5">
+              <div class="relative shrink-0">
+                <img
+                  :src="siteSettings.authorAvatarUrl || article.author?.avatar || getCuteAvatar(article.author?.name)"
+                  :alt="siteSettings.authorName || article.author?.name"
+                  class="w-14 h-14 rounded-full border-2 border-[#2563eb] object-cover"
+                />
+                <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#2563eb] rounded-full border-2 border-white"></span>
+              </div>
+              <div>
+                <h3 class="font-semibold text-[#171717] text-base">{{ siteSettings.authorName || article.author?.name }}</h3>
+                <p class="text-xs text-[#707070]">{{ siteSettings.authorTitle || article.author?.title }}</p>
+              </div>
+            </div>
+
+            <p class="text-xs text-[#707070] leading-relaxed">
+              {{ siteSettings.authorBio || article.author?.bio }}
+            </p>
+
+            <div class="flex items-center justify-between pt-3 border-t border-[#dfdfdf]">
+              <span class="text-xs font-mono text-[#707070]">{{ siteSettings.authorFollowersCount || '5.2k Pembaca' }}</span>
+              <a
+                :href="siteSettings.authorInstagramUrl || 'https://instagram.com'"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="stitch-button-primary px-3.5 py-1.5 text-xs font-semibold flex items-center gap-1"
+              >
+                <span>Ikuti {{ siteSettings.authorInstagramHandle || 'Penulis' }}</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Table of Contents (TOC) Widget (Auto-Generated strictly from <h2> tags) -->
+          <div v-if="tocItems.length > 0" class="stitch-card p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-[#dfdfdf] pb-3">
+              <span class="font-mono-eyebrow text-[#171717]">DAFTAR ISI ARTIKEL</span>
+              <span class="text-xs text-[#1d4ed8] font-mono font-semibold">{{ tocItems.length }} SUB-JUDUL</span>
+            </div>
+
+            <nav class="space-y-1.5 text-xs">
+              <button
+                v-for="item in tocItems"
+                :key="item.id"
+                @click="scrollToSection(item.id)"
+                class="w-full text-left py-2 px-3 rounded-[6px] transition-colors font-medium flex items-center justify-between group"
+                :class="[
+                  activeSection === item.id
+                    ? 'bg-[#2563eb]/10 text-[#1d4ed8] font-semibold border-l-2 border-[#2563eb]'
+                    : 'text-[#707070] hover:text-[#171717] hover:bg-[#fafafa]'
+                ]"
+              >
+                <span class="line-clamp-1">{{ item.label }}</span>
+                <span class="text-[10px] opacity-60 font-mono group-hover:translate-x-0.5 transition-transform">→</span>
+              </button>
+            </nav>
+          </div>
+
+          <!-- Article Detail Sidebar Ad Slot (Sisi Kanan Detail Artikel) -->
+          <AdSlot
+            v-if="!isPremium"
+            :enabled="siteSettings.showArticleSidebarAd !== false"
+            :scriptContent="siteSettings.articleSidebarAdScript"
+            label="IKLAN SIDEBAR DETAIL ARTIKEL"
+            type="sidebar"
+          />
+
+        </aside>
+
+      </div>
+    </template>
+
+  </div>
+</template>

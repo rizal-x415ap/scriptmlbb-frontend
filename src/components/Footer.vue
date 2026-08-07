@@ -1,0 +1,266 @@
+<script setup>
+import { RouterLink } from 'vue-router'
+import { siteSettings } from '../services/settingsStore.js'
+
+const currentYear = new Date().getFullYear()
+
+const isExternalLink = (url) => {
+  if (!url) return false
+  return /^https?:\/\//i.test(url) || url.startsWith('//')
+}
+</script>
+
+<template>
+  <footer v-if="siteSettings.showFooter" class="mt-20 border-t border-[#dfdfdf] bg-[#ffffff] text-[#707070] py-14">
+    <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-12 border-b border-[#dfdfdf]">
+        
+        <!-- Brand Info & Motto Column -->
+        <div class="md:col-span-2 space-y-4">
+          <div class="flex items-center gap-2.5">
+            <img
+              v-if="siteSettings.brandLogoUrl"
+              :src="siteSettings.brandLogoUrl"
+              :alt="siteSettings.brandLogoText || 'Logo'"
+              class="w-7 h-7 rounded-[6px] object-contain shrink-0"
+            />
+            <div
+              v-else
+              class="w-7 h-7 rounded-[6px] bg-[#2563eb] flex items-center justify-center text-white font-bold text-sm"
+            >
+              {{ (siteSettings.brandLogoText || 'S').charAt(0).toUpperCase() }}
+            </div>
+            <span class="font-semibold text-lg text-[#171717]">{{ siteSettings.brandLogoText || 'Script MLBB' }}</span>
+          </div>
+          
+          <p class="text-sm leading-relaxed text-[#707070] max-w-sm">
+            {{ siteSettings.footerBio || 'An editorial tech publication dedicated to high-performance web architecture, developer tooling, design systems, and software craftsmanship.' }}
+          </p>
+
+          <div v-if="siteSettings.footerTagline" class="font-mono-eyebrow text-[#b2b2b2]">
+            {{ siteSettings.footerTagline }}
+          </div>
+        </div>
+
+        <!-- Column 2 Links -->
+        <div class="space-y-3">
+          <h4 class="font-mono-eyebrow text-[#171717]">{{ siteSettings.footerCol2Title || 'Categories' }}</h4>
+          <ul class="space-y-2 text-sm">
+            <li v-if="siteSettings.footerCol2Link1Text">
+              <a
+                v-if="isExternalLink(siteSettings.footerCol2Link1Url)"
+                :href="siteSettings.footerCol2Link1Url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover:text-[#171717] transition-colors"
+              >
+                {{ siteSettings.footerCol2Link1Text }}
+              </a>
+              <RouterLink
+                v-else
+                :to="siteSettings.footerCol2Link1Url || '#'"
+                class="hover:text-[#171717] transition-colors"
+              >
+                {{ siteSettings.footerCol2Link1Text }}
+              </RouterLink>
+            </li>
+
+            <li v-if="siteSettings.footerCol2Link2Text">
+              <a
+                v-if="isExternalLink(siteSettings.footerCol2Link2Url)"
+                :href="siteSettings.footerCol2Link2Url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover:text-[#171717] transition-colors"
+              >
+                {{ siteSettings.footerCol2Link2Text }}
+              </a>
+              <RouterLink
+                v-else
+                :to="siteSettings.footerCol2Link2Url || '#'"
+                class="hover:text-[#171717] transition-colors"
+              >
+                {{ siteSettings.footerCol2Link2Text }}
+              </RouterLink>
+            </li>
+
+            <li v-if="siteSettings.footerCol2Link3Text">
+              <a
+                v-if="isExternalLink(siteSettings.footerCol2Link3Url)"
+                :href="siteSettings.footerCol2Link3Url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover:text-[#171717] transition-colors"
+              >
+                {{ siteSettings.footerCol2Link3Text }}
+              </a>
+              <RouterLink
+                v-else
+                :to="siteSettings.footerCol2Link3Url || '#'"
+                class="hover:text-[#171717] transition-colors"
+              >
+                {{ siteSettings.footerCol2Link3Text }}
+              </RouterLink>
+            </li>
+
+            <li v-if="siteSettings.footerCol2Link4Text">
+              <a
+                v-if="isExternalLink(siteSettings.footerCol2Link4Url)"
+                :href="siteSettings.footerCol2Link4Url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover:text-[#171717] transition-colors"
+              >
+                {{ siteSettings.footerCol2Link4Text }}
+              </a>
+              <RouterLink
+                v-else
+                :to="siteSettings.footerCol2Link4Url || '#'"
+                class="hover:text-[#171717] transition-colors"
+              >
+                {{ siteSettings.footerCol2Link4Text }}
+              </RouterLink>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Column 3 Links -->
+        <div class="space-y-3">
+          <h4 class="font-mono-eyebrow text-[#171717]">{{ siteSettings.footerCol3Title || 'Resources' }}</h4>
+          <ul class="space-y-2 text-sm">
+            <li v-if="siteSettings.footerCol3Link1Text">
+              <a
+                v-if="isExternalLink(siteSettings.footerCol3Link1Url)"
+                :href="siteSettings.footerCol3Link1Url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover:text-[#171717] transition-colors"
+              >
+                {{ siteSettings.footerCol3Link1Text }}
+              </a>
+              <RouterLink
+                v-else
+                :to="siteSettings.footerCol3Link1Url || '#'"
+                class="hover:text-[#171717] transition-colors"
+              >
+                {{ siteSettings.footerCol3Link1Text }}
+              </RouterLink>
+            </li>
+
+            <li v-if="siteSettings.footerCol3Link2Text">
+              <a
+                v-if="isExternalLink(siteSettings.footerCol3Link2Url)"
+                :href="siteSettings.footerCol3Link2Url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover:text-[#171717] transition-colors"
+              >
+                {{ siteSettings.footerCol3Link2Text }}
+              </a>
+              <RouterLink
+                v-else
+                :to="siteSettings.footerCol3Link2Url || '#'"
+                class="hover:text-[#171717] transition-colors"
+              >
+                {{ siteSettings.footerCol3Link2Text }}
+              </RouterLink>
+            </li>
+
+            <li v-if="siteSettings.footerCol3Link3Text">
+              <a
+                v-if="isExternalLink(siteSettings.footerCol3Link3Url)"
+                :href="siteSettings.footerCol3Link3Url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover:text-[#171717] transition-colors"
+              >
+                {{ siteSettings.footerCol3Link3Text }}
+              </a>
+              <RouterLink
+                v-else
+                :to="siteSettings.footerCol3Link3Url || '#'"
+                class="hover:text-[#171717] transition-colors"
+              >
+                {{ siteSettings.footerCol3Link3Text }}
+              </RouterLink>
+            </li>
+
+            <li v-if="siteSettings.footerCol3Link4Text">
+              <a
+                v-if="isExternalLink(siteSettings.footerCol3Link4Url)"
+                :href="siteSettings.footerCol3Link4Url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover:text-[#171717] transition-colors"
+              >
+                {{ siteSettings.footerCol3Link4Text }}
+              </a>
+              <RouterLink
+                v-else
+                :to="siteSettings.footerCol3Link4Url || '#'"
+                class="hover:text-[#171717] transition-colors"
+              >
+                {{ siteSettings.footerCol3Link4Text }}
+              </RouterLink>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Bottom Bar -->
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <p>{{ siteSettings.footerCopyright || `© ${currentYear} Supabaze Editorial. All rights reserved.` }}</p>
+        <div class="flex flex-wrap items-center gap-4 sm:gap-6">
+          <RouterLink to="/page/tentang-kami" class="hover:text-[#171717] transition-colors">
+            Tentang Kami
+          </RouterLink>
+          <RouterLink to="/page/kebijakan-privasi" class="hover:text-[#171717] transition-colors">
+            Kebijakan Privasi
+          </RouterLink>
+          <RouterLink to="/page/syarat-dan-ketentuan" class="hover:text-[#171717] transition-colors">
+            Syarat & Ketentuan
+          </RouterLink>
+          <a
+            v-if="siteSettings.socialLink1Text || siteSettings.twitterUrl"
+            :href="siteSettings.socialLink1Url || siteSettings.twitterUrl || '#'"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:text-[#171717] transition-colors"
+          >
+            {{ siteSettings.socialLink1Text || 'Twitter / X' }}
+          </a>
+
+          <a
+            v-if="siteSettings.socialLink2Text || siteSettings.githubUrl"
+            :href="siteSettings.socialLink2Url || siteSettings.githubUrl || '#'"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:text-[#171717] transition-colors"
+          >
+            {{ siteSettings.socialLink2Text || 'GitHub' }}
+          </a>
+
+          <a
+            v-if="siteSettings.socialLink3Text || siteSettings.linkedinUrl"
+            :href="siteSettings.socialLink3Url || siteSettings.linkedinUrl || '#'"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:text-[#171717] transition-colors"
+          >
+            {{ siteSettings.socialLink3Text || 'LinkedIn' }}
+          </a>
+
+          <a
+            v-if="siteSettings.socialLink4Text && siteSettings.socialLink4Url"
+            :href="siteSettings.socialLink4Url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:text-[#171717] transition-colors"
+          >
+            {{ siteSettings.socialLink4Text }}
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</template>

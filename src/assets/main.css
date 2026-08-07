@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #171717;
+    background-color: #f9f9f9;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-display, .font-heading {
+    font-family: 'Mona Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+}
+
+/* Custom GitHub / Vercel Modern Typography Utility Classes */
+.font-display {
+  font-family: 'Mona Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.font-body {
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.font-mono-eyebrow {
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Stitch Design System Card Elevation & Border Tokens */
+.stitch-card {
+  background-color: #ffffff;
+  border: 1px solid #dfdfdf;
+  border-radius: 12px;
+}
+
+.stitch-card:hover {
+  border-color: #c7c7c7;
+}
+
+.stitch-button-primary {
+  background-color: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.stitch-button-primary:hover {
+  background-color: #1d4ed8;
+}
+
+.stitch-button-secondary {
+  background-color: #ffffff;
+  border: 1px solid #c7c7c7;
+  color: #171717;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.stitch-button-secondary:hover {
+  background-color: #fafafa;
+  border-color: #171717;
+}
+
+.stitch-pill {
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f9f9f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #dfdfdf;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #707070;
+}
+
+/* Premium Gold/Amber Theme Styles */
+.premium-theme .stitch-button-primary {
+  background-color: #d97706;
+}
+
+.premium-theme .stitch-button-primary:hover {
+  background-color: #b45309;
+}
+
+.premium-theme .text-\[\#2563eb\],
+.premium-theme .text-\[\#1d4ed8\] {
+  color: #d97706;
+}
+
+.premium-theme .border-\[\#2563eb\] {
+  border-color: #d97706;
+}
+
+.premium-theme .bg-\[\#2563eb\] {
+  background-color: #d97706;
+}
+

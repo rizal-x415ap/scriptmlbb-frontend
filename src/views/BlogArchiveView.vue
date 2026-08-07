@@ -1,0 +1,416 @@
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
+import { ApiService } from '../services/api.js'
+import { siteSettings } from '../services/settingsStore.js'
+import { isBookmarked as checkIsBookmarked, toggleBookmark as toggleBookmarkStore } from '../services/bookmarkStore.js'
+import { isArticleLiked, addLikedArticle, removeLikedArticle } from '../services/likedStore.js'
+import ArticleCardSkeleton from '../components/ArticleCardSkeleton.vue'
+
+const props = defineProps({
+  searchQuery: {
+    type: String,
+    default: ''
+  }
+})
+
+// Async Loading & API State (Smart Skeleton - Only shows if request takes > 150ms)
+const isLoading = ref(false)
+const archiveDataset = ref([])
+
+// Search & Filter State
+const searchInput = ref(props.searchQuery || '')
+const selectedCategory = ref('All')
+const selectedYear = ref('All')
+const sortBy = ref('newest')
+
+const categories = computed(() => {
+  const set = new Set(['All'])
+  if (Array.isArray(archiveDataset.value)) {
+    archiveDataset.value.forEach(item => {
+      if (item.category) set.add(getCategoryName(item.category))
+    })
+  }
+  return Array.from(set)
+})
+
+const yearsList = computed(() => {
+  const set = new Set(['All'])
+  if (Array.isArray(archiveDataset.value)) {
+    archiveDataset.value.forEach(item => {
+      const year = item.year || (item.published_at ? new Date(item.published_at).getFullYear().toString() : null)
+      if (year) set.add(year)
+    })
+  }
+  return Array.from(set)
+})
+const yearOptions = yearsList
+
+const loadArchiveData = async () => {
+  let isDone = false
+  const timer = setTimeout(() => {
+    if (!isDone) {
+      isLoading.value = true
+    }
+  }, 150)
+
+  try {
+    archiveDataset.value = await ApiService.getArchiveArticles()
+  } finally {
+    isDone = true
+    clearTimeout(timer)
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  loadArchiveData()
+})
+
+const clearFilters = () => {
+  searchInput.value = ''
+  selectedCategory.value = 'All'
+  selectedYear.value = 'All'
+  sortBy.value = 'newest'
+}
+
+// Helpers for API Data Normalization (Laravel API returns category & author objects)
+const getCategoryName = (cat) => {
+  if (!cat) return 'General'
+  return typeof cat === 'object' ? cat.name : cat
+}
+
+const getAuthorName = (author) => {
+  if (!author) return ''
+  return typeof author === 'object' ? (author.name || '') : author
+}
+
+const getAuthorAvatar = (author) => {
+  if (!author) return ''
+  return typeof author === 'object' ? (author.avatar || '') : author
+}
+
+const getFormattedDate = (date) => {
+  if (!date) return ''
+  if (typeof date === 'string' && date.includes('T')) {
+    return new Date(date).toLocaleDateString('id-ID', { month: 'short', day: '2-digit', year: 'numeric' })
+  }
+  return date
+}
+
+const checkIsItemBookmarked = (item) => {
+  if (!item) return false
+  return checkIsBookmarked(item.id || item.slug)
+}
+
+const checkIsItemLiked = (item) => {
+  if (!item) return false
+  return isArticleLiked(item.id || item.slug)
+}
+
+// Filtered & Sorted Articles
+const filteredArchive = computed(() => {
+  let list = archiveDataset.value.filter(item => {
+    const authorName = getAuthorName(item.author)
+    const categoryName = getCategoryName(item.category)
+    const matchesQuery = !searchInput.value ||
+      (item.title && item.title.toLowerCase().includes(searchInput.value.toLowerCase())) ||
+      (item.excerpt && item.excerpt.toLowerCase().includes(searchInput.value.toLowerCase())) ||
+      (authorName && authorName.toLowerCase().includes(searchInput.value.toLowerCase()))
+    
+    const matchesCategory = selectedCategory.value === 'All' || categoryName === selectedCategory.value
+    const matchesYear = selectedYear.value === 'All' || item.year === selectedYear.value || (item.published_at && item.published_at.includes(selectedYear.value))
+
+    return matchesQuery && matchesCategory && matchesYear
+  })
+
+  if (sortBy.value === 'popular') {
+    list.sort((a, b) => (b.likes_count || 0) - (a.likes_count || 0))
+  } else if (sortBy.value === 'readingTime') {
+    list.sort((a, b) => parseInt(a.read_time || '0') - parseInt(b.read_time || '0'))
+  } else {
+    // Default: Newest first
+    list.sort((a, b) => new Date(b.published_at || b.created_at || b.date) - new Date(a.published_at || a.created_at || a.date))
+  }
+
+  return list
+})
+
+const activeFilterCount = computed(() => {
+  let count = 0
+  if (searchInput.value) count++
+  if (selectedCategory.value !== 'All') count++
+  if (selectedYear.value !== 'All') count++
+  return count
+})
+
+// Toggle Like Handler with ApiService & localStorage Persistence
+const toggleLike = async (item) => {
+  if (!item) return
+  const key = item.id || item.slug
+
+  if (!isArticleLiked(key)) {
+    addLikedArticle(key)
+    item.likes_count = (item.likes_count || 0) + 1
+    try {
+      const res = await ApiService.likeArticle(key)
+      if (res && res.likes_count !== undefined) {
+        item.likes_count = res.likes_count
+      }
+    } catch (e) {
+      console.error('Gagal menyukai artikel di halaman arsip:', e)
+    }
+  } else {
+    removeLikedArticle(key)
+    item.likes_count = Math.max(0, (item.likes_count || 0) - 1)
+  }
+}
+
+// Toggle Bookmark Handler with localStorage Persistence
+const toggleBookmark = (item) => {
+  if (!item) return
+  toggleBookmarkStore(item)
+}
+
+// Copy RSS XML Feed Link
+const isRssCopied = ref(false)
+
+const copyRssFeed = () => {
+  const rssUrl = `${window.location.origin}/rss.xml`
+  navigator.clipboard?.writeText?.(rssUrl)
+  isRssCopied.value = true
+  setTimeout(() => {
+    isRssCopied.value = false
+  }, 2500)
+}
+</script>
+
+<template>
+  <div class="space-y-10 py-4">
+
+    <!-- Header & Hero Search Bar -->
+    <header class="stitch-card p-8 sm:p-10 space-y-6 bg-gradient-to-b from-[#ffffff] via-[#fafafa] to-[#ffffff]">
+      <div class="max-w-2xl space-y-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-[#2563eb]/10 border border-[#2563eb]/20">
+          <span class="font-mono-eyebrow text-[#1d4ed8] font-semibold">ARSIP & PENCARIAN</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-medium tracking-tight text-[#171717]">
+          {{ siteSettings.archiveTitle || 'Jelajahi Arsip Artikel & Catatan Teknis' }}
+        </h1>
+        <p class="text-[#707070] text-sm sm:text-base leading-relaxed">
+          {{ siteSettings.archiveSubtitle || 'Filter seluruh koleksi artikel teknis, catatan arsitektur sistem, dan panduan teknis modern.' }}
+        </p>
+      </div>
+
+      <!-- Main Search Input Control -->
+      <div class="relative max-w-2xl">
+        <input
+          v-model="searchInput"
+          type="text"
+          placeholder="Cari berdasarkan kata kunci, judul, penulis, atau topik..."
+          class="w-full pl-11 pr-10 py-3 text-sm bg-[#ffffff] border border-[#dfdfdf] rounded-[6px] text-[#171717] placeholder-[#707070] focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] shadow-sm transition-all"
+        />
+        <svg class="w-5 h-5 text-[#707070] absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+
+        <button
+          v-if="searchInput"
+          @click="searchInput = ''"
+          class="absolute right-3.5 top-3 text-[#707070] hover:text-[#171717] font-mono text-xs"
+        >
+          ✕
+        </button>
+      </div>
+    </header>
+
+    <!-- Multi-dimensional Filters Control Surface -->
+    <div class="stitch-card p-6 space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        
+        <!-- Category Dropdown Filter -->
+        <div class="space-y-1.5">
+          <label class="font-mono-eyebrow text-[#707070]">Kategori</label>
+          <select
+            v-model="selectedCategory"
+            class="w-full px-3 py-2 text-xs bg-[#fafafa] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb]"
+          >
+            <option v-for="cat in categories" :key="cat" :value="cat">
+              {{ cat === 'All' ? 'Semua Kategori' : cat }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Year Published Dropdown Filter -->
+        <div class="space-y-1.5">
+          <label class="font-mono-eyebrow text-[#707070]">Tahun Terbit</label>
+          <select
+            v-model="selectedYear"
+            class="w-full px-3 py-2 text-xs bg-[#fafafa] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb]"
+          >
+            <option v-for="year in yearsList" :key="year" :value="year">
+              {{ year === 'All' ? 'Semua Tahun' : year }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Sort Criteria Dropdown -->
+        <div class="space-y-1.5">
+          <label class="font-mono-eyebrow text-[#707070]">Urutkan Berdasarkan</label>
+          <select
+            v-model="sortBy"
+            class="w-full px-3 py-2 text-xs bg-[#fafafa] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb]"
+          >
+            <option value="newest">Terbaru Diterbitkan</option>
+            <option value="popular">Paling Banyak Disukai</option>
+            <option value="readingTime">Waktu Baca Paling Singkat</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- Active Filters Bar & Reset -->
+      <div class="flex items-center justify-between text-xs text-[#707070]">
+        <div class="flex items-center gap-2">
+          <span>Ditemukan <strong class="text-[#171717] font-mono">{{ filteredArchive.length }}</strong> artikel</span>
+          <span v-if="activeFilterCount > 0" class="text-[#b2b2b2]">•</span>
+          <span v-if="activeFilterCount > 0" class="text-[#1d4ed8] font-semibold font-mono">
+            {{ activeFilterCount }} filter aktif
+          </span>
+        </div>
+
+        <button
+          v-if="activeFilterCount > 0"
+          @click="clearFilters"
+          class="text-[#1d4ed8] hover:underline font-medium flex items-center gap-1"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Hapus Filter
+        </button>
+      </div>
+    </div>
+
+    <!-- Asymmetric 8:4 Grid Layout (8 Cols Archive List : 4 Cols Archive Gadgets) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+      <!-- Main Archive Stream Track (8 Columns) -->
+      <main class="lg:col-span-8 space-y-4">
+        <!-- Skeleton Loading State -->
+        <div v-if="isLoading" class="space-y-4">
+          <ArticleCardSkeleton v-for="n in 3" :key="n" />
+        </div>
+
+        <!-- Archive Articles List -->
+        <div v-else class="space-y-4">
+          <article
+            v-for="item in filteredArchive"
+            :key="item.id"
+            class="stitch-card p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group hover:border-[#2563eb] transition-colors"
+          >
+            <div class="space-y-2 flex-1">
+              <!-- Kategori & Tanggal -->
+              <div class="flex items-center gap-3">
+                <span class="font-mono-eyebrow text-[#1d4ed8] bg-[#2563eb]/10 px-2 py-0.5 rounded border border-[#2563eb]/20 font-semibold text-xs">
+                  {{ getCategoryName(item.category) }}
+                </span>
+                <span v-if="getFormattedDate(item.published_at || item.date)" class="text-xs text-[#707070] font-mono">
+                  {{ getFormattedDate(item.published_at || item.date) }}
+                </span>
+              </div>
+
+              <!-- Judul Artikel -->
+              <RouterLink :to="'/article/' + (item.slug || item.id)" class="block pt-0.5">
+                <h3 class="text-base sm:text-lg font-semibold text-[#171717] leading-snug group-hover:text-[#2563eb] transition-colors">
+                  {{ item.title }}
+                </h3>
+              </RouterLink>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-2 self-end sm:self-center pt-2 sm:pt-0">
+              <button
+                @click="toggleLike(item)"
+                class="px-2.5 py-1.5 rounded-[6px] border text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                :class="checkIsItemLiked(item) ? 'bg-rose-50 border-rose-300 text-rose-600' : 'border-[#dfdfdf] text-[#707070] hover:text-[#171717] hover:bg-[#fafafa]'"
+              >
+                <svg class="w-3.5 h-3.5" :fill="checkIsItemLiked(item) ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                <span>{{ item.likes_count }}</span>
+              </button>
+
+              <button
+                @click="toggleBookmark(item)"
+                class="p-1.5 rounded-[6px] border text-xs transition-colors"
+                :class="checkIsItemBookmarked(item) ? 'bg-amber-50 border-amber-300 text-amber-600' : 'border-[#dfdfdf] text-[#707070] hover:text-[#171717] hover:bg-[#fafafa]'"
+              >
+                <svg class="w-3.5 h-3.5" :fill="checkIsItemBookmarked(item) ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                </svg>
+              </button>
+            </div>
+          </article>
+
+          <!-- Empty Results Message -->
+          <div v-if="filteredArchive.length === 0" class="text-center py-16 stitch-card p-8 space-y-3">
+            <p class="text-base text-[#171717] font-semibold">Tidak ada artikel yang sesuai</p>
+            <p class="text-xs text-[#707070]">Coba sesuaikan kata kunci pencarian Anda atau hapus filter yang aktif.</p>
+            <button @click="clearFilters" class="stitch-button-secondary px-4 py-2 text-xs">
+              Hapus Filter Pencarian
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <!-- Sidebar Gadgets Track (4 Columns) -->
+      <aside class="lg:col-span-4 space-y-6">
+
+        <!-- Timeline Archive Gadget -->
+        <div class="stitch-card p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-[#dfdfdf] pb-3">
+            <span class="font-mono-eyebrow text-[#171717]">ARSIP PER BULAN</span>
+            <span class="text-xs text-[#2563eb] font-mono">KRONOLOGI</span>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <div class="flex items-center justify-between py-1.5 px-3 rounded-[6px] bg-[#fafafa] border border-[#dfdfdf]">
+              <span class="font-medium text-[#171717]">Agustus 2026</span>
+              <span class="font-mono text-[#2563eb] font-semibold">3 artikel</span>
+            </div>
+            <div class="flex items-center justify-between py-1.5 px-3 rounded-[6px] hover:bg-[#fafafa] transition-colors text-[#707070]">
+              <span>Juli 2026</span>
+              <span class="font-mono">2 artikel</span>
+            </div>
+            <div class="flex items-center justify-between py-1.5 px-3 rounded-[6px] hover:bg-[#fafafa] transition-colors text-[#707070]">
+              <span>Desember 2025</span>
+              <span class="font-mono">1 artikel</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RSS & Export Gadget -->
+        <div class="stitch-card p-6 bg-[#fafafa] border border-[#dfdfdf] space-y-3">
+          <span class="font-mono-eyebrow text-[#2563eb]">UMPAN RSS EDITORIAL</span>
+          <h4 class="font-medium text-[#171717] text-sm">Berlangganan Umpan RSS</h4>
+          <p class="text-xs text-[#707070] leading-relaxed">
+            Dapatkan pembaruan format XML instan setiap kali artikel baru diterbitkan.
+          </p>
+          <button
+            @click="copyRssFeed"
+            class="w-full stitch-button-secondary py-2 text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+          >
+            <svg class="w-4 h-4 text-[#2563eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 5c7.18 0 13 5.82 13 13M6 11a7 7 0 017 7m-6 0a1 1 0 11-2 0 1 1 0 012 0z" />
+            </svg>
+            <span>{{ isRssCopied ? 'Tautan RSS XML Disalin!' : 'Copy RSS XML Link' }}</span>
+          </button>
+        </div>
+
+      </aside>
+
+    </div>
+
+  </div>
+</template>
