@@ -33,8 +33,6 @@ export async function onRequest(context) {
     const title = page.title || 'Script MLBB'
     const rawDescription = page.meta_description || page.excerpt || page.title || 'Halaman Script MLBB'
     const description = cleanTextSnippet(rawDescription, 160)
-
-    const title = page.title || 'Script MLBB'
     const finalTitle = title.toLowerCase().includes('script mlbb') ? title : `${title} — Script MLBB`
 
     // 1. Replace <title> tag
