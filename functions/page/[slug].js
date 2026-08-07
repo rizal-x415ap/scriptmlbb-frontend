@@ -35,6 +35,8 @@ export async function onRequest(context) {
     const description = cleanTextSnippet(rawDescription, 160)
     const finalTitle = title.toLowerCase().includes('script mlbb') ? title : `${title} — Script MLBB`
 
+    let html = await response.text()
+
     // 1. Replace <title> tag
     html = html.replace(/<title>.*?<\/title>/i, `<title>${escapeHtml(finalTitle)}</title>`)
 

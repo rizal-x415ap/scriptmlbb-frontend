@@ -39,6 +39,8 @@ export async function onRequest(context) {
     const absoluteCover = coverImage.startsWith('http') ? coverImage : `${url.origin}${coverImage.startsWith('/') ? '' : '/'}${coverImage}`
     const finalTitle = title.toLowerCase().includes('script mlbb') ? title : `${title} — Script MLBB`
 
+    let html = await response.text()
+
     // 1. Replace <title> tag
     html = html.replace(/<title>.*?<\/title>/i, `<title>${escapeHtml(finalTitle)}</title>`)
 
