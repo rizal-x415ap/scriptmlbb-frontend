@@ -57,6 +57,9 @@ export async function onRequest(context) {
     html = html.replace(/<meta\s+name="twitter:description"\s+content=".*?"\s*\/?>/i, `<meta name="twitter:description" content="${escapeHtml(excerpt)}" />`)
     html = html.replace(/<meta\s+name="twitter:image"\s+content=".*?"\s*\/?>/i, `<meta name="twitter:image" content="${escapeHtml(absoluteCover)}" />`)
 
+    // 5. Replace canonical link tag in place
+    html = html.replace(/<link\s+rel="canonical"\s+href=".*?"\s*\/?>/i, `<link rel="canonical" href="${escapeHtml(url.href)}" />`)
+
     return new Response(html, {
       headers: {
         'Content-Type': 'text/html; charset=UTF-8',
