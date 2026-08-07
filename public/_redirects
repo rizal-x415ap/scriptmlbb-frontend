@@ -1,0 +1,3 @@
+# Cloudflare Pages SPA Routing Rules
+# Redirects all client-side routes to index.html for Vue Router
+/*    /index.html    200
