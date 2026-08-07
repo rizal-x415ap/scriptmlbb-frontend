@@ -1,7 +1,0 @@
-# Robots.txt for Script MLBB
-User-agent: *
-Allow: /
-Disallow: /go/
-
-# Sitemap Location
-Sitemap: https://scriptml.pages.dev/sitemap.xml

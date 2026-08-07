@@ -165,6 +165,10 @@ const currentDateFormatted = computed(() => {
 })
 
 // Load Home Feed Data from Laravel API Service
+const currentPage = ref(1)
+const lastPage = ref(1)
+const isLoadingMore = ref(false)
+
 const loadHomeFeed = async () => {
   let isDone = false
   const timer = setTimeout(() => {
@@ -174,11 +178,15 @@ const loadHomeFeed = async () => {
   }, 150)
 
   try {
-    const data = await ApiService.getHomeFeed()
+    const data = await ApiService.getHomeFeed(1)
     featuredArticle.value = data?.featured || null
     articles.value = data?.feed || []
     if (Array.isArray(data?.topics)) {
       dynamicTopics.value = data.topics
+    }
+    if (data?.pagination) {
+      currentPage.value = data.pagination.current_page || 1
+      lastPage.value = data.pagination.last_page || 1
     }
 
     // Set Home Page SEO & WebSite Schema
@@ -199,6 +207,27 @@ const loadHomeFeed = async () => {
     isDone = true
     clearTimeout(timer)
     isLoading.value = false
+  }
+}
+
+const loadMoreArticles = async () => {
+  if (currentPage.value >= lastPage.value || isLoadingMore.value) return
+  isLoadingMore.value = true
+  try {
+    const nextPage = currentPage.value + 1
+    const res = await ApiService.getHomeFeed(nextPage)
+    if (Array.isArray(res?.feed) && res.feed.length > 0) {
+      const existingIds = new Set(articles.value.map(a => a.id))
+      const newItems = res.feed.filter(a => !existingIds.has(a.id))
+      articles.value.push(...newItems)
+      currentPage.value = nextPage
+      if (res?.pagination?.last_page) {
+        lastPage.value = res.pagination.last_page
+      }
+    }
+  } catch (e) {
+  } finally {
+    isLoadingMore.value = false
   }
 }
 
@@ -464,9 +493,14 @@ const toggleBookmark = (item) => {
         </div>
 
         <!-- Load More Feed Button -->
-        <div class="text-center pt-4">
-          <button class="stitch-button-secondary px-6 py-2.5 text-sm">
-            Muat Artikel Lainnya
+        <div v-if="currentPage < lastPage" class="text-center pt-4">
+          <button
+            @click="loadMoreArticles"
+            :disabled="isLoadingMore"
+            class="stitch-button-secondary px-6 py-2.5 text-sm inline-flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+          >
+            <span v-if="isLoadingMore" class="w-4 h-4 rounded-full border-2 border-[#171717] border-t-transparent animate-spin"></span>
+            <span>{{ isLoadingMore ? 'Memuat Artikel...' : 'Muat Artikel Lainnya' }}</span>
           </button>
         </div>
       </main>

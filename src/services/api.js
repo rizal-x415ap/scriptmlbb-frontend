@@ -93,16 +93,19 @@ export const ApiService = {
   },
 
   // Fetch Home Feed Data (SWR pattern for instant FCP/LCP)
-  async getHomeFeed() {
-    const cached = getSwrCache('home_feed')
-    const fetchPromise = fetch(`${API_BASE_URL}/home-feed`, { headers: getHeaders() })
+  async getHomeFeed(page = 1) {
+    const cacheKey = `home_feed_page_${page}`
+    const cached = page === 1 ? getSwrCache('home_feed') : null
+    const fetchPromise = fetch(`${API_BASE_URL}/home-feed?page=${page}`, { headers: getHeaders() })
       .then(res => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
         return res.json()
       })
       .then(json => {
-        const feedData = json.data || { featured: null, feed: [] }
-        setSwrCache('home_feed', feedData)
+        const feedData = json.data || { featured: null, feed: [], pagination: { current_page: 1, last_page: 1 } }
+        if (page === 1) {
+          setSwrCache('home_feed', feedData)
+        }
         return feedData
       })
 
