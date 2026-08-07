@@ -113,22 +113,22 @@ const handleActivate = async () => {
           <form @submit.prevent="handleActivate" class="space-y-3 pt-1">
             <div>
               <label class="block text-xs font-mono text-[#707070] uppercase font-semibold mb-1.5">Aktivasi Kode Token (5 Huruf)</label>
-              <div class="flex gap-2">
+              <div class="flex items-center gap-2">
                 <input
                   type="text"
                   :value="tokenInput"
                   @input="handleInput"
-                  placeholder="KODE TOKEN (ABCDE)"
+                  placeholder="KODE (ABCDE)"
                   maxlength="5"
-                  class="flex-1 px-3.5 py-2.5 bg-[#fafafa] border border-[#dfdfdf] rounded-[8px] text-center font-mono font-bold text-base uppercase tracking-widest text-[#171717] focus:bg-white focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] outline-none transition-all"
+                  class="min-w-0 flex-1 px-3 py-2.5 bg-[#fafafa] border border-[#dfdfdf] rounded-[8px] text-center font-mono font-bold text-sm sm:text-base uppercase tracking-widest text-[#171717] focus:bg-white focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] outline-none transition-all placeholder:text-gray-400 placeholder:tracking-normal placeholder:font-sans placeholder:text-xs"
                 />
                 <button
                   type="submit"
                   :disabled="isSubmitting || tokenInput.length !== 5"
-                  class="px-5 py-2.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold text-xs rounded-[8px] transition-colors cursor-pointer flex items-center justify-center gap-1.5 shrink-0 shadow-sm opacity-100"
+                  class="w-[100px] min-w-[100px] h-[42px] bg-[#2563eb] hover:bg-[#1d4ed8] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold text-xs rounded-[8px] transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 shadow-sm"
                 >
-                  <span v-if="isSubmitting" class="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
-                  <span>{{ isSubmitting ? 'Verifikasi...' : 'Aktifkan' }}</span>
+                  <span v-if="isSubmitting" class="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin shrink-0"></span>
+                  <span class="truncate">{{ isSubmitting ? 'Proses...' : 'Aktifkan' }}</span>
                 </button>
               </div>
             </div>
