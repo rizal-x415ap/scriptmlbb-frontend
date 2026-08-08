@@ -883,43 +883,39 @@ const handleConfirmDelete = async () => {
                       />
                     </div>
 
-                    <!-- RIGHT SIDE: Title, Horizontal Line, Feature Badges & Date -->
+                    <!-- RIGHT SIDE: Title, Horizontal Line & Feature Badges -->
                     <div class="flex-1 space-y-3 min-w-0 w-full text-left pr-2 sm:pr-0">
                       <!-- Title Inside Card Next to Image -->
                       <div>
-                        <h2 class="text-base sm:text-lg lg:text-xl font-bold text-[#171717] leading-snug pr-16 sm:pr-20 lg:pr-0">
-                          Download {{ article.title }}
-                        </h2>
+                        <h3 class="text-base sm:text-lg lg:text-xl font-bold text-[#171717] leading-snug pr-16 sm:pr-20 lg:pr-0">
+                          {{ article.title }}
+                        </h3>
                       </div>
 
                       <!-- Horizontal Line Separator -->
                       <div class="border-b border-[#e2e8f0]"></div>
 
-                      <!-- Tags / Feature Pills & Date Below Line -->
-                      <div class="space-y-2.5">
-                        <div class="flex flex-wrap gap-1 sm:gap-1.5">
-                          <span
-                            v-for="(feature, fIdx) in appFeaturesList"
-                            :key="fIdx"
-                            class="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-medium bg-white text-[#1d4ed8] border border-[#2563eb]/25"
-                          >
-                            {{ feature.startsWith('✓') ? feature : '✓ ' + feature }}
-                          </span>
-                        </div>
-
-                        <!-- Clean Green Date Badge -->
-                        <div>
-                          <span class="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] sm:text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/80">
-                            Diperbarui pada {{ getFormattedDate(article.published_at) }}
-                          </span>
-                        </div>
+                      <!-- Tags / Feature Pills Below Line -->
+                      <div class="flex flex-wrap gap-1 sm:gap-1.5">
+                        <span
+                          v-for="(feature, fIdx) in appFeaturesList"
+                          :key="fIdx"
+                          class="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-medium bg-white text-[#1d4ed8] border border-[#2563eb]/25"
+                        >
+                          {{ feature.startsWith('✓') ? feature : '✓ ' + feature }}
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   <!-- RIGHT COLUMN (Desktop lg:col-span-5): Link Download File -->
                   <div class="lg:col-span-5 pt-4 lg:pt-0 border-t lg:border-t-0 border-[#e2e8f0] space-y-3">
-                    <h4 class="text-xs font-bold text-[#171717] uppercase tracking-wider font-mono">LINK UNDUHAN FILE</h4>
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                      <h4 class="text-xs font-bold text-[#171717] uppercase tracking-wider font-mono">LINK UNDUHAN FILE</h4>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] sm:text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                        Diperbarui pada {{ getFormattedDate(article.published_at) }}
+                      </span>
+                    </div>
 
                     <div class="space-y-2.5 pt-1">
                       <!-- Dynamic Download Links Loop (Simple Blue Text Links) -->
