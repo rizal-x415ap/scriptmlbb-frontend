@@ -1,12 +1,13 @@
 <script setup>
 import { ref, watch, onMounted, computed } from 'vue'
-import { useRoute, RouterLink } from 'vue-router'
+import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { ApiService } from '../services/api'
 import { sanitizeHtml } from '../utils/sanitize'
 import { setSeoMeta, cleanExcerptText, getAbsoluteUrl } from '../services/seo'
 import { siteSettings } from '../services/settingsStore'
 
 const route = useRoute()
+const router = useRouter()
 
 const page = ref(null)
 const isLoading = ref(true)
@@ -18,7 +19,10 @@ const sanitizedContent = computed(() => {
 
 const fetchPageDetail = async () => {
   const slug = route.params.slug
-  if (!slug) return
+  if (!slug) {
+    router.replace('/')
+    return
+  }
 
   isLoading.value = true
   errorMessage.value = ''
@@ -50,10 +54,10 @@ const fetchPageDetail = async () => {
         jsonLdSchema: webPageSchema
       })
     } else {
-      errorMessage.value = 'Halaman tidak ditemukan.'
+      router.replace('/')
     }
   } catch (err) {
-    errorMessage.value = 'Gagal memuat halaman.'
+    router.replace('/')
   } finally {
     isLoading.value = false
   }

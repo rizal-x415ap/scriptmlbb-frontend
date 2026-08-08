@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, reactive, onMounted, watch } from 'vue'
-import { useRoute, RouterLink } from 'vue-router'
+import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { ApiService } from '../services/api.js'
 import { siteSettings } from '../services/settingsStore.js'
 import { isBookmarked as checkIsBookmarked, toggleBookmark as toggleBookmarkStore } from '../services/bookmarkStore.js'
@@ -12,6 +12,7 @@ import { sanitizeHtml } from '../utils/sanitize.js'
 import { setSeoMeta, getAbsoluteUrl } from '../services/seo.js'
 
 const route = useRoute()
+const router = useRouter()
 
 // Get article ID from router param
 const articleId = computed(() => route.params.id || 'featured-1')
@@ -252,12 +253,16 @@ const loadArticle = async () => {
 
   try {
     const data = await ApiService.getArticleById(articleId.value)
+    if (!data) {
+      router.replace('/')
+      return
+    }
     article.value = data
     likesCount.value = data?.likes_count || 0
-    if (data) {
-      isLiked.value = isArticleLiked(data.id) || isArticleLiked(data.slug)
-      updateArticleSeo(data)
-    }
+    isLiked.value = isArticleLiked(data.id) || isArticleLiked(data.slug)
+    updateArticleSeo(data)
+  } catch (err) {
+    router.replace('/')
   } finally {
     isDone = true
     clearTimeout(timer)

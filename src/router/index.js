@@ -53,6 +53,11 @@ const router = createRouter({
       path: '/premium',
       name: 'premium',
       component: () => import('../views/PremiumView.vue')
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      redirect: '/'
     }
   ],
   scrollBehavior() {

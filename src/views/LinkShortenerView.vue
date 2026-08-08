@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { useRoute, RouterLink } from 'vue-router'
+import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { ApiService } from '../services/api.js'
 import { isPremium } from '../services/premiumStore.js'
 import { siteSettings } from '../services/settingsStore.js'
@@ -10,6 +10,7 @@ import { sanitizeHtml } from '../utils/sanitize.js'
 import { setSeoMeta } from '../services/seo.js'
 
 const route = useRoute()
+const router = useRouter()
 const code = computed(() => route.params.code)
 
 const isLoading = ref(true)
@@ -43,6 +44,10 @@ onMounted(async () => {
   try {
     isLoading.value = true
     const data = await ApiService.resolveShortLink(code.value)
+    if (!data) {
+      router.replace('/')
+      return
+    }
     shortLinkData.value = data
     article.value = data.random_article
 
@@ -54,7 +59,7 @@ onMounted(async () => {
       }
     }
   } catch (err) {
-    errorMessage.value = 'Link download tidak ditemukan atau sudah tidak valid.'
+    router.replace('/')
   } finally {
     isLoading.value = false
   }
