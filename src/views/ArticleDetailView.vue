@@ -634,9 +634,9 @@ const handleConfirmDelete = async () => {
       <div class="flex flex-row items-center justify-between gap-2 border-b border-[#f0f0f0] pb-4">
         <RouterLink
           to="/"
-          class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#707070] hover:text-[#171717] transition-colors group shrink-0"
+          class="px-3 sm:px-4 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5 bg-[#f4f4f5] text-[#171717] hover:bg-[#e4e4e7] transition-all group shrink-0"
         >
-          <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1 text-[#2563eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5 text-[#2563eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           <span class="hidden sm:inline">Kembali ke Beranda</span>
