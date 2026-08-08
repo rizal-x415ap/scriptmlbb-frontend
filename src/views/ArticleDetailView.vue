@@ -892,7 +892,7 @@ const handleConfirmDelete = async () => {
                     <div class="flex-1 space-y-3 min-w-0 w-full text-left pr-2 sm:pr-0">
                       <!-- Title Inside Card Next to Image -->
                       <div>
-                        <h3 class="text-base sm:text-lg lg:text-xl font-bold text-[#171717] leading-snug break-words pr-28 sm:pr-36">
+                        <h3 class="text-base sm:text-lg lg:text-xl font-bold text-[#171717] leading-snug break-words pr-20 lg:pr-0">
                           {{ article.title }}
                         </h3>
                       </div>
