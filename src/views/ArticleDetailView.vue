@@ -813,7 +813,7 @@ const handleConfirmDelete = async () => {
 
             <!-- About This App & Feature Highlights Section -->
             <div class="space-y-5 pb-8 border-b border-[#f0f0f0]">
-              <div class="flex items-center justify-between border-b border-[#f0f0f0] pb-3">
+              <div class="flex items-center justify-between border-b border-[#f0f0f0] pb-2">
                 <h2 class="text-lg font-bold text-[#171717]">Tentang Script Ini</h2>
                 <span v-if="article.app_version" class="text-xs text-[#2563eb] font-semibold flex items-center gap-1">
                   <span>Versi {{ article.app_version }}</span>
@@ -838,7 +838,7 @@ const handleConfirmDelete = async () => {
               <div id="download-section" class="mt-8 p-5 sm:p-6 bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] space-y-5 sm:space-y-6 scroll-mt-36">
                 <!-- Header Title (Using Article Title across top) -->
                 <div class="border-b border-[#e2e8f0] pb-3">
-                  <h2 class="text-lg font-bold text-[#171717] line-clamp-1">
+                  <h2 class="text-lg font-bold text-[#171717] ">
                     Download {{ article.title }}
                   </h2>
                 </div>
