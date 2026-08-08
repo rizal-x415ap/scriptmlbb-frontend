@@ -16,7 +16,7 @@ const isLoading = ref(true)
 const shortLinkData = ref(null)
 const article = ref(null)
 const isCountingDown = ref(false)
-const countdownSeconds = ref(10)
+const countdownSeconds = ref(15)
 const originalUrl = ref(null)
 const isUnlocked = ref(false)
 const errorMessage = ref('')
@@ -61,22 +61,30 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+  if (countdownInterval) clearInterval(countdownInterval)
   // Restore standard robots tag when leaving the page
   if (metaRobotsEl) {
     metaRobotsEl.content = 'index, follow'
   }
 })
 
+let countdownInterval = null
+
 const startCountdown = () => {
   if (isCountingDown.value || isUnlocked.value) return
 
   isCountingDown.value = true
-  countdownSeconds.value = 10
+  countdownSeconds.value = 15
 
-  const interval = setInterval(async () => {
-    countdownSeconds.value -= 1
+  if (countdownInterval) clearInterval(countdownInterval)
+
+  countdownInterval = setInterval(async () => {
+    if (countdownSeconds.value > 0) {
+      countdownSeconds.value -= 1
+    }
     if (countdownSeconds.value <= 0) {
-      clearInterval(interval)
+      clearInterval(countdownInterval)
+      countdownInterval = null
       isCountingDown.value = false
       await unlockUrl()
     }
@@ -183,29 +191,27 @@ const formattedContent = computed(() => {
 
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
               <div class="space-y-1 text-center sm:text-left">
-                <h2 class="text-base font-bold text-[#171717]">Langkah 1: Klik "Get Link Unduhan"</h2>
-                <p class="text-xs text-[#707070] max-w-lg">
-                  Setelah diklik, silakan baca & gulir artikel di bawah ini hingga akhir untuk mengambil tombol unduhan.
+                <h2 class="text-base sm:text-lg font-bold text-[#171717]">Get Link Unduhan File</h2>
+                <p class="text-xs sm:text-sm text-[#707070] max-w-lg">
+                  {{ (isCountingDown || isUnlocked) ? 'Silakan gulir / scroll halaman artikel ini ke bawah untuk mengambil link unduhan.' : 'Klik tombol di samping, lalu silakan gulir / scroll halaman ke bawah.' }}
                 </p>
               </div>
 
-              <!-- Step 1 Trigger Button -->
+              <!-- Step 1 Trigger Button / Scroll Status Badge -->
               <div class="shrink-0 w-full sm:w-auto">
                 <button
                   v-if="!isCountingDown && !isUnlocked"
                   @click="startCountdown"
-                  class="stitch-button-primary w-full sm:w-auto px-6 py-2.5 text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2"
+                  class="stitch-button-primary w-full sm:w-auto px-6 py-3 text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95"
                 >
                   <span>⚡ GET LINK UNDUHAN</span>
                 </button>
 
-                <div v-else-if="isCountingDown" class="px-4 py-2 bg-white text-[#171717] rounded-full text-xs font-mono font-semibold flex items-center justify-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-[#2563eb] animate-ping"></span>
-                  <span>Countdown 10s Berjalan...</span>
-                </div>
-
-                <div v-else-if="isUnlocked" class="px-4 py-2 bg-emerald-50 text-emerald-800 rounded-full text-xs font-mono font-semibold flex items-center justify-center gap-2">
-                  <span>✓ Link Unduhan Terbuka di Bawah</span>
+                <div v-else class="px-5 py-2.5 bg-emerald-50 text-emerald-700 rounded-full text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 border border-emerald-200 shadow-xs">
+                  <svg class="w-4 h-4 text-emerald-600 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                  </svg>
+                  <span>↓ Silakan Scroll Ke Bawah Halaman</span>
                 </div>
               </div>
             </div>
@@ -284,48 +290,51 @@ const formattedContent = computed(() => {
             />
 
             <!-- MINIMALIST SHORTENER BOTTOM BOX (BAWAH ARTIKEL) -->
-            <div id="download-unlock-area" class="mt-8 p-6 sm:p-8 bg-[#f4f4f5] rounded-2xl space-y-4 text-center scroll-mt-28">
+            <div id="download-unlock-area" class="mt-8 p-6 sm:p-8 bg-[#f4f4f5] rounded-2xl space-y-4 text-center scroll-mt-36">
               
               <div class="space-y-1">
-                <span class="font-mono-eyebrow text-[#2563eb]">LANGKAH 2 // UNDUH FILE</span>
-                <h3 class="text-lg font-bold text-[#171717]">
-                  {{ isUnlocked ? 'Link Unduhan Siap Digunakan' : 'Menyiapkan Tombol Unduhan File' }}
+                <span class="font-mono-eyebrow text-[#2563eb]">PENGAMBILAN FILE UNDUHAN</span>
+                <h3 class="text-base sm:text-lg font-bold text-[#171717]">
+                  {{ isUnlocked ? 'Link File Siap Diunduh' : (isCountingDown ? 'Memproses Link Unduhan File...' : 'Menunggu Klik "Get Link Unduhan"') }}
                 </h3>
               </div>
 
-              <!-- State 1: Before Countdown Started -->
-              <div v-if="!isCountingDown && !isUnlocked" class="p-4 bg-white rounded-xl text-xs text-[#707070] max-w-md mx-auto space-y-3">
-                <p>Silakan klik tombol <strong>"GET LINK UNDUHAN"</strong> di bagian atas artikel untuk memulai countdown 10 detik.</p>
-                <button
-                  @click="startCountdown"
-                  class="stitch-button-primary px-5 py-2 text-xs font-semibold cursor-pointer"
-                >
-                  Klik Di Sini Untuk Memulai Countdown
-                </button>
-              </div>
-
-              <!-- State 2: Countdown Active (10s -> 0s) -->
-              <div v-else-if="isCountingDown" class="py-3 space-y-2">
-                <div class="font-mono text-3xl font-bold text-[#2563eb]">
-                  {{ countdownSeconds }}s
-                </div>
-                <p class="text-xs font-mono text-[#707070]">
-                  Mohon tunggu {{ countdownSeconds }} detik... Tombol unduhan sedang dibuka.
+              <!-- State 1: Before Countdown Started (Clean instruction, NO manual button) -->
+              <div v-if="!isCountingDown && !isUnlocked" class="p-4 bg-white rounded-xl text-xs sm:text-sm text-[#707070] max-w-md mx-auto space-y-2 border border-[#e4e4e7]">
+                <p class="leading-relaxed">
+                  Silakan klik tombol <strong class="text-[#2563eb]">"GET LINK UNDUHAN"</strong> di bagian atas halaman untuk memproses dan membuka link file secara otomatis.
                 </p>
               </div>
 
+              <!-- State 2: Countdown Active (10s -> 0s) -->
+              <div v-else-if="isCountingDown" class="py-4 space-y-2">
+                <div class="font-mono text-4xl font-extrabold text-[#2563eb] tracking-tight">
+                  {{ countdownSeconds }}s
+                </div>
+                <p class="text-xs sm:text-sm font-mono text-[#707070]">
+                  Mohon tunggu {{ countdownSeconds }} detik... Tombol unduhan sedang disiapkan.
+                </p>
+                <!-- Animated Progress Bar -->
+                <div class="max-w-xs mx-auto h-2 bg-[#e4e4e7] rounded-full overflow-hidden mt-2">
+                  <div
+                    class="h-full bg-[#2563eb] rounded-full transition-all duration-1000 ease-linear"
+                    :style="{ width: ((15 - countdownSeconds) / 15 * 100) + '%' }"
+                  ></div>
+                </div>
+              </div>
+
               <!-- State 3: Countdown Finished -> Green Download Button Unlocked -->
-              <div v-else-if="isUnlocked && originalUrl" class="space-y-3 pt-1">
+              <div v-else-if="isUnlocked && originalUrl" class="space-y-3 pt-2">
                 <a
                   :href="originalUrl"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="stitch-button-primary bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-6 py-3 inline-flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  class="stitch-button-primary bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm sm:text-base px-8 py-3.5 inline-flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md hover:shadow-lg active:scale-95"
                 >
                   <span>📥 Download File Sekarang →</span>
                 </a>
-                <p class="text-xs text-emerald-700 font-medium">
-                  ✓ Link unduhan berhasil dibuka. Klik tombol di atas untuk mulai mengunduh file.
+                <p class="text-xs sm:text-sm text-emerald-700 font-semibold">
+                  ✓ Link unduhan aman terverifikasi. Klik tombol di atas untuk mulai mengunduh.
                 </p>
               </div>
 

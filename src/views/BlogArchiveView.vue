@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import { ApiService } from '../services/api.js'
 import { siteSettings } from '../services/settingsStore.js'
 import { isBookmarked as checkIsBookmarked, toggleBookmark as toggleBookmarkStore } from '../services/bookmarkStore.js'
@@ -15,61 +15,113 @@ const props = defineProps({
   }
 })
 
-// Async Loading & API State (Smart Skeleton - Only shows if request takes > 150ms)
+const route = useRoute()
+
+// Async Loading & Real-Time API State
 const isLoading = ref(false)
+const isSearching = ref(false)
+const isLoadingMore = ref(false)
 const archiveDataset = ref([])
 
-// Search & Filter State
-const searchInput = ref(props.searchQuery || '')
-const selectedCategory = ref('All')
+// Search & Filter State (Initialized from URL ?search= & ?category= or props)
+const searchInput = ref(route.query.search || props.searchQuery || '')
+const selectedCategory = ref(route.query.category || 'All')
 const selectedYear = ref('All')
 const sortBy = ref('newest')
+const currentPage = ref(1)
+const lastPage = ref(1)
+const totalArticles = ref(0)
+const availableCategories = ref(['All'])
+const yearsList = ref(['All', '2026', '2025', '2024'])
 
-watch(() => props.searchQuery, (newVal) => {
-  searchInput.value = newVal || ''
-})
+let searchDebounceTimer = null
 
-const categories = computed(() => {
-  const set = new Set(['All'])
-  if (Array.isArray(archiveDataset.value)) {
-    archiveDataset.value.forEach(item => {
-      if (item.category) set.add(getCategoryName(item.category))
-    })
+watch(() => route.query.category, (newCat) => {
+  const cat = newCat || 'All'
+  if (cat !== selectedCategory.value) {
+    selectedCategory.value = cat
+    fetchArchiveData(1, false)
   }
-  return Array.from(set)
 })
 
-const yearsList = computed(() => {
-  const set = new Set(['All'])
-  if (Array.isArray(archiveDataset.value)) {
-    archiveDataset.value.forEach(item => {
-      const year = item.year || (item.published_at ? new Date(item.published_at).getFullYear().toString() : null)
-      if (year) set.add(year)
-    })
+watch(() => route.query.search, (newSearch) => {
+  const query = newSearch || ''
+  if (query !== searchInput.value) {
+    searchInput.value = query
+    fetchArchiveData(1, false)
   }
-  return Array.from(set)
 })
-const yearOptions = yearsList
 
-const loadArchiveData = async () => {
-  let isDone = false
-  const timer = setTimeout(() => {
-    if (!isDone) {
-      isLoading.value = true
-    }
-  }, 150)
+// Fetch Real-Time Archive Data directly from API
+const fetchArchiveData = async (page = 1, append = false) => {
+  if (page === 1 && !append) {
+    isSearching.value = true
+  } else {
+    isLoadingMore.value = true
+  }
 
   try {
-    archiveDataset.value = await ApiService.getArchiveArticles()
+    const params = {
+      page,
+      search: searchInput.value || '',
+      category: selectedCategory.value !== 'All' ? selectedCategory.value : '',
+      year: selectedYear.value !== 'All' ? selectedYear.value : '',
+      sort: sortBy.value || 'newest'
+    }
+
+    const res = await ApiService.getArchiveArticles(params)
+    const newItems = res.data || []
+
+    if (append) {
+      const existingIds = new Set(archiveDataset.value.map(a => a.id))
+      const uniqueItems = newItems.filter(a => !existingIds.has(a.id))
+      archiveDataset.value.push(...uniqueItems)
+    } else {
+      archiveDataset.value = newItems
+    }
+
+    if (res.meta) {
+      currentPage.value = res.meta.current_page || page
+      lastPage.value = res.meta.last_page || 1
+      totalArticles.value = res.meta.total !== undefined ? res.meta.total : archiveDataset.value.length
+    } else {
+      totalArticles.value = archiveDataset.value.length
+    }
+  } catch (e) {
+    console.error('Error fetching archive from API:', e)
   } finally {
-    isDone = true
-    clearTimeout(timer)
+    isSearching.value = false
+    isLoadingMore.value = false
     isLoading.value = false
   }
 }
 
-onMounted(() => {
-  loadArchiveData()
+// Fetch Category Filter Options from Backend API Topics
+const fetchCategoryOptions = async () => {
+  try {
+    const feedData = await ApiService.getHomeFeed(1)
+    if (Array.isArray(feedData?.topics) && feedData.topics.length > 0) {
+      const cats = feedData.topics.map(t => t.name).filter(Boolean)
+      availableCategories.value = ['All', ...new Set(cats)]
+    }
+  } catch (e) {}
+}
+
+const loadMore = async () => {
+  if (currentPage.value >= lastPage.value || isLoadingMore.value) return
+  await fetchArchiveData(currentPage.value + 1, true)
+}
+
+// Real-Time Watchers for Search Input (300ms Debounce) & Dropdowns
+watch(searchInput, () => {
+  clearTimeout(searchDebounceTimer)
+  searchDebounceTimer = setTimeout(() => {
+    fetchArchiveData(1, false)
+  }, 300)
+})
+
+watch([selectedCategory, selectedYear, sortBy], () => {
+  fetchArchiveData(1, false)
 })
 
 const clearFilters = () => {
@@ -77,22 +129,13 @@ const clearFilters = () => {
   selectedCategory.value = 'All'
   selectedYear.value = 'All'
   sortBy.value = 'newest'
+  fetchArchiveData(1, false)
 }
 
-// Helpers for API Data Normalization (Laravel API returns category & author objects)
+// Helpers for API Data Normalization
 const getCategoryName = (cat) => {
   if (!cat) return 'General'
   return typeof cat === 'object' ? cat.name : cat
-}
-
-const getAuthorName = (author) => {
-  if (!author) return ''
-  return typeof author === 'object' ? (author.name || '') : author
-}
-
-const getAuthorAvatar = (author) => {
-  if (!author) return ''
-  return typeof author === 'object' ? (author.avatar || '') : author
 }
 
 const getFormattedDate = (date) => {
@@ -113,43 +156,16 @@ const checkIsItemLiked = (item) => {
   return isArticleLiked(item.id || item.slug)
 }
 
-// Filtered & Sorted Articles
-const filteredArchive = computed(() => {
-  let list = archiveDataset.value.filter(item => {
-    const authorName = getAuthorName(item.author)
-    const categoryName = getCategoryName(item.category)
-    const matchesQuery = !searchInput.value ||
-      (item.title && item.title.toLowerCase().includes(searchInput.value.toLowerCase())) ||
-      (item.excerpt && item.excerpt.toLowerCase().includes(searchInput.value.toLowerCase())) ||
-      (authorName && authorName.toLowerCase().includes(searchInput.value.toLowerCase()))
-    
-    const matchesCategory = selectedCategory.value === 'All' || categoryName === selectedCategory.value
-    const matchesYear = selectedYear.value === 'All' || item.year === selectedYear.value || (item.published_at && item.published_at.includes(selectedYear.value))
-
-    return matchesQuery && matchesCategory && matchesYear
-  })
-
-  if (sortBy.value === 'popular') {
-    list.sort((a, b) => (b.likes_count || 0) - (a.likes_count || 0))
-  } else if (sortBy.value === 'readingTime') {
-    list.sort((a, b) => parseInt(a.read_time || '0') - parseInt(b.read_time || '0'))
-  } else {
-    // Default: Newest first
-    list.sort((a, b) => new Date(b.published_at || b.created_at || b.date) - new Date(a.published_at || a.created_at || a.date))
-  }
-
-  return list
-})
-
 const activeFilterCount = computed(() => {
   let count = 0
   if (searchInput.value) count++
   if (selectedCategory.value !== 'All') count++
   if (selectedYear.value !== 'All') count++
+  if (sortBy.value !== 'newest') count++
   return count
 })
 
-// Toggle Like Handler with ApiService & localStorage Persistence
+// Toggle Like Handler
 const toggleLike = async (item) => {
   if (!item) return
   const key = item.id || item.slug
@@ -162,16 +178,14 @@ const toggleLike = async (item) => {
       if (res && res.likes_count !== undefined) {
         item.likes_count = res.likes_count
       }
-    } catch (e) {
-      console.error('Gagal menyukai artikel di halaman arsip:', e)
-    }
+    } catch (e) {}
   } else {
     removeLikedArticle(key)
     item.likes_count = Math.max(0, (item.likes_count || 0) - 1)
   }
 }
 
-// Toggle Bookmark Handler with localStorage Persistence
+// Toggle Bookmark Handler
 const toggleBookmark = (item) => {
   if (!item) return
   toggleBookmarkStore(item)
@@ -190,6 +204,9 @@ const copyRssFeed = () => {
 }
 
 onMounted(() => {
+  isLoading.value = true
+  fetchCategoryOptions()
+  fetchArchiveData(1, false)
   setSeoMeta({
     title: siteSettings.archiveTitle || 'Arsip Artikel & Catatan Teknis',
     description: siteSettings.archiveSubtitle || 'Filter seluruh koleksi artikel teknis, catatan arsitektur sistem, dan panduan software.',
@@ -249,7 +266,7 @@ onMounted(() => {
             v-model="selectedCategory"
             class="w-full px-3 py-2 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb] focus:bg-white"
           >
-            <option v-for="cat in categories" :key="cat" :value="cat">
+            <option v-for="cat in availableCategories" :key="cat" :value="cat">
               {{ cat === 'All' ? 'Semua Kategori' : cat }}
             </option>
           </select>
@@ -286,7 +303,7 @@ onMounted(() => {
       <!-- Active Filters Bar & Reset -->
       <div class="flex items-center justify-between text-xs text-[#707070]">
         <div class="flex items-center gap-2">
-          <span>Ditemukan <strong class="text-[#171717] font-mono">{{ filteredArchive.length }}</strong> artikel</span>
+          <span>Ditemukan <strong class="text-[#171717] font-mono">{{ totalArticles }}</strong> artikel</span>
           <span v-if="activeFilterCount > 0" class="text-[#b2b2b2]">•</span>
           <span v-if="activeFilterCount > 0" class="text-[#2563eb] font-semibold font-mono">
             {{ activeFilterCount }} filter aktif
@@ -312,67 +329,84 @@ onMounted(() => {
       <!-- Main Archive Stream Track (8 Columns) -->
       <main class="lg:col-span-8 space-y-4">
         <!-- Skeleton Loading State -->
-        <div v-if="isLoading" class="divide-y divide-[#f0f0f0]">
+        <div v-if="isLoading || isSearching" class="divide-y divide-[#f0f0f0]">
           <ArticleCardSkeleton v-for="n in 3" :key="n" />
         </div>
 
         <!-- Archive Articles List -->
-        <div v-else class="divide-y divide-[#f0f0f0]">
-          <article
-            v-for="item in filteredArchive"
-            :key="item.id"
-            class="py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group"
-          >
-            <div class="space-y-2 flex-1">
-              <!-- Kategori & Tanggal -->
-              <div class="flex items-center gap-3">
-                <span class="font-mono-eyebrow text-[#2563eb]">
-                  {{ getCategoryName(item.category) }}
-                </span>
-                <span v-if="getFormattedDate(item.published_at || item.date)" class="text-xs text-[#707070] font-mono">
-                  {{ getFormattedDate(item.published_at || item.date) }}
-                </span>
+        <div v-else class="space-y-6">
+          <div class="divide-y divide-[#f0f0f0]">
+            <article
+              v-for="item in archiveDataset"
+              :key="item.id"
+              class="py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group"
+            >
+              <div class="space-y-2 flex-1">
+                <!-- Kategori & Tanggal -->
+                <div class="flex items-center gap-3">
+                  <span class="font-mono-eyebrow text-[#2563eb]">
+                    {{ getCategoryName(item.category) }}
+                  </span>
+                  <span v-if="getFormattedDate(item.published_at || item.created_at)" class="text-xs text-[#707070] font-mono">
+                    {{ getFormattedDate(item.published_at || item.created_at) }}
+                  </span>
+                </div>
+
+                <!-- Judul Artikel -->
+                <RouterLink :to="'/article/' + (item.slug || item.id)" class="block pt-0.5">
+                  <h3 class="text-base sm:text-lg font-semibold text-[#171717] leading-snug group-hover:text-[#2563eb] transition-colors">
+                    {{ item.title }}
+                  </h3>
+                </RouterLink>
               </div>
 
-              <!-- Judul Artikel -->
-              <RouterLink :to="'/article/' + (item.slug || item.id)" class="block pt-0.5">
-                <h3 class="text-base sm:text-lg font-semibold text-[#171717] leading-snug group-hover:text-[#2563eb] transition-colors">
-                  {{ item.title }}
-                </h3>
-              </RouterLink>
-            </div>
+              <!-- Action Buttons -->
+              <div class="flex items-center gap-2 self-end sm:self-center pt-2 sm:pt-0">
+                <button
+                  @click="toggleLike(item)"
+                  class="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  :class="checkIsItemLiked(item) ? 'bg-rose-50 text-rose-600' : 'bg-[#f4f4f5] text-[#707070] hover:text-[#171717] hover:bg-[#e4e4e7]'"
+                >
+                  <svg class="w-3.5 h-3.5" :fill="checkIsItemLiked(item) ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  <span>{{ item.likes_count }}</span>
+                </button>
 
-            <!-- Action Buttons -->
-            <div class="flex items-center gap-2 self-end sm:self-center pt-2 sm:pt-0">
-              <button
-                @click="toggleLike(item)"
-                class="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-                :class="checkIsItemLiked(item) ? 'bg-rose-50 text-rose-600' : 'bg-[#f4f4f5] text-[#707070] hover:text-[#171717] hover:bg-[#e4e4e7]'"
-              >
-                <svg class="w-3.5 h-3.5" :fill="checkIsItemLiked(item) ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                <span>{{ item.likes_count }}</span>
-              </button>
-
-              <button
-                @click="toggleBookmark(item)"
-                class="p-1.5 rounded-full text-xs transition-colors cursor-pointer"
-                :class="checkIsItemBookmarked(item) ? 'bg-amber-50 text-amber-600' : 'bg-[#f4f4f5] text-[#707070] hover:text-[#171717] hover:bg-[#e4e4e7]'"
-              >
-                <svg class="w-3.5 h-3.5" :fill="checkIsItemBookmarked(item) ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                </svg>
-              </button>
-            </div>
-          </article>
+                <button
+                  @click="toggleBookmark(item)"
+                  class="p-1.5 rounded-full text-xs transition-colors cursor-pointer"
+                  :class="checkIsItemBookmarked(item) ? 'bg-amber-50 text-amber-600' : 'bg-[#f4f4f5] text-[#707070] hover:text-[#171717] hover:bg-[#e4e4e7]'"
+                >
+                  <svg class="w-3.5 h-3.5" :fill="checkIsItemBookmarked(item) ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                </button>
+              </div>
+            </article>
+          </div>
 
           <!-- Empty Results Message -->
-          <div v-if="filteredArchive.length === 0" class="text-center py-16 space-y-3">
+          <div v-if="archiveDataset.length === 0" class="text-center py-16 space-y-3">
             <p class="text-base text-[#171717] font-semibold">Tidak ada artikel yang sesuai</p>
             <p class="text-xs text-[#707070]">Coba sesuaikan kata kunci pencarian Anda atau hapus filter yang aktif.</p>
             <button @click="clearFilters" class="stitch-button-secondary px-4 py-2 text-xs cursor-pointer">
               Hapus Filter Pencarian
+            </button>
+          </div>
+
+          <!-- Paginasi Load More Button -->
+          <div v-if="currentPage < lastPage" class="pt-6 text-center">
+            <button
+              @click="loadMore"
+              :disabled="isLoadingMore"
+              class="stitch-button-secondary px-6 py-2.5 text-xs font-bold inline-flex items-center gap-2 cursor-pointer transition-all"
+            >
+              <svg v-if="isLoadingMore" class="w-4 h-4 animate-spin text-[#2563eb]" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>{{ isLoadingMore ? 'Memuat Artikel...' : 'Muat Lebih Banyak Artikel ↓' }}</span>
             </button>
           </div>
         </div>

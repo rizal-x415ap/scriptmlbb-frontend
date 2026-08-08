@@ -16,6 +16,18 @@ const router = createRouter({
       component: () => import('../views/BlogArchiveView.vue')
     },
     {
+      path: '/hitung-wr',
+      name: 'hitung-wr',
+      alias: ['/wr-calculator', '/calculator'],
+      component: () => import('../views/WrCalculatorView.vue')
+    },
+    {
+      path: '/contact',
+      name: 'contact',
+      alias: ['/hubungi-kami', '/kontak'],
+      component: () => import('../views/ContactView.vue')
+    },
+    {
       path: '/article/:id',
       name: 'article-detail',
       component: () => import('../views/ArticleDetailView.vue'),

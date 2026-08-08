@@ -10,6 +10,8 @@ const defaultSettings = {
   faviconUrl: '/favicon.svg',
   brandLogoText: 'Script MLBB',
   brandLogoUrl: '',
+  contactEmail: 'rizal@scriptmlbb.com',
+  premiumFreeAdUrl: 'https://scriptmlbb.com',
   showAnnouncementBar: true,
   announcementText: '⚡ DAPATKAN UPDATE ARTIKEL TERBARU DAN WAWASAN ARSITEKTUR SISTEM',
   announcementLink: '/archive',

@@ -18,24 +18,46 @@ const props = defineProps({
 
 // Async Loading & API State (Smart Skeleton - Only shows if request takes > 150ms)
 const isLoading = ref(false)
+const isFeedLoading = ref(false)
 const featuredArticle = ref(null)
 const articles = ref([])
 
 // Reactive Category Filter State
 const selectedCategory = ref('All')
+const allCategoriesList = ref(['All'])
 
-// Dynamic Categories derived from Backend Data
+// Dynamic Categories sorted by article count descending (Highest article count first, with 'All' at index 0)
 const categories = computed(() => {
-  const cats = new Set(['All'])
-  if (featuredArticle.value && featuredArticle.value.category) {
-    cats.add(getCategoryName(featuredArticle.value.category))
-  }
-  if (Array.isArray(articles.value)) {
-    articles.value.forEach(a => {
-      if (a.category) cats.add(getCategoryName(a.category))
+  const countMap = {}
+
+  // 1. Populate countMap from backend dynamicTopics (DB orderByDesc articles_count)
+  if (Array.isArray(dynamicTopics.value)) {
+    dynamicTopics.value.forEach(t => {
+      if (t.name) {
+        countMap[t.name] = t.count || 0
+      }
     })
   }
-  return Array.from(cats)
+
+  // 2. Fallback: Add any missing categories from loaded articles
+  if (Array.isArray(articles.value)) {
+    articles.value.forEach(a => {
+      const catName = getCategoryName(a.category)
+      if (catName && catName !== 'All') {
+        if (!(catName in countMap)) {
+          countMap[catName] = 1
+        }
+      }
+    })
+  }
+
+  // 3. Sort category names by count descending
+  const sortedCategories = Object.keys(countMap).sort((a, b) => {
+    return (countMap[b] || 0) - (countMap[a] || 0)
+  })
+
+  // 'All' is always pinned at the beginning
+  return ['All', ...sortedCategories]
 })
 
 // Dynamic Most Read Articles (Sorted by views_count from MySQL)
@@ -63,13 +85,10 @@ const scrollFeaturedRight = () => {
   }
 }
 
-// Top Featured Slider Articles (Fixed Max 5 Newest Articles, Independent from Feed Load More)
+// Top Featured Slider Articles (Fixed 5 Latest Articles for Site Settings Featured Category)
 const featuredArticlesList = computed(() => {
-  let list = topSliderArticles.value
-  if (selectedCategory.value !== 'All') {
-    list = articles.value.filter(a => getCategoryName(a.category).toLowerCase() === selectedCategory.value.toLowerCase())
-  }
-  return list.slice(0, 5)
+  if (!Array.isArray(topSliderArticles.value)) return []
+  return topSliderArticles.value.slice(0, 5)
 })
 
 // Interactive Newsletter Subscription State
@@ -129,9 +148,15 @@ const getAuthorName = (author) => {
   return typeof author === 'object' ? (author.name || '') : author
 }
 
+const getCuteAvatar = (name) => {
+  const seed = encodeURIComponent(name || 'Rizal Efendi')
+  return `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`
+}
+
 const getAuthorAvatar = (author) => {
-  if (!author) return ''
-  return typeof author === 'object' ? (author.avatar || '') : author
+  if (author && typeof author === 'object' && author.avatar) return author.avatar
+  if (siteSettings.authorAvatarUrl) return siteSettings.authorAvatarUrl
+  return getCuteAvatar(siteSettings.authorName || 'Rizal Efendi')
 }
 
 const getFormattedDate = (date) => {
@@ -169,7 +194,7 @@ const currentPage = ref(1)
 const lastPage = ref(1)
 const isLoadingMore = ref(false)
 
-const loadHomeFeed = async () => {
+const loadHomeFeed = async (page = 1, category = 'All') => {
   let isDone = false
   const timer = setTimeout(() => {
     if (!isDone) {
@@ -178,15 +203,28 @@ const loadHomeFeed = async () => {
   }, 150)
 
   try {
-    const data = await ApiService.getHomeFeed(1)
+    const data = await ApiService.getHomeFeed(page, category)
     featuredArticle.value = data?.featured || null
     articles.value = data?.feed || []
     
-    // Store top 5 newest articles for top slider independently
-    topSliderArticles.value = (data?.feed || []).slice(0, 5)
+    // Fetch 5 top articles specifically for the top featured slider based on siteSettings.featuredPostCategory
+    const targetCategory = siteSettings.featuredPostCategory || 'All'
+    if (targetCategory !== 'All') {
+      try {
+        const featData = await ApiService.getHomeFeed(1, targetCategory)
+        topSliderArticles.value = (featData?.feed || []).slice(0, 5)
+      } catch (e) {
+        topSliderArticles.value = (data?.feed || []).slice(0, 5)
+      }
+    } else {
+      topSliderArticles.value = (data?.feed || []).slice(0, 5)
+    }
 
-    if (Array.isArray(data?.topics)) {
+    if (Array.isArray(data?.topics) && data.topics.length > 0) {
       dynamicTopics.value = data.topics
+      data.topics.forEach(t => {
+        if (t.name) allCategoriesList.value.push(t.name)
+      })
     }
     if (data?.pagination) {
       currentPage.value = data.pagination.current_page || 1
@@ -214,12 +252,31 @@ const loadHomeFeed = async () => {
   }
 }
 
+const selectCategory = async (cat) => {
+  if (selectedCategory.value === cat && articles.value.length > 0) return
+  selectedCategory.value = cat
+  currentPage.value = 1
+  isFeedLoading.value = true
+
+  try {
+    const data = await ApiService.getHomeFeed(1, cat)
+    articles.value = data?.feed || []
+    if (data?.pagination) {
+      currentPage.value = data.pagination.current_page || 1
+      lastPage.value = data.pagination.last_page || 1
+    }
+  } catch (e) {
+  } finally {
+    isFeedLoading.value = false
+  }
+}
+
 const loadMoreArticles = async () => {
   if (currentPage.value >= lastPage.value || isLoadingMore.value) return
   isLoadingMore.value = true
   try {
     const nextPage = currentPage.value + 1
-    const res = await ApiService.getHomeFeed(nextPage)
+    const res = await ApiService.getHomeFeed(nextPage, selectedCategory.value)
     if (Array.isArray(res?.feed) && res.feed.length > 0) {
       const existingIds = new Set(articles.value.map(a => a.id))
       const newItems = res.feed.filter(a => !existingIds.has(a.id))
@@ -242,12 +299,10 @@ onMounted(() => {
 // Filtered Articles Computed Property (Featured articles pinned at top)
 const filteredArticles = computed(() => {
   const list = articles.value.filter(article => {
-    const catName = getCategoryName(article.category)
-    const matchesCategory = selectedCategory.value === 'All' || catName === selectedCategory.value
     const matchesSearch = !props.searchQuery ||
       article.title.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
       (article.excerpt && article.excerpt.toLowerCase().includes(props.searchQuery.toLowerCase()))
-    return matchesCategory && matchesSearch
+    return matchesSearch
   })
 
   return list.sort((a, b) => {
@@ -278,44 +333,20 @@ const toggleBookmark = (item) => {
 
     <!-- Top Section: Featured Carousel Slider (Full Width) -->
     <section class="space-y-6">
-      <!-- Section Header with Category Filter & Navigation Arrows -->
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#f0f0f0] pb-4">
-        <div class="flex flex-wrap items-center gap-3">
-          <span class="w-2.5 h-2.5 rounded-full bg-[#2563eb] animate-pulse"></span>
-          <h1 class="font-extrabold text-[#2563eb] text-base sm:text-xl tracking-tight uppercase">
-            UPDATE SCRIPT SKIN MOBILE LEGENDS
-          </h1>
+      <!-- Section Header -->
+      <div class="flex flex-wrap items-center gap-3 border-b border-[#f0f0f0] pb-4">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#2563eb] animate-pulse"></span>
+        <h1 class="font-extrabold text-[#171717] text-xl sm:text-2xl lg:text-3xl tracking-tight leading-snug">
+          Update Script Skin Mobile Legends
+        </h1>
 
-          <!-- Real-Time Device Date Badge -->
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700">
-            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span>{{ currentDateFormatted }}</span>
-          </span>
-
-          <!-- Left / Right Slider Controls -->
-          <div class="flex items-center gap-1.5 ml-1">
-            <button
-              @click="scrollFeaturedLeft"
-              class="p-2 rounded-full bg-[#f4f4f5] text-[#707070] hover:text-[#171717] hover:bg-[#e4e4e7] transition-all cursor-pointer"
-              aria-label="Slide Left"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <button
-              @click="scrollFeaturedRight"
-              class="p-2 rounded-full bg-[#f4f4f5] text-[#707070] hover:text-[#171717] hover:bg-[#e4e4e7] transition-all cursor-pointer"
-              aria-label="Slide Right"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-        </div>
+        <!-- Real-Time Device Date Badge (Blue Theme) -->
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#2563eb]/10 text-[#2563eb]">
+          <svg class="w-3.5 h-3.5 text-[#2563eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>{{ currentDateFormatted }}</span>
+        </span>
       </div>
 
       <!-- Skeleton Loading -->
@@ -371,31 +402,51 @@ const toggleBookmark = (item) => {
 
             <!-- Article Title -->
             <RouterLink :to="'/article/' + (item.slug || item.id)" class="block">
-              <h3 class="text-base font-semibold text-[#171717] leading-snug line-clamp-2 group-hover:text-[#2563eb] transition-colors">
+              <h3 class="text-sm sm:text-base font-semibold text-[#171717] leading-snug line-clamp-2 group-hover:text-[#2563eb] transition-colors">
                 {{ item.title }}
               </h3>
             </RouterLink>
           </div>
 
           <!-- Date Footer -->
-          <div class="pt-3 mt-3 border-t border-[#f0f0f0] flex items-center justify-between text-xs text-[#888888] font-mono">
+          <div class="pt-3 mt-3 border-t border-[#f0f0f0] flex items-center justify-between text-xs sm:text-sm text-[#888888] font-mono">
             <span>{{ getFormattedDate(item.published_at || item.date) }}</span>
           </div>
         </article>
 
-        <!-- Minimalist End Slider Item (Hanya Arrow Button & Teks Lihat Artikel Lainnya) -->
+        <!-- Cardless Open End Slider Item (Matching Exact Structure & 1:1 Ratio of Article Items) -->
         <RouterLink
-          :to="selectedCategory !== 'All' ? '/archive?category=' + encodeURIComponent(selectedCategory) : '/archive'"
-          class="w-[160px] sm:w-[180px] shrink-0 snap-start flex flex-col items-center justify-center text-center self-center py-6 group cursor-pointer"
+          :to="(siteSettings.featuredPostCategory && siteSettings.featuredPostCategory !== 'All') ? '/archive?category=' + encodeURIComponent(siteSettings.featuredPostCategory) : '/archive'"
+          class="w-[240px] sm:w-[260px] shrink-0 snap-start flex flex-col justify-between group cursor-pointer"
         >
-          <div class="w-12 h-12 rounded-full bg-[#f4f4f5] group-hover:bg-[#2563eb] text-[#171717] group-hover:text-white flex items-center justify-center transition-all duration-300 mb-2.5">
-            <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
+          <div class="space-y-3">
+            <!-- 1:1 Aspect Ratio Box (Same height & rounded corners as article thumbnail cover) -->
+            <div class="w-full aspect-square rounded-[14px] bg-[#f4f4f5] group-hover:bg-[#2563eb] transition-colors duration-300 flex flex-col items-center justify-center p-6 text-center text-[#171717] group-hover:text-white relative">
+              <div class="w-12 h-12 rounded-full bg-white group-hover:bg-white/20 text-[#2563eb] group-hover:text-white flex items-center justify-center transition-colors mb-3 shadow-xs">
+                <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </div>
+              <span class="text-xs font-bold font-mono tracking-wider">ARSIP LENGKAP</span>
+            </div>
+
+            <!-- Eyebrow Tag (Same font & position as article category) -->
+            <div>
+              <span class="font-mono-eyebrow text-[#2563eb]">
+                LIHAT LAINNYA
+              </span>
+            </div>
+
+            <!-- Title (Same size & typography as article title) -->
+            <h3 class="text-sm sm:text-base font-semibold text-[#171717] group-hover:text-[#2563eb] transition-colors leading-snug line-clamp-2">
+              Jelajahi Artikel {{ (siteSettings.featuredPostCategory && siteSettings.featuredPostCategory !== 'All') ? siteSettings.featuredPostCategory : 'Lainnya' }}
+            </h3>
           </div>
-          <span class="text-xs font-bold text-[#171717] group-hover:text-[#2563eb] transition-colors leading-snug">
-            Lihat Artikel Lainnya
-          </span>
+
+          <!-- Date Footer Alignment Line (Same border-t as article cards) -->
+          <div class="pt-3 mt-3 border-t border-[#f0f0f0] flex items-center justify-between text-xs text-[#888888] font-mono">
+            <span>Buka Arsip →</span>
+          </div>
         </RouterLink>
       </div>
 
@@ -415,8 +466,8 @@ const toggleBookmark = (item) => {
           <button
             v-for="cat in categories"
             :key="cat"
-            @click="selectedCategory = cat"
-            class="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer"
+            @click="selectCategory(cat)"
+            class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all cursor-pointer"
             :class="[
               selectedCategory === cat
                 ? 'bg-[#2563eb] text-white'
@@ -428,7 +479,7 @@ const toggleBookmark = (item) => {
         </div>
 
         <!-- Skeleton Loading State for Feed Stream -->
-        <div v-if="isLoading" class="divide-y divide-[#f0f0f0]">
+        <div v-if="isLoading || isFeedLoading" class="divide-y divide-[#f0f0f0]">
           <ArticleCardSkeleton v-for="n in 3" :key="n" />
         </div>
 
@@ -458,13 +509,13 @@ const toggleBookmark = (item) => {
 
                 <!-- Judul Artikel -->
                 <RouterLink :to="'/article/' + (article.slug || article.id)" class="block">
-                  <h2 class="text-base sm:text-lg font-semibold text-[#171717] leading-snug line-clamp-2 group-hover:text-[#2563eb] transition-colors">
+                  <h2 class="text-lg sm:text-xl font-semibold text-[#171717] leading-snug line-clamp-2 group-hover:text-[#2563eb] transition-colors">
                     {{ article.title }}
                   </h2>
                 </RouterLink>
 
                 <!-- Tanggal & Meta Footer -->
-                <div class="pt-1.5 flex items-center gap-2 text-xs text-[#888888] font-mono">
+                <div class="pt-1.5 flex items-center gap-2 text-xs sm:text-sm text-[#888888] font-mono">
                   <span>{{ getFormattedDate(article.published_at || article.date) }}</span>
                   <span class="text-[#cccccc]">•</span>
                   <span>{{ article.read_time }}</span>
@@ -514,7 +565,7 @@ const toggleBookmark = (item) => {
           <button
             @click="loadMoreArticles"
             :disabled="isLoadingMore"
-            class="stitch-button-secondary px-8 py-2.5 text-xs inline-flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            class="stitch-button-secondary px-8 py-3 text-sm inline-flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <span v-if="isLoadingMore" class="w-3.5 h-3.5 rounded-full border-2 border-[#171717] border-t-transparent animate-spin"></span>
             <span>{{ isLoadingMore ? 'Memuat Artikel...' : 'Muat Artikel Lainnya' }}</span>
@@ -559,7 +610,7 @@ const toggleBookmark = (item) => {
               </div>
 
               <RouterLink :to="'/article/' + (item.slug || item.id)" class="block">
-                <h4 class="text-sm font-semibold text-[#171717] line-clamp-2 leading-snug group-hover:text-[#2563eb] transition-colors">
+                <h4 class="text-sm sm:text-base font-semibold text-[#171717] line-clamp-2 leading-snug group-hover:text-[#2563eb] transition-colors">
                   {{ item.title }}
                 </h4>
               </RouterLink>
@@ -582,19 +633,19 @@ const toggleBookmark = (item) => {
           <div class="flex items-center gap-4">
             <div class="relative">
               <img
-                :src="siteSettings.authorAvatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'"
-                :alt="siteSettings.authorName || 'Author'"
-                class="w-12 h-12 rounded-full object-cover border border-[#e4e4e7]"
+                :src="siteSettings.authorAvatarUrl || getCuteAvatar(siteSettings.authorName || 'Rizal Efendi')"
+                :alt="siteSettings.authorName || 'Rizal Efendi'"
+                class="w-12 h-12 rounded-full object-contain border border-[#e4e4e7] p-0.5 bg-[#f4f4f5]"
               />
               <span class="absolute bottom-0 right-0 w-3 h-3 bg-[#2563eb] rounded-full border-2 border-white"></span>
             </div>
             <div>
-              <h3 class="font-bold text-[#171717] text-sm">{{ siteSettings.authorName || 'Rizal Efendi' }}</h3>
-              <p class="text-xs text-[#707070]">{{ siteSettings.authorTitle || 'Penulis & Pengembang Sistem' }}</p>
+              <h3 class="font-bold text-[#171717] text-sm sm:text-base">{{ siteSettings.authorName || 'Rizal Efendi' }}</h3>
+              <p class="text-xs sm:text-sm text-[#707070]">{{ siteSettings.authorTitle || 'Penulis & Pengembang Sistem' }}</p>
             </div>
           </div>
 
-          <p class="text-xs text-[#707070] leading-relaxed">
+          <p class="text-xs sm:text-sm text-[#707070] leading-relaxed">
             {{ siteSettings.authorBio || 'Berbagi pengalaman teknis seputar pemrograman, arsitektur web, dan desain sistem modern.' }}
           </p>
 
@@ -615,16 +666,15 @@ const toggleBookmark = (item) => {
         <div v-if="siteSettings.showTopicsWidget && computedTopics.length > 0" class="space-y-3 pb-6 border-b border-[#f0f0f0]">
           <h4 class="font-mono-eyebrow text-[#171717]">TOPIK POPULER</h4>
           <div class="flex flex-wrap gap-2">
-            <button
+            <RouterLink
               v-for="tag in computedTopics"
               :key="tag.name"
-              @click="selectedCategory = tag.name"
-              class="px-3 py-1 rounded-full text-xs transition-colors flex items-center gap-1.5 cursor-pointer border-0"
-              :class="selectedCategory === tag.name ? 'bg-[#2563eb] text-white font-semibold' : 'bg-[#f4f4f5] text-[#666666] hover:bg-[#e4e4e7] hover:text-[#171717]'"
+              :to="'/archive?category=' + encodeURIComponent(tag.name)"
+              class="px-3.5 py-1.5 rounded-full text-xs sm:text-sm transition-colors flex items-center gap-1.5 cursor-pointer bg-[#f4f4f5] text-[#666666] hover:bg-[#2563eb] hover:text-white"
             >
               <span>{{ tag.name }}</span>
               <span class="text-[10px] opacity-70 font-mono">({{ tag.count }})</span>
-            </button>
+            </RouterLink>
           </div>
         </div>
 

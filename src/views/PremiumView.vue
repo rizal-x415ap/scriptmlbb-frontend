@@ -1,6 +1,6 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { isPremium, premiumToken, premiumExpiresAt, activateToken, clearPremium } from '../services/premiumStore.js'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { isPremium, premiumToken, premiumExpiresAt, activateToken, activateFreeDayPremium, clearPremium } from '../services/premiumStore.js'
 import { siteSettings } from '../services/settingsStore.js'
 import { setSeoMeta } from '../services/seo.js'
 
@@ -17,6 +17,16 @@ const tokenInput = ref('')
 const isSubmitting = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
+
+// 15-Second Ad Click Verification State
+const isVerifyingAd = ref(false)
+const adTimerSeconds = ref(15)
+const isAdUnlocked = ref(false)
+let adInterval = null
+
+onUnmounted(() => {
+  if (adInterval) clearInterval(adInterval)
+})
 
 const whatsappBuyUrl = computed(() => {
   return siteSettings.premiumBuyUrl || 'https://wa.me/6285262335849?text=Min%20Saya%20mau%20beli%20token%20Script%20MLBB'
@@ -64,6 +74,33 @@ const handleActivate = async () => {
   } finally {
     isSubmitting.value = false
   }
+}
+
+const startAdVerification = () => {
+  if (isVerifyingAd.value || isAdUnlocked.value) return
+
+  const targetAdUrl = siteSettings.premiumFreeAdUrl || siteSettings.announcementLink || 'https://scriptmlbb.com'
+  window.open(targetAdUrl, '_blank')
+
+  isVerifyingAd.value = true
+  adTimerSeconds.value = 15
+
+  if (adInterval) clearInterval(adInterval)
+
+  adInterval = setInterval(() => {
+    if (adTimerSeconds.value > 0) {
+      adTimerSeconds.value -= 1
+    }
+    if (adTimerSeconds.value <= 0) {
+      clearInterval(adInterval)
+      adInterval = null
+      isVerifyingAd.value = false
+      isAdUnlocked.value = true
+
+      activateFreeDayPremium()
+      successMessage.value = '🎉 Selamat! Status Premium 1 Hari Gratis telah aktif!'
+    }
+  }, 1000)
 }
 
 const handleLogout = () => {
@@ -147,10 +184,65 @@ const handleLogout = () => {
           </div>
         </div>
 
-        <!-- Token Input Form -->
+        <!-- Token Input Form & Free 1-Day Option -->
         <div v-else class="pb-6 space-y-6">
-          <div class="border-b border-[#f0f0f0] pb-4">
-            <h3 class="text-base font-bold text-[#171717]">Aktivasi Kode Token Premium</h3>
+
+          <!-- FREE 1-DAY PREMIUM VIA AD CLICK CARD -->
+          <div class="p-5 bg-gradient-to-r from-amber-50 via-amber-50/80 to-amber-100/50 rounded-2xl border border-amber-200 space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 font-bold text-amber-900 text-sm">
+                <span class="text-base">🎁</span>
+                <span>Coba Premium 1 Hari GRATIS</span>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-200 text-amber-900 uppercase font-mono">
+                GRATIS
+              </span>
+            </div>
+
+            <p class="text-xs sm:text-sm text-amber-950/80 leading-relaxed">
+              Klik iklan sponsor di bawah ini dan buka selama <strong>15 detik</strong> untuk langsung mengaktifkan status Premium 1 Hari tanpa membeli token!
+            </p>
+
+            <!-- Ad Click Verification Trigger Area -->
+            <div>
+              <button
+                v-if="!isVerifyingAd && !isAdUnlocked"
+                @click="startAdVerification"
+                class="w-full py-3 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs sm:text-sm rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm active:scale-95"
+              >
+                <span>🚀 Klik Iklan 15 Detik Untuk Premium Gratis</span>
+                <span>→</span>
+              </button>
+
+              <!-- Live 15s Countdown Progress State -->
+              <div v-else-if="isVerifyingAd" class="p-4 bg-white rounded-xl border border-amber-300 space-y-2 text-center">
+                <div class="flex items-center justify-between text-xs sm:text-sm font-mono font-bold text-amber-900">
+                  <span class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-600 animate-ping"></span>
+                    <span>Memverifikasi Kunjungan Iklan...</span>
+                  </span>
+                  <span class="text-amber-700 font-extrabold text-base">{{ adTimerSeconds }}s</span>
+                </div>
+                <div class="w-full h-2.5 bg-amber-100 rounded-full overflow-hidden">
+                  <div
+                    class="h-full bg-amber-600 rounded-full transition-all duration-1000 ease-linear"
+                    :style="{ width: ((15 - adTimerSeconds) / 15 * 100) + '%' }"
+                  ></div>
+                </div>
+                <p class="text-xs text-amber-800/90 font-mono">
+                  Mohon buka & tonton tab iklan selama {{ adTimerSeconds }} detik...
+                </p>
+              </div>
+
+              <!-- Unlocked State Banner -->
+              <div v-else-if="isAdUnlocked" class="p-3 bg-emerald-100 text-emerald-900 rounded-xl text-xs sm:text-sm font-bold text-center border border-emerald-300">
+                🎉 Premium 1 Hari Gratis Berhasil Diaktifkan!
+              </div>
+            </div>
+          </div>
+
+          <div class="border-b border-[#f0f0f0] pb-4 pt-2">
+            <h3 class="text-base font-bold text-[#171717]">Atau Aktivasi Kode Token 30 Hari</h3>
             <p class="text-xs text-[#707070] mt-0.5">Masukkan 5 huruf kode token berlangganan Anda di bawah ini</p>
           </div>
 
@@ -187,7 +279,7 @@ const handleLogout = () => {
 
           <!-- Buy Token CTA -->
           <div class="pt-4 border-t border-[#f0f0f0] space-y-3 text-center">
-            <p class="text-xs text-[#707070]">Belum memiliki kode token berlangganan?</p>
+            <p class="text-xs text-[#707070]">Belum memiliki kode token berlangganan 30 hari?</p>
             <a
               :href="whatsappBuyUrl"
               target="_blank"
@@ -222,31 +314,26 @@ const handleLogout = () => {
                 ⚡
               </div>
               <div>
-                <h4 class="font-bold text-[#171717]">Direct File Download</h4>
-                <p class="text-[#707070] mt-0.5 leading-relaxed">Unduh file aplikasi dan script langsung ke server penyimpanan tanpa harus menunggu countdown shortener.</p>
+                <h4 class="font-bold text-[#171717]">Direct Download Tanpa Shortener</h4>
+                <p class="text-[#707070] mt-0.5 leading-relaxed">Unduh file aplikasi dan script skin secara instan tanpa menunggu halaman iklan pendek.</p>
               </div>
             </div>
 
             <div class="flex items-start gap-3">
               <div class="w-7 h-7 rounded-full bg-[#2563eb]/10 text-[#2563eb] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                🎨
+                🎁
               </div>
               <div>
-                <h4 class="font-bold text-[#171717]">Tema Gold Eksklusif</h4>
-                <p class="text-[#707070] mt-0.5 leading-relaxed">Tampilan UI website secara otomatis berubah menjadi tema warna Gold/Amber premium.</p>
-              </div>
-            </div>
-
-            <div class="flex items-start gap-3">
-              <div class="w-7 h-7 rounded-full bg-[#2563eb]/10 text-[#2563eb] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                📱
-              </div>
-              <div>
-                <h4 class="font-bold text-[#171717]">Satu Token Per Perangkat</h4>
-                <p class="text-[#707070] mt-0.5 leading-relaxed">Token tersimpan aman di browser Anda. Tidak perlu repot login setiap kali membuka website.</p>
+                <h4 class="font-bold text-[#171717]">Opsi 1 Hari Gratis via Klik Iklan</h4>
+                <p class="text-[#707070] mt-0.5 leading-relaxed">Cukup klik iklan sponsorship selama 15 detik untuk mengaktifkan status Premium 1 Hari secara cuma-cuma.</p>
               </div>
             </div>
           </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-[#f4f4f5] text-xs text-[#707070] space-y-2">
+          <h4 class="font-bold text-[#171717]">Butuh Bantuan Aktivasi?</h4>
+          <p class="leading-relaxed">Jika Anda mengalami kendala saat mengaktifkan token atau klaim gratis, silakan hubungi tim dukungan kami melalui kontak yang tersedia.</p>
         </div>
       </div>
 

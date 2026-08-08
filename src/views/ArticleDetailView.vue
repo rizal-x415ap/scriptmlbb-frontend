@@ -9,6 +9,7 @@ import ArticleDetailSkeleton from '../components/ArticleDetailSkeleton.vue'
 import AdSlot from '../components/AdSlot.vue'
 import { isPremium } from '../services/premiumStore.js'
 import { sanitizeHtml } from '../utils/sanitize.js'
+import { setSeoMeta, getAbsoluteUrl } from '../services/seo.js'
 
 const route = useRoute()
 
@@ -31,14 +32,27 @@ const getCategoryName = (cat) => {
   return typeof cat === 'object' ? (cat.name || '') : cat
 }
 
+const getCuteAvatar = (name) => {
+  const seed = encodeURIComponent(name || 'Rizal Efendi')
+  return `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`
+}
+
 const getAuthorName = (author) => {
-  if (!author) return ''
-  return typeof author === 'object' ? (author.name || '') : author
+  if (author && typeof author === 'object' && author.name) return author.name
+  if (typeof author === 'string' && author.trim()) return author
+  return siteSettings.authorName || 'Rizal Efendi'
 }
 
 const getAuthorAvatar = (author) => {
-  if (!author) return ''
-  return typeof author === 'object' ? (author.avatar || '') : author
+  if (author && typeof author === 'object' && author.avatar) return author.avatar
+  if (siteSettings.authorAvatarUrl) return siteSettings.authorAvatarUrl
+  const name = getAuthorName(author)
+  return getCuteAvatar(name)
+}
+
+const getAuthorTitle = (author) => {
+  if (author && typeof author === 'object' && author.title) return author.title
+  return siteSettings.authorTitle || 'Penulis & Pengembang Sistem'
 }
 
 const getFormattedDate = (date) => {
@@ -332,10 +346,6 @@ const parsedDownloadLinks = computed(() => {
 })
 
 // Comments State
-const getCuteAvatar = (name) => {
-  const seed = encodeURIComponent(name || 'Anonymous User')
-  return `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`
-}
 
 // Helper to parse comment if content or object is stored as raw JSON string
 const parseCommentData = (commentObj) => {
@@ -986,31 +996,60 @@ const handleConfirmDelete = async () => {
           <template v-else>
             <!-- Article Header Block -->
             <header class="space-y-5 pb-6 border-b border-[#f0f0f0]">
-              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-[#2563eb]/10">
-                <span class="font-mono-eyebrow text-[#2563eb]">{{ getCategoryName(article.category) }}</span>
+              <div class="flex items-center gap-2 font-mono text-xs">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2563eb]/10">
+                  <span class="font-mono-eyebrow text-[#2563eb]">{{ getCategoryName(article.category) }}</span>
+                </div>
+                <span v-if="getFormattedDate(article.published_at || article.date)" class="text-[#707070]">•</span>
+                <span v-if="getFormattedDate(article.published_at || article.date)" class="text-[#707070]">{{ getFormattedDate(article.published_at || article.date) }}</span>
+                <span v-if="article.read_time" class="text-[#707070]">•</span>
+                <span v-if="article.read_time" class="text-[#2563eb] font-semibold">{{ article.read_time }}</span>
               </div>
 
               <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#171717] leading-[1.15]">
                 {{ article.title }}
               </h1>
 
-              <p class="text-base sm:text-lg text-[#707070] leading-relaxed">
+              <p v-if="article.subtitle" class="text-base sm:text-lg text-[#707070] leading-relaxed">
                 {{ article.subtitle }}
               </p>
 
-              <!-- Author Metadata Row -->
-              <div class="flex items-center gap-3.5 pt-4 border-t border-[#f0f0f0]">
-                <img :src="getAuthorAvatar(article.author)" :alt="getAuthorName(article.author)" loading="lazy" decoding="async" width="44" height="44" class="w-11 h-11 rounded-full object-cover border border-[#e4e4e7]" />
-                <div>
-                  <div class="font-semibold text-[#171717] text-sm sm:text-base">{{ getAuthorName(article.author) }}</div>
-                  <div class="text-xs text-[#707070] flex items-center gap-2 font-mono">
-                    <span>{{ article.author?.title || 'Penulis' }}</span>
-                    <span>•</span>
-                    <span>{{ getFormattedDate(article.published_at || article.date) }}</span>
-                    <span>•</span>
-                    <span class="text-[#2563eb] font-semibold">{{ article.read_time }}</span>
+              <!-- Author Profile Block (Matching Sidebar Data: Icon, Nama, Subtitle & Button Ikuti) -->
+              <div class="flex flex-row items-center justify-between gap-4 pt-4 border-t border-[#f0f0f0]">
+                <div class="flex items-center gap-3.5">
+                  <div class="relative shrink-0">
+                    <img
+                      :src="getAuthorAvatar(article.author)"
+                      :alt="getAuthorName(article.author)"
+                      loading="lazy"
+                      decoding="async"
+                      width="48"
+                      height="48"
+                      class="w-12 h-12 rounded-full object-contain border border-[#e4e4e7] p-0.5 bg-[#f4f4f5]"
+                    />
+                    <span class="absolute bottom-0 right-0 w-3 h-3 bg-[#2563eb] rounded-full border-2 border-white"></span>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-[#171717] text-sm sm:text-base leading-snug">
+                      {{ getAuthorName(article.author) }}
+                    </h3>
+                    <p class="text-xs text-[#707070]">
+                      {{ getAuthorTitle(article.author) }}
+                    </p>
                   </div>
                 </div>
+
+                <a
+                  :href="siteSettings.authorInstagramUrl || 'https://instagram.com'"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="stitch-button-primary px-4 py-2 text-xs font-semibold inline-flex items-center justify-center gap-1.5 shrink-0 active:scale-95 transition-transform"
+                >
+                  <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM3 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 019.374 21c-2.331 0-4.512-.645-6.374-1.765z" />
+                  </svg>
+                  <span>Ikuti {{ siteSettings.authorInstagramHandle || 'Penulis' }}</span>
+                </a>
               </div>
             </header>
 
@@ -1329,27 +1368,27 @@ const handleConfirmDelete = async () => {
         </main>
 
         <!-- Right Track: Sidebar Widgets (4 Columns) -->
-        <aside class="lg:col-span-4 space-y-8 sticky top-20">
+        <aside class="lg:col-span-4 space-y-8 sticky top-32">
 
           <!-- Author Profile & Bio Gadget -->
           <div class="space-y-4 pb-6 border-b border-[#f0f0f0]">
             <div class="flex items-center gap-3.5">
               <div class="relative shrink-0">
                 <img
-                  :src="siteSettings.authorAvatarUrl || article.author?.avatar || getCuteAvatar(article.author?.name)"
-                  :alt="siteSettings.authorName || article.author?.name"
+                  :src="getAuthorAvatar(article.author)"
+                  :alt="getAuthorName(article.author)"
                   class="w-12 h-12 rounded-full border border-[#e4e4e7] object-cover"
                 />
                 <span class="absolute bottom-0 right-0 w-3 h-3 bg-[#2563eb] rounded-full border-2 border-white"></span>
               </div>
               <div>
-                <h3 class="font-bold text-[#171717] text-sm">{{ siteSettings.authorName || article.author?.name }}</h3>
-                <p class="text-xs text-[#707070]">{{ siteSettings.authorTitle || article.author?.title }}</p>
+                <h3 class="font-bold text-[#171717] text-sm">{{ getAuthorName(article.author) }}</h3>
+                <p class="text-xs text-[#707070]">{{ getAuthorTitle(article.author) }}</p>
               </div>
             </div>
 
             <p class="text-xs text-[#707070] leading-relaxed">
-              {{ siteSettings.authorBio || article.author?.bio }}
+              {{ siteSettings.authorBio || (article.author && article.author.bio) || 'Berbagi pengalaman teknis seputar pemrograman, arsitektur web, dan desain sistem modern.' }}
             </p>
 
             <div class="flex items-center justify-between pt-2 border-t border-[#f0f0f0]">

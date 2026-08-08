@@ -11,23 +11,23 @@ const searchQuery = ref('')
 
 const emit = defineEmits(['search'])
 
-const handleSearchInput = () => {
-  emit('search', searchQuery.value)
-  if (searchQuery.value.trim() && route.path !== '/archive') {
-    router.push('/archive')
-  }
-}
-
 const handleSearchSubmit = () => {
-  emit('search', searchQuery.value)
-  if (route.path !== '/archive') {
-    router.push('/archive')
+  const query = searchQuery.value.trim()
+  emit('search', query)
+  
+  router.push({
+    path: '/archive',
+    query: query ? { search: query } : {}
+  })
+
+  if (isMobileMenuOpen.value) {
+    isMobileMenuOpen.value = false
   }
 }
 
 const navLinks = [
   { name: 'Beranda', path: '/' },
-  { name: 'Arsip & Cari', path: '/archive' },
+  { name: 'Hitung WR', path: '/hitung-wr', isWr: true },
   { name: 'Disimpan', path: '/bookmarks', isBookmark: true }
 ]
 </script>
@@ -66,13 +66,12 @@ const navLinks = [
           <div class="relative w-full">
             <input
               v-model="searchQuery"
-              @input="handleSearchInput"
               type="text"
               placeholder="Cari artikel, script skin..."
-              class="w-full pl-9 pr-4 py-1.5 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] placeholder-[#a1a1aa] focus:outline-none focus:border-[#2563eb] focus:bg-white transition-all"
+              class="w-full pl-9.5 pr-4 py-2.5 text-sm bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] placeholder-[#a1a1aa] focus:outline-none focus:border-[#2563eb] focus:bg-white transition-all"
             />
-            <button type="submit" class="absolute left-3 top-2 text-[#707070] hover:text-[#2563eb] transition-colors cursor-pointer">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <button type="submit" class="absolute left-3 top-2.5 text-[#707070] hover:text-[#2563eb] transition-colors cursor-pointer" aria-label="Cari">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
             </button>
@@ -80,12 +79,12 @@ const navLinks = [
         </form>
 
         <!-- Desktop Navigation -->
-        <nav class="hidden md:flex items-center gap-6">
+        <nav class="hidden md:flex items-center gap-7">
           <RouterLink
             v-for="link in navLinks"
             :key="link.path"
             :to="link.path"
-            class="text-xs font-semibold transition-colors inline-flex items-center gap-1.5"
+            class="text-base font-semibold transition-colors inline-flex items-center gap-1.5 md:gap-2"
             :class="[
               route.path === link.path
                 ? 'text-[#2563eb]'
@@ -93,24 +92,24 @@ const navLinks = [
             ]"
           >
             <!-- Beranda Icon -->
-            <svg v-if="link.path === '/'" class="w-3.5 h-3.5 shrink-0" :class="route.path === '/' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <svg v-if="link.path === '/'" class="w-4 h-4 shrink-0" :class="route.path === '/' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
             </svg>
 
-            <!-- Arsip Icon -->
-            <svg v-else-if="link.path === '/archive'" class="w-3.5 h-3.5 shrink-0" :class="route.path === '/archive' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+            <!-- Hitung WR Icon -->
+            <svg v-else-if="link.isWr" class="w-4 h-4 shrink-0" :class="route.path === '/hitung-wr' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-3-2.25V18m-3-2.25V18m9-6V18M3 4.5h18a1.5 1.5 0 011.5 1.5v12a1.5 1.5 0 01-1.5 1.5H3a1.5 1.5 0 01-1.5-1.5V6a1.5 1.5 0 011.5-1.5zM6 7.5h12v3H6v-3z" />
             </svg>
 
             <!-- Disimpan / Bookmark Icon -->
-            <svg v-else-if="link.isBookmark" class="w-3.5 h-3.5 shrink-0 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
+            <svg v-else-if="link.isBookmark" class="w-4 h-4 shrink-0 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
               <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
             </svg>
 
             <span>{{ link.name }}</span>
             <span
               v-if="link.isBookmark && bookmarkedArticles.length > 0"
-              class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 font-mono"
+              class="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300 font-mono"
             >
               {{ bookmarkedArticles.length }}
             </span>
@@ -119,8 +118,8 @@ const navLinks = [
 
         <!-- CTA Buttons -->
         <div class="hidden sm:flex items-center gap-3 shrink-0">
-          <RouterLink to="/archive" class="stitch-button-primary px-4 py-2 text-xs flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <RouterLink to="/archive" class="stitch-button-primary px-4 py-2 text-xs sm:text-sm flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
             Jelajahi Arsip
@@ -144,7 +143,6 @@ const navLinks = [
         <form @submit.prevent="handleSearchSubmit" class="px-2">
           <input
             v-model="searchQuery"
-            @input="handleSearchInput"
             type="text"
             placeholder="Cari artikel, script skin..."
             class="w-full px-3 py-2 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] placeholder-[#a1a1aa] focus:outline-none focus:border-[#2563eb]"
@@ -167,8 +165,8 @@ const navLinks = [
             <svg v-if="link.path === '/'" class="w-4 h-4 shrink-0" :class="route.path === '/' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
             </svg>
-            <svg v-else-if="link.path === '/archive'" class="w-4 h-4 shrink-0" :class="route.path === '/archive' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+            <svg v-else-if="link.isWr" class="w-4 h-4 shrink-0" :class="route.path === '/hitung-wr' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-3-2.25V18m-3-2.25V18m9-6V18M3 4.5h18a1.5 1.5 0 011.5 1.5v12a1.5 1.5 0 01-1.5 1.5H3a1.5 1.5 0 01-1.5-1.5V6a1.5 1.5 0 011.5-1.5zM6 7.5h12v3H6v-3z" />
             </svg>
             <svg v-else-if="link.isBookmark" class="w-4 h-4 shrink-0 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
               <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />

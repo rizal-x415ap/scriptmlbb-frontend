@@ -33,7 +33,7 @@ const isExternalLink = (url) => {
             <span class="font-semibold text-lg text-[#171717]">{{ siteSettings.brandLogoText || 'Script MLBB' }}</span>
           </div>
           
-          <p class="text-xs sm:text-sm leading-relaxed text-[#707070] max-w-sm">
+          <p class="text-sm leading-relaxed text-[#707070] max-w-sm">
             {{ siteSettings.footerBio || 'An editorial tech publication dedicated to high-performance web architecture, developer tooling, design systems, and software craftsmanship.' }}
           </p>
 
@@ -45,7 +45,7 @@ const isExternalLink = (url) => {
         <!-- Column 2 Links -->
         <div class="space-y-3">
           <h4 class="font-mono-eyebrow text-[#171717]">{{ siteSettings.footerCol2Title || 'Categories' }}</h4>
-          <ul class="space-y-2 text-xs sm:text-sm">
+          <ul class="space-y-2.5 text-sm">
             <li v-if="siteSettings.footerCol2Link1Text">
               <a
                 v-if="isExternalLink(siteSettings.footerCol2Link1Url)"
@@ -207,10 +207,12 @@ const isExternalLink = (url) => {
         </div>
       </div>
 
-      <!-- Bottom Bar -->
       <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#888888]">
         <p>{{ siteSettings.footerCopyright || `© ${currentYear} Supabaze Editorial. All rights reserved.` }}</p>
         <div class="flex flex-wrap items-center gap-4 sm:gap-6">
+          <RouterLink to="/contact" class="hover:text-[#171717] transition-colors font-semibold text-[#2563eb]">
+            Hubungi Kami
+          </RouterLink>
           <RouterLink to="/page/tentang-kami" class="hover:text-[#171717] transition-colors">
             Tentang Kami
           </RouterLink>

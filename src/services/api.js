@@ -92,18 +92,18 @@ export const ApiService = {
     return json
   },
 
-  // Fetch Home Feed Data (SWR pattern for instant FCP/LCP)
-  async getHomeFeed(page = 1) {
-    const cacheKey = `home_feed_page_${page}`
-    const cached = page === 1 ? getSwrCache('home_feed') : null
-    const fetchPromise = fetch(`${API_BASE_URL}/home-feed?page=${page}`, { headers: getHeaders() })
+  // Fetch Home Feed Data (Supports Category Filtering & Pagination)
+  async getHomeFeed(page = 1, category = 'All') {
+    const catQuery = category && category !== 'All' ? `&category=${encodeURIComponent(category)}` : ''
+    const cached = (page === 1 && (!category || category === 'All')) ? getSwrCache('home_feed') : null
+    const fetchPromise = fetch(`${API_BASE_URL}/home-feed?page=${page}${catQuery}`, { headers: getHeaders() })
       .then(res => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
         return res.json()
       })
       .then(json => {
         const feedData = json.data || { featured: null, feed: [], pagination: { current_page: 1, last_page: 1 } }
-        if (page === 1) {
+        if (page === 1 && (!category || category === 'All')) {
           setSwrCache('home_feed', feedData)
         }
         return feedData
@@ -152,7 +152,13 @@ export const ApiService = {
 
   // Fetch Archive Articles with filtering & search parameters
   async getArchiveArticles(params = {}) {
-    const query = new URLSearchParams(params).toString()
+    const cleanParams = {}
+    Object.keys(params).forEach(k => {
+      if (params[k] !== undefined && params[k] !== null && params[k] !== '' && params[k] !== 'All') {
+        cleanParams[k] = params[k]
+      }
+    })
+    const query = new URLSearchParams(cleanParams).toString()
     const response = await fetch(`${API_BASE_URL}/articles?${query}`, {
       headers: getHeaders()
     })
@@ -160,7 +166,10 @@ export const ApiService = {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
     const json = await response.json()
-    return json.data || []
+    return {
+      data: json.data || [],
+      meta: json.meta || { current_page: 1, last_page: 1, total: 0 }
+    }
   },
 
   // Submit Article Comment

@@ -52,10 +52,25 @@ export function loadPremiumStatus() {
   verificationPromise = (async () => {
     isVerifyingPremium.value = true
     const savedToken = localStorage.getItem('blog_premium_token')
+    const savedExpires = localStorage.getItem('blog_premium_expires')
     if (!savedToken) {
       isPremium.value = false
       isVerifyingPremium.value = false
       return false
+    }
+
+    if (savedToken === 'FREE1DAY') {
+      if (savedExpires && new Date(savedExpires) > new Date()) {
+        isPremium.value = true
+        premiumToken.value = 'FREE1DAY'
+        premiumExpiresAt.value = savedExpires
+        isVerifyingPremium.value = false
+        return true
+      } else {
+        clearPremium()
+        isVerifyingPremium.value = false
+        return false
+      }
     }
 
     try {
@@ -142,4 +157,21 @@ export function shouldShowPopup() {
 
   const FIVE_MINUTES = 5 * 60 * 1000
   return (Date.now() - parseInt(lastDismiss, 10)) > FIVE_MINUTES
+}
+
+/**
+ * Activate 1-Day Free Premium via Ad Click
+ */
+export function activateFreeDayPremium() {
+  const expiresDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+  const freeToken = 'FREE1DAY'
+
+  isPremium.value = true
+  premiumToken.value = freeToken
+  premiumExpiresAt.value = expiresDate
+
+  localStorage.setItem('blog_premium_token', freeToken)
+  localStorage.setItem('blog_premium_expires', expiresDate)
+
+  return expiresDate
 }
