@@ -859,21 +859,23 @@ const handleConfirmDelete = async () => {
               />
 
               <!-- App Technical Specs & Download Links Box (Card Utama Utuh) -->
-              <div id="download-section" class="mt-8 p-5 sm:p-6 bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] space-y-5 sm:space-y-6 scroll-mt-36">
-                <!-- Header Title (Using Article Title across top) -->
-                <div class="border-b border-[#e2e8f0] pb-3">
-                  <h2 class="text-lg font-bold text-[#171717] ">
-                    Download {{ article.title }}
-                  </h2>
+              <div id="download-section" class="relative mt-8 p-4 sm:p-6 bg-[#f8fafc] rounded-xl border-2 border-[#2563eb] space-y-5 scroll-mt-36 overflow-hidden shadow-sm">
+                
+                <!-- Top Right Corner Badge (Menempel Kanan Atas Card) -->
+                <div class="absolute top-0 right-0 bg-[#2563eb] text-white text-[10px] sm:text-xs font-bold px-3 py-1 rounded-bl-lg shadow-sm flex items-center gap-1.5 font-mono tracking-wider z-10">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  <span>DOWNLOAD SCRIPT</span>
                 </div>
 
-                <!-- Grid Layout: On Desktop (lg:), Left is Poster & Specs (7 cols), Right is Simple Blue Link List (5 cols) -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- Grid Layout: On Desktop (lg:), Left is Poster & Specs with Title (7 cols), Right is Simple Blue Link List (5 cols) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start pt-3 sm:pt-2">
                   
-                  <!-- LEFT COLUMN (Desktop lg:col-span-7): Poster 3:5 on Left + Badges & Specs on Right -->
+                  <!-- LEFT COLUMN (Desktop lg:col-span-7): Poster Image on Left + Title, Horizontal Line, Badges & Date on Right -->
                   <div class="lg:col-span-7 flex flex-row items-start gap-3 sm:gap-5">
                     <!-- LEFT SIDE: 3:5 Aspect Ratio Poster Thumbnail Image -->
-                    <div class="w-24 sm:w-36 aspect-[3/5] rounded-[10px] overflow-hidden border border-[#e2e8f0] bg-[#171717] shrink-0 relative">
+                    <div class="w-24 sm:w-36 aspect-[3/5] rounded-lg overflow-hidden border border-[#e2e8f0] bg-[#171717] shrink-0 relative shadow-xs">
                       <img
                         :src="article.app_poster_35 || article.cover_image"
                         :alt="article.title"
@@ -881,29 +883,41 @@ const handleConfirmDelete = async () => {
                       />
                     </div>
 
-                    <!-- RIGHT SIDE: Feature Badges & Technical Specs -->
-                    <div class="flex-1 space-y-2 sm:space-y-3 min-w-0 w-full text-left">
-                      <!-- Tags / Feature Pills -->
-                      <div class="flex flex-wrap gap-1 sm:gap-1.5">
-                        <span
-                          v-for="(feature, fIdx) in appFeaturesList"
-                          :key="fIdx"
-                          class="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-medium bg-white text-[#1d4ed8] border border-[#2563eb]/25"
-                        >
-                          {{ feature.startsWith('✓') ? feature : '✓ ' + feature }}
-                        </span>
+                    <!-- RIGHT SIDE: Title, Horizontal Line, Feature Badges & Date -->
+                    <div class="flex-1 space-y-3 min-w-0 w-full text-left pr-2 sm:pr-0">
+                      <!-- Title Inside Card Next to Image -->
+                      <div>
+                        <h2 class="text-base sm:text-lg lg:text-xl font-bold text-[#171717] leading-snug pr-16 sm:pr-20 lg:pr-0">
+                          Download {{ article.title }}
+                        </h2>
                       </div>
 
-                      <!-- Clean Green Date Badge (Square corners, small text) -->
-                      <div>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] sm:text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/80">
-                          Diperbarui pada {{ getFormattedDate(article.published_at) }}
-                        </span>
+                      <!-- Horizontal Line Separator -->
+                      <div class="border-b border-[#e2e8f0]"></div>
+
+                      <!-- Tags / Feature Pills & Date Below Line -->
+                      <div class="space-y-2.5">
+                        <div class="flex flex-wrap gap-1 sm:gap-1.5">
+                          <span
+                            v-for="(feature, fIdx) in appFeaturesList"
+                            :key="fIdx"
+                            class="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-medium bg-white text-[#1d4ed8] border border-[#2563eb]/25"
+                          >
+                            {{ feature.startsWith('✓') ? feature : '✓ ' + feature }}
+                          </span>
+                        </div>
+
+                        <!-- Clean Green Date Badge -->
+                        <div>
+                          <span class="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] sm:text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                            Diperbarui pada {{ getFormattedDate(article.published_at) }}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  <!-- RIGHT COLUMN (Desktop lg:col-span-5): Simple Blue Link List (Tanpa Inner Card) -->
+                  <!-- RIGHT COLUMN (Desktop lg:col-span-5): Link Download File -->
                   <div class="lg:col-span-5 pt-4 lg:pt-0 border-t lg:border-t-0 border-[#e2e8f0] space-y-3">
                     <h4 class="text-xs font-bold text-[#171717] uppercase tracking-wider font-mono">LINK UNDUHAN FILE</h4>
 
