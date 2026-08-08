@@ -383,20 +383,30 @@ const toggleBookmark = (item) => {
           </div>
         </article>
 
-        <!-- Card "Lihat Artikel Lainnya" di Akhir Slider Track -->
+        <!-- Card "Lihat Artikel Lainnya" di Akhir Slider Track (Minimalis & Elegan) -->
         <RouterLink
           :to="selectedCategory !== 'All' ? '/archive?category=' + encodeURIComponent(selectedCategory) : '/archive'"
-          class="w-[200px] sm:w-[220px] shrink-0 snap-start flex flex-col items-center justify-center text-center p-6 bg-[#f4f4f5] hover:bg-[#2563eb] text-[#171717] hover:text-white rounded-[14px] transition-all group cursor-pointer border border-transparent"
+          class="w-[200px] sm:w-[220px] shrink-0 snap-start flex flex-col justify-between p-5 rounded-[14px] border border-[#ebebeb] hover:border-[#2563eb] bg-white group cursor-pointer transition-all duration-300"
         >
-          <div class="w-12 h-12 rounded-full bg-white group-hover:bg-white/20 flex items-center justify-center text-[#2563eb] group-hover:text-white mb-3 transition-colors shadow-xs">
-            <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
+          <div class="flex-1 flex flex-col items-center justify-center text-center py-6 space-y-3">
+            <div class="w-11 h-11 rounded-full bg-[#f4f4f5] group-hover:bg-[#2563eb] text-[#171717] group-hover:text-white flex items-center justify-center transition-colors duration-300">
+              <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </div>
+            <div class="space-y-1">
+              <span class="block text-xs font-bold text-[#171717] group-hover:text-[#2563eb] transition-colors">
+                Lihat Artikel Lainnya
+              </span>
+              <span class="block text-[11px] text-[#888888] font-mono">
+                {{ selectedCategory !== 'All' ? selectedCategory : 'Arsip Lengkap' }}
+              </span>
+            </div>
           </div>
-          <span class="font-bold text-sm leading-snug">Lihat Artikel Lainnya</span>
-          <span class="text-xs font-mono opacity-70 mt-1">
-            {{ selectedCategory !== 'All' ? selectedCategory : 'Jelajahi Arsip' }} →
-          </span>
+
+          <div class="pt-3 border-t border-[#f0f0f0] flex items-center justify-center text-[11px] font-semibold text-[#2563eb] group-hover:underline">
+            <span>Jelajahi →</span>
+          </div>
         </RouterLink>
       </div>
 
