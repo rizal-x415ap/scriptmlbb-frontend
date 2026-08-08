@@ -69,9 +69,7 @@ const handleActivate = async () => {
     const result = await activateToken(tokenInput.value)
     successMessage.value = result.message || 'Selamat! Berlangganan Premium berhasil.'
     tokenInput.value = ''
-    setTimeout(() => {
-      window.location.reload()
-    }, 1500)
+    window.location.reload()
   } catch (err) {
     errorMessage.value = err.message || 'Gagal mengaktifkan token.'
   } finally {
@@ -102,9 +100,7 @@ const startAdVerification = () => {
 
       activateFreeDayPremium()
       successMessage.value = '🎉 Selamat! Status Premium 1 Hari Gratis telah aktif!'
-      setTimeout(() => {
-        window.location.reload()
-      }, 1500)
+      window.location.reload()
     }
   }, 1000)
 }
