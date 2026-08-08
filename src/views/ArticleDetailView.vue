@@ -755,7 +755,7 @@ const handleConfirmDelete = async () => {
                       </span>
                       <!-- Badge 2: Work Classic / Rank (Soft Emerald Pill) -->
                       <span class="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-[#059669] bg-[#ecfdf5] px-2.5 py-0.5 rounded-full border border-[#a7f3d0]">
-                        ✓ Work Classic / Rank
+                        ✓ New Patch
                       </span>
                       <!-- Badge 3: No Password (Soft Amber Pill) -->
                       <span class="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-[#d97706] bg-[#fffbeb] px-2.5 py-0.5 rounded-full border border-[#fef3c7]">
@@ -892,7 +892,7 @@ const handleConfirmDelete = async () => {
                     <div class="flex-1 space-y-3 min-w-0 w-full text-left pr-2 sm:pr-0">
                       <!-- Title Inside Card Next to Image -->
                       <div>
-                        <h3 class="text-base sm:text-lg lg:text-xl font-bold text-[#171717] leading-snug break-words pr-20 lg:pr-0">
+                        <h3 class="text-base sm:text-lg lg:text-xl font-bold text-[#171717] leading-snug break-all pr-0">
                           {{ article.title }}
                         </h3>
                       </div>
