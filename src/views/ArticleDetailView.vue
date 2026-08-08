@@ -747,15 +747,20 @@ const handleConfirmDelete = async () => {
                       </h1>
                     </div>
 
-                    <!-- ROW 2 (Below): Developer Name & Badges in its own full-width row (Centered Horizontally) -->
-                    <div class="flex flex-wrap gap-x-3 gap-y-1.5 pt-1 text-xs sm:text-sm">
-                      <span class="font-semibold text-[#2563eb]">
-                        {{ article.app_developer || getAuthorName(article.author) }}
+                    <!-- ROW 2 (Below): Developer Name & Badges in its own full-width row (Distinct Colorful Pill Badges) -->
+                    <div class="flex flex-wrap items-center gap-2 pt-1">
+                      <!-- Badge 1: Developer Name (Soft Blue Pill) -->
+                      <span class="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-[#2563eb] bg-[#eff6ff] px-2.5 py-0.5 rounded-full border border-[#bfdbfe]">
+                        👤 {{ article.app_developer || getAuthorName(article.author) }}
                       </span>
-                      <span class="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-[#059669] bg-[#ecfdf5] px-2.5 py-0.5 rounded-full border border-[#a7f3d0]">
+                      <!-- Badge 2: Work Classic / Rank (Soft Emerald Pill) -->
+                      <span class="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-[#059669] bg-[#ecfdf5] px-2.5 py-0.5 rounded-full border border-[#a7f3d0]">
                         ✓ Work Classic / Rank
                       </span>
-                      <span class="text-[11px] sm:text-xs text-[#707070] font-mono">• No Password</span>
+                      <!-- Badge 3: No Password (Soft Amber Pill) -->
+                      <span class="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-[#d97706] bg-[#fffbeb] px-2.5 py-0.5 rounded-full border border-[#fef3c7]">
+                        🔒 No Password
+                      </span>
                     </div>
                   </div>
 
