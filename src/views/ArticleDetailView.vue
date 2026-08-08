@@ -156,7 +156,25 @@ const formattedContent = computed(() => {
     .replace(/^>\s+(.*$)/gim, '<blockquote class="border-l-2 border-[#3ecf8e] pl-6 py-2 italic text-[#171717] bg-[#fafafa] rounded-r-[6px] my-6">$1</blockquote>')
     .replace(/```([\s\S]*?)```/gim, '<div class="rounded-[6px] bg-[#1c1c1c] text-[#fafafa] p-6 border border-white/10 overflow-x-auto my-6 font-mono text-sm"><pre><code>$1</code></pre></div>')
 
-  // 4. Auto-inject loading="lazy" & decoding="async" to all inline article content <img> tags
+  // 4. Convert Markdown Unordered Lists (- or *) if present as plain text
+  raw = raw.replace(/(?:^\s*[-*]\s+.+(?:\r?\n|$))+/gm, (match) => {
+    const items = match.trim().split(/\r?\n/).map(line => {
+      const clean = line.replace(/^\s*[-*]\s+/, '')
+      return `<li>${clean}</li>`
+    }).join('')
+    return `<ul>${items}</ul>`
+  })
+
+  // 5. Convert Markdown Ordered Lists (1. 2. 3.) if present as plain text
+  raw = raw.replace(/(?:^\s*\d+\.\s+.+(?:\r?\n|$))+/gm, (match) => {
+    const items = match.trim().split(/\r?\n/).map(line => {
+      const clean = line.replace(/^\s*\d+\.\s+/, '')
+      return `<li>${clean}</li>`
+    }).join('')
+    return `<ol>${items}</ol>`
+  })
+
+  // 6. Auto-inject loading="lazy" & decoding="async" to all inline article content <img> tags
   raw = raw.replace(/<img([^>]+)>/gim, (match, attrs) => {
     if (attrs.includes('loading=')) return match
     return `<img${attrs} loading="lazy" decoding="async" class="rounded-[8px] max-w-full h-auto my-4 shadow-sm" />`

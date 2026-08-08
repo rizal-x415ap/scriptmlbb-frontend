@@ -145,4 +145,160 @@
   color: #d97706 !important;
 }
 
+/* ==========================================================================
+   Article Content Body (ul, ol, li, p) Minimalist Typography System
+   ========================================================================== */
+
+.article-content-body {
+  color: #171717;
+  line-height: 1.8;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+  hyphens: auto !important;
+}
+
+.article-content-body p {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.article-content-body p:first-child {
+  margin-top: 0;
+}
+
+/* Fix <em>, <i>, <strong>, <span>, <code> text overflow bug */
+.article-content-body em,
+.article-content-body i {
+  font-style: italic !important;
+  display: inline !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+  white-space: normal !important;
+  max-width: 100% !important;
+}
+
+.article-content-body code {
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+  white-space: pre-wrap !important;
+}
+
+/* Automatic Blue Link Styling for <a> tags inside article content */
+.article-content-body a {
+  color: #2563eb !important;
+  font-weight: 600 !important;
+  text-decoration: underline !important;
+  text-decoration-color: rgba(37, 99, 235, 0.4) !important;
+  text-underline-offset: 3px !important;
+  transition: all 0.2s ease !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+.article-content-body a:hover {
+  color: #1d4ed8 !important;
+  text-decoration-color: #1d4ed8 !important;
+}
+
+.premium-theme .article-content-body a {
+  color: #d97706 !important;
+  text-decoration-color: rgba(217, 119, 6, 0.4) !important;
+}
+
+.premium-theme .article-content-body a:hover {
+  color: #b45309 !important;
+  text-decoration-color: #b45309 !important;
+}
+
+/* Unordered Lists (<ul>) - Minimalist Accent Bullet System */
+.article-content-body ul {
+  list-style: none !important;
+  padding-left: 0 !important;
+  margin-top: 1rem !important;
+  margin-bottom: 1.25rem !important;
+}
+
+.article-content-body ul > li {
+  position: relative !important;
+  padding-left: 1.75rem !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+  line-height: 1.75 !important;
+}
+
+.article-content-body ul > li::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 0.35rem !important;
+  top: 0.65em !important;
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  background-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15) !important;
+  transition: all 0.2s ease;
+}
+
+/* Ordered Lists (<ol>) - Clean Monospace Numbering */
+.article-content-body ol {
+  counter-reset: article-counter !important;
+  list-style: none !important;
+  padding-left: 0 !important;
+  margin-top: 1rem !important;
+  margin-bottom: 1.25rem !important;
+}
+
+.article-content-body ol > li {
+  counter-increment: article-counter !important;
+  position: relative !important;
+  padding-left: 2.25rem !important;
+  margin-top: 0.625rem !important;
+  margin-bottom: 0.625rem !important;
+  line-height: 1.75 !important;
+}
+
+.article-content-body ol > li::before {
+  content: counter(article-counter) "." !important;
+  position: absolute !important;
+  left: 0.25rem !important;
+  top: 0 !important;
+  font-family: 'Fira Code', monospace !important;
+  font-weight: 700 !important;
+  font-size: 0.9em !important;
+  color: #2563eb !important;
+  min-width: 1.5rem !important;
+}
+
+/* Nested Lists (ul ul, ol ol, ul ol, ol ul) */
+.article-content-body ul ul,
+.article-content-body ul ol,
+.article-content-body ol ul,
+.article-content-body ol ol {
+  margin-top: 0.375rem !important;
+  margin-bottom: 0.375rem !important;
+  padding-left: 0.5rem !important;
+}
+
+.article-content-body ul ul > li::before {
+  background-color: #707070 !important;
+  box-shadow: none !important;
+  width: 5px !important;
+  height: 5px !important;
+}
+
+.article-content-body li > p {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+/* Premium Amber Theme Support for Article Lists */
+.premium-theme .article-content-body ul > li::before {
+  background-color: #d97706 !important;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15) !important;
+}
+
+.premium-theme .article-content-body ol > li::before {
+  color: #d97706 !important;
+}
+
 
