@@ -411,7 +411,7 @@ const toggleBookmark = (item) => {
 
             <!-- Article Title -->
             <RouterLink :to="'/article/' + (item.slug || item.id)" class="block">
-              <h3 class="text-sm sm:text-base font-semibold text-[#171717] leading-snug line-clamp-2 group-hover:text-[#2563eb] transition-colors">
+              <h3 class="text-base sm:text-lg font-semibold text-[#171717] leading-snug line-clamp-2 group-hover:text-[#2563eb] transition-colors">
                 {{ item.title }}
               </h3>
             </RouterLink>
@@ -447,7 +447,7 @@ const toggleBookmark = (item) => {
             </div>
 
             <!-- Title (Same size & typography as article title) -->
-            <h3 class="text-sm sm:text-base font-semibold text-[#171717] group-hover:text-[#2563eb] transition-colors leading-snug line-clamp-2">
+            <h3 class="text-base sm:text-lg font-semibold text-[#171717] group-hover:text-[#2563eb] transition-colors leading-snug line-clamp-2">
               Jelajahi Artikel {{ (siteSettings.featuredPostCategory && siteSettings.featuredPostCategory !== 'All') ? siteSettings.featuredPostCategory : 'Lainnya' }}
             </h3>
           </div>
