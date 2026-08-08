@@ -33,7 +33,7 @@ const handleLogout = () => {
         <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-white text-[10px] font-bold shrink-0">
           👑
         </span>
-        <span class="font-bold tracking-wide truncate">AKUN PREMIUM AKTIF</span>
+        <span class="font-bold tracking-wide truncate">PREMIUM AKTIF</span>
         <span class="hidden sm:inline text-amber-100">• Bebas Iklan & Direct Download</span>
         <span class="text-amber-200">| Expired: {{ formattedExpiry }}</span>
       </div>

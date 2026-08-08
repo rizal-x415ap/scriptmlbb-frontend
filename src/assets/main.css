@@ -136,4 +136,18 @@
   background-color: #d97706;
 }
 
+/* Premium Brand Logo & Title Styling */
+.premium-theme .brand-logo-text {
+  color: #d97706 !important;
+}
+
+.premium-theme .brand-logo-icon {
+  background-color: #d97706 !important;
+  border-color: #d97706 !important;
+}
+
+.premium-theme .home-hero-title {
+  color: #d97706 !important;
+}
+
 

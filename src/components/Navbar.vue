@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { siteSettings } from '../services/settingsStore.js'
 import { bookmarkedArticles } from '../services/bookmarkStore.js'
+import { isPremium } from '../services/premiumStore.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -47,7 +48,8 @@ const navLinks = [
           />
           <div
             v-else
-            class="w-8 h-8 rounded-[8px] bg-[#171717] text-white flex items-center justify-center border border-[#171717]/10 group-hover:bg-[#2563eb] transition-colors shrink-0"
+            class="w-8 h-8 rounded-[8px] text-white flex items-center justify-center border transition-colors shrink-0 brand-logo-icon"
+            :class="isPremium ? 'bg-amber-600 border-amber-600 group-hover:bg-amber-700' : 'bg-[#171717] border-[#171717]/10 group-hover:bg-[#2563eb]'"
           >
             <!-- Minimalist Script Terminal Emblem -->
             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -55,8 +57,14 @@ const navLinks = [
             </svg>
           </div>
           <div class="flex items-center gap-1.5">
-            <span class="font-bold text-lg text-[#171717] tracking-tight group-hover:text-[#2563eb] transition-colors">
+            <span
+              class="font-bold text-lg tracking-tight transition-colors brand-logo-text"
+              :class="isPremium ? 'text-amber-600 group-hover:text-amber-700' : 'text-[#171717] group-hover:text-[#2563eb]'"
+            >
               {{ siteSettings.brandLogoText || 'Script MLBB' }}
+            </span>
+            <span v-if="isPremium" class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-800 border border-amber-300">
+              PRO
             </span>
           </div>
         </RouterLink>

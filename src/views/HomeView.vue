@@ -335,14 +335,23 @@ const toggleBookmark = (item) => {
     <section class="space-y-6">
       <!-- Section Header -->
       <div class="flex flex-wrap items-center gap-3 border-b border-[#f0f0f0] pb-4">
-        <span class="w-2.5 h-2.5 rounded-full bg-[#2563eb] animate-pulse"></span>
-        <h1 class="font-extrabold text-[#171717] text-xl sm:text-2xl lg:text-3xl tracking-tight leading-snug">
+        <span
+          class="w-2.5 h-2.5 rounded-full animate-pulse transition-colors"
+          :class="isPremium ? 'bg-amber-500' : 'bg-[#2563eb]'"
+        ></span>
+        <h1
+          class="font-extrabold text-xl sm:text-2xl lg:text-3xl tracking-tight leading-snug transition-colors home-hero-title"
+          :class="isPremium ? 'text-amber-600' : 'text-[#171717]'"
+        >
           Update Script Skin Mobile Legends
         </h1>
 
-        <!-- Real-Time Device Date Badge (Blue Theme) -->
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#2563eb]/10 text-[#2563eb]">
-          <svg class="w-3.5 h-3.5 text-[#2563eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- Real-Time Device Date Badge (Blue/Amber Theme) -->
+        <span
+          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-colors"
+          :class="isPremium ? 'bg-amber-100 text-amber-800' : 'bg-[#2563eb]/10 text-[#2563eb]'"
+        >
+          <svg class="w-3.5 h-3.5" :class="isPremium ? 'text-amber-600' : 'text-[#2563eb]'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           <span>{{ currentDateFormatted }}</span>
