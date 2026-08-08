@@ -39,6 +39,9 @@ onUnmounted(() => {
 })
 
 const handleClose = () => {
+  // Prevent closing modal while 15-second ad verification is active
+  if (isVerifyingAd.value) return
+
   if (adInterval) clearInterval(adInterval)
   isVisible.value = false
   dismissPopup()
@@ -117,14 +120,22 @@ const startAdVerification = () => {
         
         <!-- Header Container -->
         <div class="p-5 sm:p-6 relative bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white">
-          <!-- Close Button -->
+          <!-- Close Button or Lock Badge during 15s Verification -->
           <button
+            v-if="!isVerifyingAd"
             @click="handleClose"
-            class="absolute top-3.5 right-3.5 w-7 h-7 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center text-xs font-bold transition-all cursor-pointer"
-            title="Tutup"
+            class="absolute top-3.5 right-3.5 w-7 h-7 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center text-xs font-bold transition-all cursor-pointer z-10"
+            title="Tutup Modal"
           >
             ✕
           </button>
+          <div
+            v-else
+            class="absolute top-3.5 right-3.5 px-2.5 py-1 rounded-full bg-amber-500/90 text-amber-950 flex items-center gap-1.5 text-[10px] font-mono font-bold z-10 shadow-xs border border-amber-300 animate-pulse select-none"
+            title="Modal dikunci hingga verifikasi 15s selesai"
+          >
+            <span>🔒 Dikunci {{ adTimerSeconds }}s</span>
+          </div>
 
           <div class="flex items-center gap-2 mb-1">
             <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
