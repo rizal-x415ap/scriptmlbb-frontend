@@ -100,7 +100,7 @@ const startAdVerification = () => {
 
       setTimeout(() => {
         isVisible.value = false
-      }, 2500)
+      }, 2000)
     }
   }, 1000)
 }
@@ -110,83 +110,82 @@ const startAdVerification = () => {
   <Transition name="fade">
     <div
       v-if="isVisible && !isPremium"
-      class="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 pt-20 sm:pt-24 bg-[#171717]/70 backdrop-blur-xs overflow-y-auto"
+      class="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-[#171717]/75 backdrop-blur-xs overflow-y-auto"
     >
-      <!-- Sleek Professional Modal Container matching Blog Editorial Aesthetic -->
-      <div class="relative w-full max-w-md bg-white rounded-[16px] shadow-2xl border border-[#dfdfdf] overflow-hidden transform transition-all my-auto">
+      <!-- Sleek Compact Modal Container -->
+      <div class="relative w-full max-w-sm sm:max-w-md bg-white rounded-[20px] shadow-2xl border border-[#e4e4e7] overflow-hidden transform transition-all my-auto">
         
-        <!-- Header Container (Vibrant Blue Background) -->
-        <div class="p-6 pb-5 relative bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white">
+        <!-- Header Container -->
+        <div class="p-5 sm:p-6 relative bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white">
           <!-- Close Button -->
           <button
             @click="handleClose"
-            class="absolute top-4 right-4 w-7 h-7 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center text-xs font-bold transition-all cursor-pointer"
-            title="Tutup Modal"
+            class="absolute top-3.5 right-3.5 w-7 h-7 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center text-xs font-bold transition-all cursor-pointer"
+            title="Tutup"
           >
             ✕
           </button>
 
-          <div class="flex items-center gap-2 mb-2">
+          <div class="flex items-center gap-2 mb-1">
             <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-            <span class="font-mono-eyebrow text-blue-100">AKSES PREMIUM // MEMBER TOKEN</span>
+            <span class="font-mono-eyebrow text-blue-100">AKSES PREMIUM</span>
           </div>
 
-          <h3 class="text-xl font-bold text-white tracking-tight leading-snug">
-            Berlangganan Akun Premium
+          <h3 class="text-lg sm:text-xl font-bold text-white tracking-tight leading-snug">
+            Nikmati Akses Premium
           </h3>
-          <p class="text-xs text-blue-100 mt-1 font-mono">
-            Rp {{ priceText }}/bulan • Bebas Iklan & Direct Download
+          <p class="text-xs text-blue-100/90 mt-0.5 font-mono">
+            Bebas Iklan • Direct Download • Tanpa Antri
           </p>
         </div>
 
         <!-- Body Content -->
-        <div class="p-6 space-y-5">
-          
-          <!-- Benefit Bullet Checklist -->
-          <div class="space-y-2.5 text-xs text-[#171717]">
-            <div class="flex items-start gap-2.5 p-3 rounded-[10px] bg-[#f9f9f9] border border-[#dfdfdf]">
-              <span class="text-[#2563eb] font-bold text-sm shrink-0">✓</span>
-              <span class="leading-relaxed"><strong>Bebas Iklan 100%</strong> — Tanpa kemunculan banner iklan di seluruh halaman.</span>
+        <div class="p-5 sm:p-6 space-y-4">
+
+          <!-- Ringkas: 2 Keuntungan Utama (Pills format) -->
+          <div class="grid grid-cols-2 gap-2 text-xs font-medium text-[#171717]">
+            <div class="p-2.5 rounded-xl bg-[#f4f4f5] border border-[#e4e4e7] flex items-center gap-2">
+              <span class="text-base shrink-0">🚫</span>
+              <span class="font-semibold leading-tight text-[11px] sm:text-xs">Bebas Iklan 100%</span>
             </div>
-            <div class="flex items-start gap-2.5 p-3 rounded-[10px] bg-[#f9f9f9] border border-[#dfdfdf]">
-              <span class="text-[#2563eb] font-bold text-sm shrink-0">✓</span>
-              <span class="leading-relaxed"><strong>Direct Download</strong> — Unduh file langsung tanpa halaman perantara shortener.</span>
+            <div class="p-2.5 rounded-xl bg-[#f4f4f5] border border-[#e4e4e7] flex items-center gap-2">
+              <span class="text-base shrink-0">⚡</span>
+              <span class="font-semibold leading-tight text-[11px] sm:text-xs">Direct Download</span>
             </div>
           </div>
 
-          <!-- FREE 1-DAY PREMIUM VIA AD CLICK OPTION CARD -->
-          <div class="p-4 bg-gradient-to-r from-amber-50 via-amber-50/80 to-amber-100/50 rounded-[12px] border border-amber-200 space-y-3">
+          <!-- OPSI 1: GRATIS 1 HARI VIA KLIK IKLAN -->
+          <div class="p-4 bg-gradient-to-r from-amber-50 via-amber-50/90 to-amber-100/50 rounded-2xl border border-amber-200/90 space-y-2.5">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-1.5 font-bold text-amber-900 text-xs sm:text-sm">
                 <span>🎁</span>
-                <span>Coba Premium 1 Hari GRATIS</span>
+                <span>Opsi 1: Gratis 1 Hari</span>
               </div>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-200 text-amber-900 uppercase font-mono">
-                GRATIS
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-200 text-amber-900 font-mono">
+                KLIK 15 DETIK
               </span>
             </div>
 
             <p class="text-xs text-amber-950/80 leading-relaxed">
-              Klik iklan sponsor di bawah dan buka selama <strong>15 detik</strong> untuk membuka status Premium 1 Hari tanpa token!
+              Klik iklan sponsor di bawah & lihat selama 15 detik untuk aktifkan Premium 1 Hari tanpa token.
             </p>
 
-            <!-- Ad Click Verification Trigger Area -->
+            <!-- Ad Click Button / Progress -->
             <div>
               <button
                 v-if="!isVerifyingAd && !isAdUnlocked"
                 @click="startAdVerification"
-                class="w-full py-2.5 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-[8px] transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs active:scale-95"
+                class="w-full py-2.5 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs active:scale-95"
               >
-                <span>🚀 Klik Iklan 15s Untuk Premium Gratis</span>
-                <span>→</span>
+                <span>🚀 Klik Iklan 15s (Gratis 1 Hari)</span>
               </button>
 
               <!-- Live 15s Countdown Progress State -->
-              <div v-else-if="isVerifyingAd" class="p-3 bg-white rounded-[8px] border border-amber-300 space-y-2 text-center">
+              <div v-else-if="isVerifyingAd" class="p-3 bg-white rounded-xl border border-amber-300 space-y-1.5 text-center">
                 <div class="flex items-center justify-between text-xs font-mono font-bold text-amber-900">
                   <span class="flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-amber-600 animate-ping"></span>
-                    <span>Memverifikasi Iklan...</span>
+                    <span>Verifikasi Iklan...</span>
                   </span>
                   <span class="text-amber-700 font-extrabold text-sm">{{ adTimerSeconds }}s</span>
                 </div>
@@ -196,22 +195,18 @@ const startAdVerification = () => {
                     :style="{ width: ((15 - adTimerSeconds) / 15 * 100) + '%' }"
                   ></div>
                 </div>
-                <p class="text-[11px] text-amber-800/90 font-mono">
-                  Mohon lihat tab iklan selama {{ adTimerSeconds }} detik...
-                </p>
               </div>
 
-              <!-- Unlocked State Banner -->
-              <div v-else-if="isAdUnlocked" class="p-2.5 bg-emerald-100 text-emerald-900 rounded-[8px] text-xs font-bold text-center border border-emerald-300">
-                🎉 Premium 1 Hari Gratis Berhasil Diaktifkan!
+              <div v-else-if="isAdUnlocked" class="p-2.5 bg-emerald-100 text-emerald-900 rounded-xl text-xs font-bold text-center border border-emerald-300">
+                🎉 Premium 1 Hari Gratis Aktif!
               </div>
             </div>
           </div>
 
-          <!-- Token Input Form -->
-          <form @submit.prevent="handleActivate" class="space-y-3 pt-1 border-t border-[#dfdfdf]">
-            <div>
-              <label class="block text-xs font-mono text-[#707070] uppercase font-semibold mb-1.5">Aktivasi Kode Token 30 Hari (5 Huruf)</label>
+          <!-- OPSI 2: KODE TOKEN / BELI WHATSAPP -->
+          <div class="pt-2 border-t border-[#e4e4e7] space-y-3">
+            <form @submit.prevent="handleActivate" class="space-y-2">
+              <label class="block text-xs font-mono text-[#707070] font-semibold uppercase">Opsi 2: Punya Kode Token?</label>
               <div class="flex items-center gap-2">
                 <input
                   type="text"
@@ -219,42 +214,35 @@ const startAdVerification = () => {
                   @input="handleInput"
                   placeholder="KODE (ABCDE)"
                   maxlength="5"
-                  class="min-w-0 flex-1 px-3 py-2.5 bg-[#fafafa] border border-[#dfdfdf] rounded-[8px] text-center font-mono font-bold text-sm uppercase tracking-widest text-[#171717] focus:bg-white focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] outline-none transition-all placeholder:text-gray-400 placeholder:tracking-normal placeholder:font-sans placeholder:text-xs"
+                  class="min-w-0 flex-1 px-3 py-2.5 bg-[#f4f4f5] border border-[#e4e4e7] rounded-xl text-center font-mono font-bold text-xs sm:text-sm uppercase tracking-widest text-[#171717] focus:bg-white focus:border-[#2563eb] outline-none transition-all placeholder:text-gray-400 placeholder:tracking-normal placeholder:font-sans placeholder:text-xs"
                 />
                 <button
                   type="submit"
                   :disabled="isSubmitting || tokenInput.length !== 5"
-                  class="w-[100px] min-w-[100px] h-[42px] bg-[#2563eb] hover:bg-[#1d4ed8] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold text-xs rounded-[8px] transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 shadow-sm"
+                  class="px-4 py-2.5 bg-[#2563eb] hover:bg-[#1d4ed8] disabled:bg-gray-200 disabled:text-gray-400 text-white font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1 shrink-0"
                 >
-                  <span v-if="isSubmitting" class="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin shrink-0"></span>
-                  <span class="truncate">{{ isSubmitting ? 'Proses...' : 'Aktifkan' }}</span>
+                  <span v-if="isSubmitting" class="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+                  <span>{{ isSubmitting ? '...' : 'Aktifkan' }}</span>
                 </button>
               </div>
-            </div>
 
-            <!-- Feedback Messages -->
-            <div v-if="errorMessage" class="p-2.5 bg-red-50 text-red-700 border border-red-200 rounded-[8px] text-xs font-medium text-center">
-              ⚠️ {{ errorMessage }}
-            </div>
-            <div v-if="successMessage" class="p-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-[8px] text-xs font-medium text-center">
-              ✅ {{ successMessage }}
-            </div>
-          </form>
+              <!-- Messages -->
+              <div v-if="errorMessage" class="p-2 bg-red-50 text-red-700 border border-red-200 rounded-xl text-xs font-medium text-center">
+                ⚠️ {{ errorMessage }}
+              </div>
+              <div v-if="successMessage" class="p-2 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-medium text-center">
+                ✅ {{ successMessage }}
+              </div>
+            </form>
 
-          <!-- Buy Link CTA Button (WhatsApp Green) -->
-          <div class="pt-3 border-t border-[#dfdfdf] space-y-3">
             <a
               :href="whatsappBuyUrl"
               target="_blank"
               rel="noopener noreferrer"
-              class="w-full text-center py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-[8px] text-xs transition-colors flex items-center justify-center gap-2 shadow-sm"
+              class="w-full text-center py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
             >
-              <span>Beli Token via WhatsApp (Rp {{ priceText }}/bln)</span>
+              <span>💬 Beli Token via WA (Rp {{ priceText }}/bln)</span>
             </a>
-
-            <div class="text-center text-[11px] text-[#707070]">
-              Atau buka <RouterLink to="/premium" @click="handleClose" class="text-[#2563eb] font-semibold hover:underline">Halaman Aktivasi Token →</RouterLink>
-            </div>
           </div>
 
         </div>

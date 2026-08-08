@@ -98,7 +98,7 @@ export function setSeoMeta({
 }) {
   const brandName = siteSettings.brandLogoText || 'Script MLBB'
   const defaultTitle = siteSettings.siteTitle || `${brandName} // Blog & Artikel Software`
-  const defaultDescription = siteSettings.siteDescription || 'Blog artikel teknis, arsitektur web modern, dan catatan rekayasa perangkat lunak.'
+  const defaultDescription = siteSettings.siteDescription || 'Script MLBB adalah website teknologi yang membahas Mobile Legends, Gadget, tutorial, pemrograman, Script Skin ML, Loading Screen  ML dan lainnya.'
 
   // 1. Page Title Calculation
   let finalTitle = ''

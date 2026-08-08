@@ -3,9 +3,9 @@ import { ApiService } from './api.js'
 import { isPremium } from './premiumStore.js'
 
 const defaultSettings = {
-  siteTitle: 'SUPABAZE // Blog & Artikel Software',
-  siteDescription: 'Blog artikel teknis dan arsitektur pengembangan web modern.',
-  metaKeywords: 'Vue3, Vite, Laravel, Arsitektur, Web Development',
+  siteTitle: 'Script MLBB // Blog & Artikel Software',
+  siteDescription: 'Script MLBB adalah website teknologi yang membahas Mobile Legends, Gadget, tutorial, pemrograman, Script Skin ML, Loading Screen  ML dan lainnya.',
+  metaKeywords: 'loading screen ml, loading screen Moibile legends, intro ml, script skin ml, script ml, script mobile legends skin, cara menghitung wr, situs penghitung wr, mobile legends, hitung wr, website penghitung wr, penghitung wr',
   siteBaseUrl: 'http://localhost:5173',
   faviconUrl: '/favicon.svg',
   brandLogoText: 'Script MLBB',
@@ -16,7 +16,7 @@ const defaultSettings = {
   announcementText: '⚡ DAPATKAN UPDATE ARTIKEL TERBARU DAN WAWASAN ARSITEKTUR SISTEM',
   announcementLink: '/archive',
   featuredPostCategory: 'All',
-  archiveTitle: 'Jelajahi Arsip Artikel & Catatan Teknis',
+  archiveTitle: 'Jelajahi Arsip Artikel & Script Skin',
   archiveSubtitle: 'Filter seluruh koleksi artikel teknis, catatan arsitektur sistem, dan panduan teknis modern.',
   showMostReadWidget: true,
   showAuthorWidget: true,
@@ -24,7 +24,7 @@ const defaultSettings = {
   showTopicsWidget: true,
   showFooter: true,
   footerTagline: 'KARYA DIGITAL — PRESISI EDITORIAL',
-  footerBio: 'Menulis tentang arsitektur sistem web, optimasi performa front-end, dan desain pengalaman pengguna yang intuitif.',
+  footerBio: 'Temukan informasi teknologi, Digital Marketing, Gadget, tutorial, pemrograman, Mobile Legends, Script ML, dan hal menarik lainnya.',
   footerCol2Title: 'Kategori',
   // Custom Script Injections
   headScriptContent: '',
@@ -51,7 +51,7 @@ const defaultSettings = {
   footerCol3Link3Url: 'https://tailwindcss.com',
   footerCol3Link4Text: 'Arsip Artikel',
   footerCol3Link4Url: '/archive',
-  footerCopyright: '© 2026 SUPABAZE INC. HAK CIPTA DILINDUNGI UNTUK SELURUH KARYA.',
+  footerCopyright: '© 2026 SCRIPT MLBB INC. HAK CIPTA DILINDUNGI UNTUK SELURUH KARYA.',
   socialLink1Text: 'Twitter / X',
   socialLink1Url: 'https://twitter.com',
   socialLink2Text: 'GitHub',
@@ -65,8 +65,8 @@ const defaultSettings = {
   authorAvatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
   authorBio: 'Berbagi pengalaman teknis seputar pemrograman, arsitektur web, dan desain sistem modern.',
   authorFollowersCount: '5.2k Pembaca',
-  authorInstagramUrl: 'https://instagram.com',
-  authorInstagramHandle: '@rizal.efendi',
+  authorInstagramUrl: 'https://instagram.com/@rizalefd_',
+  authorInstagramHandle: '@rizalefd_',
   // Ad Management & Placements Settings
   showHomeSidebarAd1: true,
   homeSidebarAd1Script: '',
