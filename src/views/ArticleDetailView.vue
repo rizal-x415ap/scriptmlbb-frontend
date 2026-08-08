@@ -713,8 +713,8 @@ const handleConfirmDelete = async () => {
                       </h1>
                     </div>
 
-                    <!-- ROW 2 (Below): Developer Name & Badges in its own full-width row -->
-                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 pt-1 text-xs sm:text-sm">
+                    <!-- ROW 2 (Below): Developer Name & Badges in its own full-width row (Centered Horizontally) -->
+                    <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 pt-1 text-xs sm:text-sm">
                       <span class="font-semibold text-[#2563eb]">
                         {{ article.app_developer || getAuthorName(article.author) }}
                       </span>
