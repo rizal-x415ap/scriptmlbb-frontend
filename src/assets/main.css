@@ -20,11 +20,6 @@
     line-height: 1.25;
   }
 
-  /* Responsive Body Text: Ensure minimum readable size on all devices */
-  p, li, td, th, label, span, a, div {
-    /* Inherit base 16px; never go below 13px on any device */
-  }
-
   /* Readable input & textarea sizing */
   input, textarea, select, button {
     font-size: 1rem; /* 16px - prevents iOS zoom on focus */
