@@ -25,8 +25,8 @@ let metaRobotsEl = null
 
 onMounted(async () => {
   setSeoMeta({
-    title: 'Halaman Unduh File SafeLink',
-    description: 'Menyiapkan tautan unduhan aman secara otomatis.',
+    title: 'Halaman Download File SafeLink',
+    description: 'Menyiapkan tautan download aman secara otomatis.',
     url: `/go/${code.value}`,
     type: 'website'
   })
@@ -54,7 +54,7 @@ onMounted(async () => {
       }
     }
   } catch (err) {
-    errorMessage.value = 'Link unduhan tidak ditemukan atau sudah tidak valid.'
+    errorMessage.value = 'Link download tidak ditemukan atau sudah tidak valid.'
   } finally {
     isLoading.value = false
   }
@@ -97,7 +97,7 @@ const unlockUrl = async () => {
     originalUrl.value = url
     isUnlocked.value = true
   } catch (err) {
-    errorMessage.value = 'Gagal mengambil link unduhan asli.'
+    errorMessage.value = 'Gagal mengambil link download asli.'
   }
 }
 
@@ -182,7 +182,7 @@ const formattedContent = computed(() => {
             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#e4e4e7] pb-3">
               <div class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-[#2563eb] animate-pulse"></span>
-                <span class="font-mono-eyebrow text-[#2563eb]">LINK GENERATOR // FILE UNDUHAN</span>
+                <span class="font-mono-eyebrow text-[#2563eb]">LINK GENERATOR // FILE DOWNLOAD</span>
               </div>
               <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-white text-[#171717] border border-[#e4e4e7]">
                 File: {{ shortLinkData?.link_name || 'Download File' }}
@@ -191,9 +191,9 @@ const formattedContent = computed(() => {
 
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
               <div class="space-y-1 text-center sm:text-left">
-                <h2 class="text-base sm:text-lg font-bold text-[#171717]">Get Link Unduhan File</h2>
+                <h2 class="text-base sm:text-lg font-bold text-[#171717]">Get Link Download File</h2>
                 <p class="text-xs sm:text-sm text-[#707070] max-w-lg">
-                  {{ (isCountingDown || isUnlocked) ? 'Silakan gulir / scroll halaman artikel ini ke bawah untuk mengambil link unduhan.' : 'Klik tombol di samping, lalu silakan gulir / scroll halaman ke bawah.' }}
+                  {{ (isCountingDown || isUnlocked) ? 'Silakan gulir / scroll halaman artikel ini ke bawah untuk mengambil link download.' : 'Klik tombol di samping, lalu silakan gulir / scroll halaman ke bawah.' }}
                 </p>
               </div>
 
@@ -204,7 +204,7 @@ const formattedContent = computed(() => {
                   @click="startCountdown"
                   class="stitch-button-primary w-full sm:w-auto px-6 py-3 text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95"
                 >
-                  <span>⚡ GET LINK UNDUHAN</span>
+                  <span>⚡ GET LINK DOWNLOAD</span>
                 </button>
 
                 <div v-else class="px-5 py-2.5 bg-emerald-50 text-emerald-700 rounded-full text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 border border-emerald-200 shadow-xs">
@@ -293,16 +293,16 @@ const formattedContent = computed(() => {
             <div id="download-unlock-area" class="mt-8 p-6 sm:p-8 bg-[#f4f4f5] rounded-2xl space-y-4 text-center scroll-mt-36">
               
               <div class="space-y-1">
-                <span class="font-mono-eyebrow text-[#2563eb]">PENGAMBILAN FILE UNDUHAN</span>
+                <span class="font-mono-eyebrow text-[#2563eb]">PENGAMBILAN FILE DOWNLOAD</span>
                 <h3 class="text-base sm:text-lg font-bold text-[#171717]">
-                  {{ isUnlocked ? 'Link File Siap Diunduh' : (isCountingDown ? 'Memproses Link Unduhan File...' : 'Menunggu Klik "Get Link Unduhan"') }}
+                  {{ isUnlocked ? 'Link File Siap Diunduh' : (isCountingDown ? 'Memproses Link Download File...' : 'Menunggu Klik "Get Link Download"') }}
                 </h3>
               </div>
 
               <!-- State 1: Before Countdown Started (Clean instruction, NO manual button) -->
               <div v-if="!isCountingDown && !isUnlocked" class="p-4 bg-white rounded-xl text-xs sm:text-sm text-[#707070] max-w-md mx-auto space-y-2 border border-[#e4e4e7]">
                 <p class="leading-relaxed">
-                  Silakan klik tombol <strong class="text-[#2563eb]">"GET LINK UNDUHAN"</strong> di bagian atas halaman untuk memproses dan membuka link file secara otomatis.
+                  Silakan klik tombol <strong class="text-[#2563eb]">"GET LINK DOWNLOAD"</strong> di bagian atas halaman untuk memproses dan membuka link file secara otomatis.
                 </p>
               </div>
 
@@ -312,7 +312,7 @@ const formattedContent = computed(() => {
                   {{ countdownSeconds }}s
                 </div>
                 <p class="text-xs sm:text-sm font-mono text-[#707070]">
-                  Mohon tunggu {{ countdownSeconds }} detik... Tombol unduhan sedang disiapkan.
+                  Mohon tunggu {{ countdownSeconds }} detik... Tombol download sedang disiapkan.
                 </p>
                 <!-- Animated Progress Bar -->
                 <div class="max-w-xs mx-auto h-2 bg-[#e4e4e7] rounded-full overflow-hidden mt-2">
@@ -334,7 +334,7 @@ const formattedContent = computed(() => {
                   <span>📥 Download File Sekarang →</span>
                 </a>
                 <p class="text-xs sm:text-sm text-emerald-700 font-semibold">
-                  ✓ Link unduhan aman terverifikasi. Klik tombol di atas untuk mulai mengunduh.
+                  ✓ Link download aman terverifikasi. Klik tombol di atas untuk mulai mengunduh.
                 </p>
               </div>
 
