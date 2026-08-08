@@ -665,7 +665,7 @@ const handleConfirmDelete = async () => {
   <div class="space-y-8 py-4">
 
     <!-- Skeleton Loading State for Article Detail -->
-    <ArticleDetailSkeleton v-if="isLoading" />
+    <ArticleDetailSkeleton v-if="isLoading" :isPlayStore="isPlayStoreStyle" />
 
     <!-- Article Content -->
     <template v-else-if="article">
