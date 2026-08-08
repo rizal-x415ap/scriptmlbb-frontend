@@ -824,22 +824,23 @@ const handleConfirmDelete = async () => {
                 type="in-article"
               />
 
-              <!-- App Technical Specs & Download Links Box -->
-              <div id="download-section" class="mt-8 p-5 sm:p-6 bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] space-y-5 sm:space-y-6 scroll-mt-36">
-                <!-- Header Title (Using Article Title across top) -->
-                <div class="border-b border-[#e2e8f0] pb-3">
-                  <h2 class="text-base font-bold text-[#171717] line-clamp-1">
-                  Download {{ article.title }}
+              <!-- App Technical Specs & Download Links Section (Simple Open Layout) -->
+              <div id="download-section" class="mt-8 space-y-6 pt-6 border-t border-[#f0f0f0] scroll-mt-36">
+                <!-- Section Header -->
+                <div class="space-y-1">
+                  <span class="font-mono-eyebrow text-[#2563eb]">UNDUHAN FILE</span>
+                  <h2 class="text-lg font-bold text-[#171717]">
+                    Download {{ article.title }}
                   </h2>
                 </div>
 
-                <!-- Grid Layout: On Desktop (lg:), Left is Poster & Specs (7 cols), Right is Download Links List (5 cols) -->
+                <!-- Grid Layout: Poster & Specs on Left, Simple Link List on Right -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                   
-                  <!-- LEFT COLUMN (Desktop lg:col-span-7): Poster 3:5 on Left + Badges & Specs on Right -->
-                  <div class="lg:col-span-7 flex flex-row items-start gap-3 sm:gap-5">
-                    <!-- LEFT SIDE: 3:5 Aspect Ratio Poster Thumbnail Image -->
-                    <div class="w-24 sm:w-36 aspect-[3/5] rounded-[10px] overflow-hidden border border-[#e2e8f0] bg-[#171717] shrink-0 relative">
+                  <!-- LEFT COLUMN (Desktop lg:col-span-6): Poster 3:5 + Feature Pills & Specs -->
+                  <div class="lg:col-span-6 flex flex-row items-start gap-4">
+                    <!-- 3:5 Aspect Ratio Poster Image -->
+                    <div class="w-24 sm:w-32 aspect-[3/5] rounded-xl overflow-hidden bg-[#171717] shrink-0 relative">
                       <img
                         :src="article.app_poster_35 || article.cover_image"
                         :alt="article.title"
@@ -847,64 +848,60 @@ const handleConfirmDelete = async () => {
                       />
                     </div>
 
-                    <!-- RIGHT SIDE: Feature Badges & Technical Specs -->
-                    <div class="flex-1 space-y-2 sm:space-y-3 min-w-0 w-full text-left">
+                    <!-- Feature Badges & Specs -->
+                    <div class="flex-1 space-y-3 text-left min-w-0">
                       <!-- Tags / Feature Pills -->
-                      <div class="flex flex-wrap gap-1 sm:gap-1.5">
+                      <div class="flex flex-wrap gap-1.5">
                         <span
                           v-for="(feature, fIdx) in appFeaturesList"
                           :key="fIdx"
-                          class="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-medium bg-white text-[#1d4ed8] border border-[#2563eb]/25"
+                          class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#2563eb]/10 text-[#2563eb]"
                         >
                           {{ feature.startsWith('✓') ? feature : '✓ ' + feature }}
                         </span>
                       </div>
 
-                      <!-- Clean Green Date Badge (Square corners, small text) -->
+                      <!-- Date Badge -->
                       <div>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] sm:text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/80">
-                          Diperbarui pada {{ getFormattedDate(article.published_at) }}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 font-mono">
+                          Diperbarui {{ getFormattedDate(article.published_at) }}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <!-- RIGHT COLUMN (Desktop lg:col-span-5): Compact Download Links List on Far Right -->
-                  <div class="lg:col-span-5 pt-4 lg:pt-0 border-t lg:border-t-0 border-[#e2e8f0] space-y-3">
-                    <h4 class="text-xs font-bold text-[#171717] uppercase tracking-wider font-mono">LINK UNDUHAN FILE</h4>
+                  <!-- RIGHT COLUMN (Desktop lg:col-span-6): Simple Blue Text Link List -->
+                  <div class="lg:col-span-6 space-y-3">
+                    <h4 class="text-xs font-bold text-[#171717] uppercase tracking-wider font-mono-eyebrow">PILIH SERVER UNDUHAN</h4>
 
-                    <div class="divide-y divide-[#e2e8f0] border border-[#e2e8f0] rounded-xl bg-white text-xs max-h-[220px] overflow-y-auto scrollbar-thin">
-                      
-                      <!-- Dynamic Download Links Loop -->
+                    <div class="space-y-2.5 pt-1">
+                      <!-- Dynamic Download Links Loop (Simple Blue Text Link List) -->
                       <template v-for="(link, lIdx) in parsedDownloadLinks" :key="lIdx">
                         <RouterLink
                           v-if="link.isShortener"
                           :to="link.url"
-                          class="flex items-center gap-2.5 p-2.5 sm:p-3 hover:bg-[#2563eb]/5 transition-colors group min-w-0"
+                          class="flex items-center gap-2.5 text-sm font-bold text-[#2563eb] hover:text-[#1d4ed8] active:text-[#1e40af] hover:underline transition-colors group cursor-pointer"
                         >
-                          <svg class="w-4 h-4 text-[#2563eb] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg class="w-4 h-4 shrink-0 transition-transform group-hover:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                           </svg>
-                          <span class="font-medium text-[#171717] group-hover:text-[#2563eb] transition-colors truncate">
-                            {{ link.name }}
-                          </span>
+                          <span class="truncate">{{ link.name }}</span>
+                          <span class="text-xs font-mono opacity-75">→</span>
                         </RouterLink>
                         <a
                           v-else
                           :href="link.url || '#'"
                           target="_blank"
                           rel="noopener noreferrer"
-                          class="flex items-center gap-2.5 p-2.5 sm:p-3 hover:bg-[#2563eb]/5 transition-colors group min-w-0"
+                          class="flex items-center gap-2.5 text-sm font-bold text-[#2563eb] hover:text-[#1d4ed8] active:text-[#1e40af] hover:underline transition-colors group cursor-pointer"
                         >
-                          <svg class="w-4 h-4 text-[#2563eb] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m4 4V4" />
+                          <svg class="w-4 h-4 shrink-0 transition-transform group-hover:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                           </svg>
-                          <span class="font-medium text-[#171717] group-hover:text-[#2563eb] transition-colors truncate">
-                            {{ link.name }}
-                          </span>
+                          <span class="truncate">{{ link.name }}</span>
+                          <span class="text-xs font-mono opacity-75">→</span>
                         </a>
                       </template>
-
                     </div>
                   </div>
 
