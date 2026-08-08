@@ -237,8 +237,38 @@ const loadArticle = async () => {
   }
 }
 
+const mostReadArticles = ref([])
+const computedTopics = ref([])
+
+const loadSidebarData = async () => {
+  try {
+    const feedRes = await ApiService.getHomeFeed(1, 'All')
+    if (Array.isArray(feedRes?.feed)) {
+      mostReadArticles.value = [...feedRes.feed]
+        .sort((a, b) => (b.views_count || 0) - (a.views_count || 0))
+        .slice(0, 5)
+
+      const topicMap = {}
+      feedRes.feed.forEach(item => {
+        const catName = getCategoryName(item.category)
+        if (catName && catName !== 'Uncategorized') {
+          topicMap[catName] = (topicMap[catName] || 0) + 1
+        }
+      })
+
+      computedTopics.value = Object.entries(topicMap).map(([name, count]) => ({
+        name,
+        count
+      })).sort((a, b) => b.count - a.count).slice(0, 8)
+    }
+  } catch (err) {
+    console.error('Gagal memuat data sidebar:', err)
+  }
+}
+
 onMounted(() => {
   loadArticle()
+  loadSidebarData()
 })
 
 watch(() => route.params.id, () => {
@@ -825,6 +855,8 @@ const handleConfirmDelete = async () => {
                 v-if="!isPremium"
                 :enabled="siteSettings.showArticleMiddleAd !== false"
                 :scriptContent="siteSettings.articleMiddleAdScript"
+                :scriptContentDesktop="siteSettings.articleMiddleAdScriptDesktop"
+                :scriptContentMobile="siteSettings.articleMiddleAdScriptMobile"
                 label="IKLAN TENGAH ARTIKEL"
                 type="in-article"
               />
@@ -1079,6 +1111,8 @@ const handleConfirmDelete = async () => {
               v-if="!isPremium"
               :enabled="siteSettings.showArticleEndAd !== false"
               :scriptContent="siteSettings.articleEndAdScript"
+              :scriptContentDesktop="siteSettings.articleEndAdScriptDesktop"
+              :scriptContentMobile="siteSettings.articleEndAdScriptMobile"
               label="IKLAN AKHIR ARTIKEL"
               type="in-article"
             />
@@ -1362,27 +1396,81 @@ const handleConfirmDelete = async () => {
 
         </main>
 
-        <!-- Right Track: Sidebar Widgets (4 Columns) -->
+        <!-- Right Track: Sidebar Widgets (4 Columns - Matching Home Page Sidebar) -->
         <aside class="lg:col-span-4 space-y-8 sticky top-32">
 
+          <!-- Home Sidebar Ad Slot 1 (Sisi Kanan Tempat 1) -->
+          <AdSlot
+            v-if="!isPremium"
+            :enabled="siteSettings.showHomeSidebarAd1 !== false"
+            :scriptContent="siteSettings.homeSidebarAd1Script"
+            :scriptContentDesktop="siteSettings.homeSidebarAd1ScriptDesktop"
+            :scriptContentMobile="siteSettings.homeSidebarAd1ScriptMobile"
+            label="IKLAN SIDEBAR 1"
+            type="sidebar"
+          />
+
+          <!-- Most Read Articles Bento Gadget -->
+          <div v-if="siteSettings.showMostReadWidget && mostReadArticles.length > 0" class="space-y-4 pb-6 border-b border-[#f0f0f0]">
+            <div class="flex items-center justify-between pb-2 border-b border-[#f0f0f0]">
+              <span class="font-mono-eyebrow text-[#171717]">ARTIKEL TERPOPULER</span>
+              <span class="w-2 h-2 rounded-full bg-[#2563eb] animate-pulse"></span>
+            </div>
+
+            <div class="space-y-3.5 divide-y divide-[#f0f0f0]">
+              <article
+                v-for="(item, index) in mostReadArticles"
+                :key="item.id"
+                class="pt-3 first:pt-0 space-y-1.5 group"
+              >
+                <div class="flex items-center justify-between text-xs text-[#888888]">
+                  <span class="font-mono-eyebrow text-[#2563eb]">#0{{ index + 1 }} • {{ getCategoryName(item.category) }}</span>
+                  <span class="font-mono text-[#888888] flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-[#2563eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    {{ item.views_count || 120 }}
+                  </span>
+                </div>
+
+                <RouterLink :to="'/article/' + (item.slug || item.id)" class="block">
+                  <h4 class="text-sm sm:text-base font-semibold text-[#171717] line-clamp-2 leading-snug group-hover:text-[#2563eb] transition-colors">
+                    {{ item.title }}
+                  </h4>
+                </RouterLink>
+              </article>
+            </div>
+
+            <div class="pt-3 border-t border-[#f0f0f0] flex items-center justify-between text-xs text-[#888888]">
+              <span class="font-mono">DIURUTKAN POPULARITAS</span>
+              <RouterLink to="/archive" class="font-semibold text-[#171717] hover:text-[#2563eb] flex items-center gap-1">
+                Lihat Semua
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </RouterLink>
+            </div>
+          </div>
+
           <!-- Author Profile & Bio Gadget -->
-          <div class="space-y-4 pb-6 border-b border-[#f0f0f0]">
+          <div v-if="siteSettings.showAuthorWidget" class="space-y-4 pb-6 border-b border-[#f0f0f0]">
             <div class="flex items-center gap-3.5">
               <div class="relative shrink-0">
                 <img
-                  :src="getAuthorAvatar(article.author)"
-                  :alt="getAuthorName(article.author)"
+                  :src="siteSettings.authorAvatarUrl || getAuthorAvatar(article.author)"
+                  :alt="siteSettings.authorName || getAuthorName(article.author)"
                   class="w-12 h-12 rounded-full border border-[#e4e4e7] object-cover"
                 />
                 <span class="absolute bottom-0 right-0 w-3 h-3 bg-[#2563eb] rounded-full border-2 border-white"></span>
               </div>
               <div>
-                <h3 class="font-bold text-[#171717] text-sm">{{ getAuthorName(article.author) }}</h3>
-                <p class="text-xs text-[#707070]">{{ getAuthorTitle(article.author) }}</p>
+                <h3 class="font-bold text-[#171717] text-sm">{{ siteSettings.authorName || getAuthorName(article.author) }}</h3>
+                <p class="text-xs text-[#707070]">{{ siteSettings.authorTitle || getAuthorTitle(article.author) }}</p>
               </div>
             </div>
 
-            <p class="text-xs text-[#707070] leading-relaxed">
+            <p class="text-xs sm:text-sm text-[#707070] leading-relaxed">
               {{ siteSettings.authorBio || (article.author && article.author.bio) || 'Berbagi pengalaman teknis seputar pemrograman, arsitektur web, dan desain sistem modern.' }}
             </p>
 
@@ -1399,29 +1487,20 @@ const handleConfirmDelete = async () => {
             </div>
           </div>
 
-          <!-- Table of Contents (TOC) Widget (Auto-Generated strictly from <h2> tags) -->
-          <div v-if="tocItems.length > 0" class="space-y-3 pb-6 border-b border-[#f0f0f0]">
-            <div class="flex items-center justify-between pb-2 border-b border-[#f0f0f0]">
-              <span class="font-mono-eyebrow text-[#171717]">DAFTAR ISI ARTIKEL</span>
-              <span class="text-xs text-[#2563eb] font-mono font-semibold">{{ tocItems.length }} SUB-JUDUL</span>
-            </div>
-
-            <nav class="space-y-1 text-xs">
-              <button
-                v-for="item in tocItems"
-                :key="item.id"
-                @click="scrollToSection(item.id)"
-                class="w-full text-left py-1.5 px-3 rounded-full transition-colors font-medium flex items-center justify-between group cursor-pointer"
-                :class="[
-                  activeSection === item.id
-                    ? 'bg-[#2563eb]/10 text-[#2563eb] font-semibold'
-                    : 'text-[#707070] hover:text-[#171717] hover:bg-[#f4f4f5]'
-                ]"
+          <!-- TOPIK POPULER Gadget (Dynamic from Database) -->
+          <div v-if="siteSettings.showTopicsWidget && computedTopics.length > 0" class="space-y-3 pb-6 border-b border-[#f0f0f0]">
+            <h4 class="font-mono-eyebrow text-[#171717]">TOPIK POPULER</h4>
+            <div class="flex flex-wrap gap-2">
+              <RouterLink
+                v-for="tag in computedTopics"
+                :key="tag.name"
+                :to="'/archive?category=' + encodeURIComponent(tag.name)"
+                class="px-3.5 py-1.5 rounded-full text-xs sm:text-sm transition-colors flex items-center gap-1.5 cursor-pointer bg-[#f4f4f5] text-[#666666] hover:bg-[#2563eb] hover:text-white"
               >
-                <span class="line-clamp-1">{{ item.label }}</span>
-                <span class="text-[10px] opacity-60 font-mono group-hover:translate-x-0.5 transition-transform">→</span>
-              </button>
-            </nav>
+                <span>{{ tag.name }}</span>
+                <span class="text-[10px] opacity-70 font-mono">({{ tag.count }})</span>
+              </RouterLink>
+            </div>
           </div>
 
           <!-- Article Detail Sidebar Ad Slot (Sisi Kanan Detail Artikel) -->
@@ -1429,6 +1508,8 @@ const handleConfirmDelete = async () => {
             v-if="!isPremium"
             :enabled="siteSettings.showArticleSidebarAd !== false"
             :scriptContent="siteSettings.articleSidebarAdScript"
+            :scriptContentDesktop="siteSettings.articleSidebarAdScriptDesktop"
+            :scriptContentMobile="siteSettings.articleSidebarAdScriptMobile"
             label="IKLAN SIDEBAR DETAIL ARTIKEL"
             type="sidebar"
           />

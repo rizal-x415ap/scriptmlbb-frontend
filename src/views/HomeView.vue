@@ -559,6 +559,8 @@ const toggleBookmark = (item) => {
               v-if="!isPremium && index === 2"
               :enabled="siteSettings.showHomeFeedAd !== false"
               :scriptContent="siteSettings.homeFeedAdScript"
+              :scriptContentDesktop="siteSettings.homeFeedAdScriptDesktop"
+              :scriptContentMobile="siteSettings.homeFeedAdScriptMobile"
               label="IKLAN FEED UTAMA (POST 3)"
               type="feed"
             />
@@ -590,6 +592,8 @@ const toggleBookmark = (item) => {
           v-if="!isPremium"
           :enabled="siteSettings.showHomeSidebarAd1 !== false"
           :scriptContent="siteSettings.homeSidebarAd1Script"
+          :scriptContentDesktop="siteSettings.homeSidebarAd1ScriptDesktop"
+          :scriptContentMobile="siteSettings.homeSidebarAd1ScriptMobile"
           label="IKLAN SIDEBAR 1"
           type="sidebar"
         />
@@ -692,6 +696,8 @@ const toggleBookmark = (item) => {
           v-if="!isPremium"
           :enabled="siteSettings.showHomeSidebarAd2 !== false"
           :scriptContent="siteSettings.homeSidebarAd2Script"
+          :scriptContentDesktop="siteSettings.homeSidebarAd2ScriptDesktop"
+          :scriptContentMobile="siteSettings.homeSidebarAd2ScriptMobile"
           label="IKLAN SIDEBAR 2"
           type="sidebar"
         />
@@ -705,7 +711,9 @@ const toggleBookmark = (item) => {
       v-if="!isPremium"
       :enabled="siteSettings.showPreFooterAd !== false"
       :scriptContent="siteSettings.preFooterAdScript"
-      label="IKLAN PRE-FOOTER BANNER"
+      :scriptContentDesktop="siteSettings.preFooterAdScriptDesktop"
+      :scriptContentMobile="siteSettings.preFooterAdScriptMobile"
+      label="IKLAN PRE-FOOTER"
       type="pre-footer"
     />
 
