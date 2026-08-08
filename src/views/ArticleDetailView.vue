@@ -718,7 +718,7 @@ const handleConfirmDelete = async () => {
                         :alt="article.title"
                         class="w-16 h-16 sm:w-20 sm:h-20 rounded-[22%] object-cover border border-[#e4e4e7] shrink-0 bg-[#171717] aspect-square"
                       />
-                      <h1 class="text-lg sm:text-2xl font-bold text-[#171717] leading-snug flex-1 min-w-0">
+                      <h1 class="text-xl sm:text-2xl font-bold text-[#171717] leading-snug flex-1 min-w-0">
                         {{ article.title }}
                       </h1>
                     </div>
@@ -838,7 +838,7 @@ const handleConfirmDelete = async () => {
               <div id="download-section" class="mt-8 p-5 sm:p-6 bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] space-y-5 sm:space-y-6 scroll-mt-36">
                 <!-- Header Title (Using Article Title across top) -->
                 <div class="border-b border-[#e2e8f0] pb-3">
-                  <h2 class="text-base font-bold text-[#171717] line-clamp-1">
+                  <h2 class="text-lg font-bold text-[#171717] line-clamp-1">
                     Download {{ article.title }}
                   </h2>
                 </div>
