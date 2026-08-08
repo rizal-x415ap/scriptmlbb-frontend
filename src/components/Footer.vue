@@ -210,18 +210,6 @@ const isExternalLink = (url) => {
       <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#888888]">
         <p>{{ siteSettings.footerCopyright || `© ${currentYear} Supabaze Editorial. All rights reserved.` }}</p>
         <div class="flex flex-wrap items-center gap-4 sm:gap-6">
-          <RouterLink to="/contact" class="hover:text-[#171717] transition-colors font-semibold text-[#2563eb]">
-            Hubungi Kami
-          </RouterLink>
-          <RouterLink to="/page/tentang-kami" class="hover:text-[#171717] transition-colors">
-            Tentang Kami
-          </RouterLink>
-          <RouterLink to="/page/kebijakan-privasi" class="hover:text-[#171717] transition-colors">
-            Kebijakan Privasi
-          </RouterLink>
-          <RouterLink to="/page/syarat-dan-ketentuan" class="hover:text-[#171717] transition-colors">
-            Syarat & Ketentuan
-          </RouterLink>
           <a
             v-if="siteSettings.socialLink1Text || siteSettings.twitterUrl"
             :href="siteSettings.socialLink1Url || siteSettings.twitterUrl || '#'"
