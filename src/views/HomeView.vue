@@ -1,8 +1,8 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { ApiService } from '../services/api.js'
-import { siteSettings } from '../services/settingsStore.js'
+import { siteSettings, loadSiteSettings } from '../services/settingsStore.js'
 import { isPremium } from '../services/premiumStore.js'
 import SkeletonLoader from '../components/SkeletonLoader.vue'
 import ArticleCardSkeleton from '../components/ArticleCardSkeleton.vue'
@@ -203,6 +203,9 @@ const loadHomeFeed = async (page = 1, category = 'All') => {
   }, 150)
 
   try {
+    // Ensure siteSettings is loaded before resolving featuredPostCategory
+    await loadSiteSettings()
+
     const data = await ApiService.getHomeFeed(page, category)
     featuredArticle.value = data?.featured || null
     articles.value = data?.feed || []
@@ -294,6 +297,21 @@ const loadMoreArticles = async () => {
 
 onMounted(() => {
   loadHomeFeed()
+})
+
+// Watch siteSettings.featuredPostCategory to re-evaluate top slider articles if settings update dynamically
+watch(() => siteSettings.featuredPostCategory, async (newCat) => {
+  const targetCategory = newCat || 'All'
+  if (targetCategory !== 'All') {
+    try {
+      const featData = await ApiService.getHomeFeed(1, targetCategory)
+      topSliderArticles.value = (featData?.feed || []).slice(0, 5)
+    } catch (e) {
+      // Keep existing topSliderArticles
+    }
+  } else {
+    topSliderArticles.value = (articles.value || []).slice(0, 5)
+  }
 })
 
 // Filtered Articles Computed Property (Featured articles pinned at top)
