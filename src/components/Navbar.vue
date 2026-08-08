@@ -147,43 +147,43 @@ const navLinks = [
       </div>
 
       <!-- Mobile Search & Drawer -->
-      <div v-if="isMobileMenuOpen" class="md:hidden py-4 border-t border-[#f0f0f0] space-y-3">
+      <div v-if="isMobileMenuOpen" class="md:hidden py-4 border-t border-[#f0f0f0] space-y-3.5">
         <form @submit.prevent="handleSearchSubmit" class="px-2">
           <input
             v-model="searchQuery"
             type="text"
             placeholder="Cari artikel, script skin..."
-            class="w-full px-3 py-2 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] placeholder-[#a1a1aa] focus:outline-none focus:border-[#2563eb]"
+            class="w-full px-4 py-2.5 text-sm bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] placeholder-[#a1a1aa] focus:outline-none focus:border-[#2563eb]"
           />
         </form>
-        <div class="space-y-1">
+        <div class="space-y-1.5 px-1">
           <RouterLink
             v-for="link in navLinks"
             :key="link.path"
             :to="link.path"
             @click="isMobileMenuOpen = false"
-            class="flex items-center gap-2.5 px-3 py-2 text-sm font-medium rounded-full transition-colors"
+            class="flex items-center gap-3 px-4 py-3 text-base sm:text-lg font-bold rounded-xl transition-colors"
             :class="[
               route.path === link.path
-                ? 'bg-[#2563eb]/10 text-[#1d4ed8] font-semibold'
-                : 'text-[#707070] hover:text-[#171717] hover:bg-[#f4f4f5]'
+                ? 'bg-[#2563eb]/10 text-[#1d4ed8]'
+                : 'text-[#171717] hover:bg-[#f4f4f5]'
             ]"
           >
             <!-- Mobile Icons -->
-            <svg v-if="link.path === '/'" class="w-4 h-4 shrink-0" :class="route.path === '/' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <svg v-if="link.path === '/'" class="w-5 h-5 shrink-0" :class="route.path === '/' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
             </svg>
-            <svg v-else-if="link.isWr" class="w-4 h-4 shrink-0" :class="route.path === '/hitung-wr' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <svg v-else-if="link.isWr" class="w-5 h-5 shrink-0" :class="route.path === '/hitung-wr' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-3-2.25V18m-3-2.25V18m9-6V18M3 4.5h18a1.5 1.5 0 011.5 1.5v12a1.5 1.5 0 01-1.5 1.5H3a1.5 1.5 0 01-1.5-1.5V6a1.5 1.5 0 011.5-1.5zM6 7.5h12v3H6v-3z" />
             </svg>
-            <svg v-else-if="link.isBookmark" class="w-4 h-4 shrink-0 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
+            <svg v-else-if="link.isBookmark" class="w-5 h-5 shrink-0 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
               <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
             </svg>
 
             <span>{{ link.name }}</span>
             <span
               v-if="link.isBookmark && bookmarkedArticles.length > 0"
-              class="ml-auto px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300 font-mono"
+              class="ml-auto px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300 font-mono"
             >
               {{ bookmarkedArticles.length }}
             </span>
