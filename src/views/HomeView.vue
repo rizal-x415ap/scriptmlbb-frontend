@@ -518,7 +518,7 @@ const toggleBookmark = (item) => {
 
                 <!-- Judul Artikel -->
                 <RouterLink :to="'/article/' + (article.slug || article.id)" class="block">
-                  <h2 class="text-lg sm:text-xl font-semibold text-[#171717] leading-snug line-clamp-2 group-hover:text-[#2563eb] transition-colors">
+                  <h2 class="text-base sm:text-lg font-semibold text-[#171717] leading-snug line-clamp-2 group-hover:text-[#2563eb] transition-colors">
                     {{ article.title }}
                   </h2>
                 </RouterLink>
