@@ -135,7 +135,7 @@ const startAdVerification = () => {
             Nikmati Akses Premium
           </h3>
           <p class="text-xs text-blue-100/90 mt-0.5 font-mono">
-            Bebas Iklan • Direct Download • Tanpa Antri
+            Bebas Iklan • Direct Download • Tanpa Ribet
           </p>
         </div>
 
@@ -205,8 +205,27 @@ const startAdVerification = () => {
 
           <!-- OPSI 2: KODE TOKEN / BELI WHATSAPP -->
           <div class="pt-2 border-t border-[#e4e4e7] space-y-3">
-            <form @submit.prevent="handleActivate" class="space-y-2">
-              <label class="block text-xs font-mono text-[#707070] font-semibold uppercase">Opsi 2: Punya Kode Token?</label>
+            <!-- PROMINENT WHATSAPP BUY TOKEN BUTTON (TOP HIGHLIGHT) -->
+            <a
+              :href="whatsappBuyUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-full py-3.5 px-4 bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-extrabold rounded-2xl text-xs sm:text-sm transition-all duration-200 flex items-center justify-between gap-2 shadow-md hover:shadow-lg hover:scale-[1.01] active:scale-95 cursor-pointer ring-2 ring-emerald-500/30"
+            >
+              <div class="flex items-center gap-2.5">
+                <span class="text-base sm:text-lg shrink-0">💬</span>
+                <div class="text-left leading-tight">
+                  <div class="text-xs sm:text-sm font-extrabold tracking-wide">Beli Token 30 Hari via WA</div>
+                  <div class="text-[10px] text-emerald-100 font-mono font-medium">Proses Instan & Langsung Aktif</div>
+                </div>
+              </div>
+              <div class="px-2.5 py-1 rounded-full bg-white/20 text-white text-[11px] font-mono font-bold shrink-0 border border-white/30">
+                Rp {{ priceText }}/bln
+              </div>
+            </a>
+
+            <form @submit.prevent="handleActivate" class="space-y-2 pt-1">
+              <label class="block text-xs font-mono text-[#707070] font-semibold uppercase">Punya Kode Token?</label>
               <div class="flex items-center gap-2">
                 <input
                   type="text"
@@ -234,15 +253,6 @@ const startAdVerification = () => {
                 ✅ {{ successMessage }}
               </div>
             </form>
-
-            <a
-              :href="whatsappBuyUrl"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="w-full text-center py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-            >
-              <span>💬 Beli Token via WA (Rp {{ priceText }}/bln)</span>
-            </a>
           </div>
 
         </div>
