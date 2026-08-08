@@ -3,9 +3,9 @@ import SkeletonLoader from './SkeletonLoader.vue'
 </script>
 
 <template>
-  <div class="stitch-card p-6 flex flex-col sm:flex-row gap-6">
+  <div class="bg-white rounded-[16px] p-6 shadow-xs border-0 flex flex-col sm:flex-row gap-6">
     <!-- Thumbnail Skeleton (1:1 Ratio) -->
-    <SkeletonLoader className="w-20 sm:w-28 aspect-square shrink-0 rounded-[8px]" />
+    <SkeletonLoader className="w-20 sm:w-28 aspect-square shrink-0 rounded-[12px]" />
 
     <!-- Details Skeleton -->
     <div class="flex flex-col justify-between flex-1 space-y-4">

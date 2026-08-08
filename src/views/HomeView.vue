@@ -275,7 +275,7 @@ const toggleBookmark = (item) => {
     <!-- Top Section: Featured Carousel Slider (Full Width) -->
     <section class="space-y-6">
       <!-- Section Header with Category Filter & Navigation Arrows -->
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#dfdfdf] pb-4">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#f0f0f0] pb-4">
         <div class="flex flex-wrap items-center gap-3">
           <span class="w-2.5 h-2.5 rounded-full bg-[#2563eb] animate-pulse"></span>
           <h1 class="font-extrabold text-[#2563eb] text-base sm:text-xl tracking-tight uppercase">
@@ -283,7 +283,7 @@ const toggleBookmark = (item) => {
           </h1>
 
           <!-- Real-Time Device Date Badge -->
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 shadow-2xs border-0">
             <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
@@ -294,19 +294,19 @@ const toggleBookmark = (item) => {
           <div class="flex items-center gap-1.5 ml-1">
             <button
               @click="scrollFeaturedLeft"
-              class="p-1.5 rounded-[6px] border border-[#dfdfdf] bg-[#fafafa] text-[#707070] hover:text-[#171717] hover:border-[#171717] transition-colors"
+              class="p-2 rounded-[8px] bg-white text-[#707070] hover:text-[#171717] shadow-xs border-0 transition-all cursor-pointer"
               aria-label="Slide Left"
             >
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
             <button
               @click="scrollFeaturedRight"
-              class="p-1.5 rounded-[6px] border border-[#dfdfdf] bg-[#fafafa] text-[#707070] hover:text-[#171717] hover:border-[#171717] transition-colors"
+              class="p-2 rounded-[8px] bg-white text-[#707070] hover:text-[#171717] shadow-xs border-0 transition-all cursor-pointer"
               aria-label="Slide Right"
             >
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -318,8 +318,8 @@ const toggleBookmark = (item) => {
 
       <!-- Skeleton Loading -->
       <div v-if="isLoading" class="flex gap-4 overflow-hidden">
-        <div v-for="n in 4" :key="n" class="w-[240px] sm:w-[255px] shrink-0 stitch-card p-4 space-y-3">
-          <SkeletonLoader className="h-48 w-full rounded-[8px]" />
+        <div v-for="n in 4" :key="n" class="w-[240px] sm:w-[260px] shrink-0 bg-white rounded-[16px] p-4 shadow-xs border-0 space-y-3">
+          <SkeletonLoader className="h-48 w-full rounded-[12px]" />
           <SkeletonLoader className="h-4 w-1/3" />
           <SkeletonLoader className="h-5 w-full" />
           <SkeletonLoader className="h-3 w-1/2" />
@@ -335,20 +335,20 @@ const toggleBookmark = (item) => {
         <article
           v-for="item in featuredArticlesList"
           :key="'feat-card-' + item.id"
-          class="w-[240px] sm:w-[255px] shrink-0 snap-start stitch-card p-4 flex flex-col justify-between group hover:border-[#2563eb] transition-colors"
+          class="w-[240px] sm:w-[260px] shrink-0 snap-start bg-white rounded-[16px] p-4 flex flex-col justify-between group shadow-xs hover:shadow-md transition-all duration-300 border-0"
         >
           <div class="space-y-3">
             <!-- Thumbnail Image (1:1 Ratio with floating views count badge) -->
             <RouterLink
               :to="'/article/' + (item.slug || item.id)"
-              class="block w-full aspect-square rounded-[8px] overflow-hidden bg-[#1c1c1c] relative"
+              class="block w-full aspect-square rounded-[12px] overflow-hidden bg-[#f4f4f5] relative"
             >
               <img
                 :src="item.cover_image"
                 :alt="item.title"
                 loading="lazy"
                 decoding="async"
-                class="w-full h-full object-cover"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
               <!-- Floating Views Badge (Pojok Kanan Atas) -->
               <div class="absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#171717]/85 text-white backdrop-blur-md border border-white/20 flex items-center gap-1 shadow-md z-10 pointer-events-none">
@@ -362,27 +362,27 @@ const toggleBookmark = (item) => {
 
             <!-- Category Badge -->
             <div>
-              <span class="font-mono-eyebrow text-[#1d4ed8] text-xs font-semibold">
+              <span class="font-mono-eyebrow text-[#2563eb] text-xs font-semibold">
                 {{ getCategoryName(item.category) }}
               </span>
             </div>
 
             <!-- Article Title -->
             <RouterLink :to="'/article/' + (item.slug || item.id)" class="block">
-              <h3 class="text-base font-medium text-[#171717] leading-snug line-clamp-2 group-hover:text-[#1d4ed8] transition-colors">
+              <h3 class="text-base font-semibold text-[#171717] leading-snug line-clamp-2 group-hover:text-[#2563eb] transition-colors">
                 {{ item.title }}
               </h3>
             </RouterLink>
           </div>
 
           <!-- Date Footer -->
-          <div class="pt-3.5 mt-3.5 border-t border-[#dfdfdf] flex items-center justify-between text-xs text-[#707070] font-mono">
+          <div class="pt-3 mt-3 border-t border-[#f4f4f5] flex items-center justify-between text-xs text-[#888888] font-mono">
             <span>{{ getFormattedDate(item.published_at || item.date) }}</span>
           </div>
         </article>
       </div>
 
-      <div v-else class="stitch-card p-8 text-center text-[#707070] text-sm">
+      <div v-else class="bg-white rounded-[16px] shadow-xs border-0 p-8 text-center text-[#707070] text-sm">
         Tidak ada artikel pilihan yang ditemukan dalam kategori ini.
       </div>
     </section>
@@ -394,16 +394,16 @@ const toggleBookmark = (item) => {
       <main class="lg:col-span-8 space-y-8">
 
         <!-- Category Filter Tabs -->
-        <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-[#dfdfdf]">
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-[#f0f0f0]">
           <button
             v-for="cat in categories"
             :key="cat"
             @click="selectedCategory = cat"
-            class="px-4 py-1.5 stitch-pill whitespace-nowrap text-sm border transition-all"
+            class="px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all border-0 shadow-2xs cursor-pointer"
             :class="[
               selectedCategory === cat
-                ? 'bg-[#2563eb] text-white border-[#2563eb] font-semibold'
-                : 'bg-[#fafafa] text-[#707070] border-[#dfdfdf] hover:border-[#171717] hover:text-[#171717]'
+                ? 'bg-[#2563eb] text-white shadow-xs'
+                : 'bg-white text-[#666666] hover:bg-[#f3f4f6] hover:text-[#171717]'
             ]"
           >
             {{ cat === 'All' ? 'Semua Kategori' : cat }}
@@ -411,7 +411,7 @@ const toggleBookmark = (item) => {
         </div>
 
         <!-- Skeleton Loading State for Feed Stream -->
-        <div v-if="isLoading" class="space-y-6">
+        <div v-if="isLoading" class="space-y-4">
           <ArticleCardSkeleton v-for="n in 3" :key="n" />
         </div>
 
@@ -419,18 +419,18 @@ const toggleBookmark = (item) => {
         <div v-else class="space-y-4">
           <template v-for="(article, index) in filteredArticles" :key="article.id || article.slug || index">
             <article
-              class="stitch-card p-4 sm:p-5 flex flex-row items-center justify-between gap-4 sm:gap-6 group hover:border-[#2563eb] transition-colors"
+              class="bg-white rounded-[16px] p-4 sm:p-5 flex flex-row items-center justify-between gap-4 sm:gap-6 group shadow-xs hover:shadow-md transition-all duration-300 border-0"
             >
               <!-- Sisi Kiri: Kategori, Judul & Tanggal -->
               <div class="flex flex-col justify-between flex-1 min-w-0 space-y-2">
                 <!-- Kategori Badge & Pin Disematkan -->
                 <div class="flex flex-wrap items-center gap-2">
-                  <span class="font-mono-eyebrow text-[#1d4ed8] text-xs font-semibold">
+                  <span class="font-mono-eyebrow text-[#2563eb] text-xs font-semibold">
                     {{ getCategoryName(article.category) }}
                   </span>
                   <span
                     v-if="article.is_featured"
-                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-300 shadow-2xs"
+                    class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-amber-50 text-amber-700 shadow-2xs border-0"
                   >
                     <svg class="w-3 h-3 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
@@ -441,15 +441,15 @@ const toggleBookmark = (item) => {
 
                 <!-- Judul Artikel -->
                 <RouterLink :to="'/article/' + (article.slug || article.id)" class="block">
-                  <h2 class="text-base sm:text-lg font-medium text-[#171717] leading-snug line-clamp-2 group-hover:text-[#1d4ed8] transition-colors">
+                  <h2 class="text-base sm:text-lg font-semibold text-[#171717] leading-snug line-clamp-2 group-hover:text-[#2563eb] transition-colors">
                     {{ article.title }}
                   </h2>
                 </RouterLink>
 
                 <!-- Tanggal & Meta Footer -->
-                <div class="pt-1.5 flex items-center gap-2 text-xs text-[#707070] font-mono border-t border-[#dfdfdf]/60">
+                <div class="pt-1.5 flex items-center gap-2 text-xs text-[#888888] font-mono border-t border-[#f4f4f5]">
                   <span>{{ getFormattedDate(article.published_at || article.date) }}</span>
-                  <span class="text-[#b2b2b2]">•</span>
+                  <span class="text-[#cccccc]">•</span>
                   <span>{{ article.read_time }}</span>
                 </div>
               </div>
@@ -457,14 +457,14 @@ const toggleBookmark = (item) => {
               <!-- Sisi Kanan: Thumbnail Image (Rasio 1:1 Aspect Square with Floating Views Badge) -->
               <RouterLink
                 :to="'/article/' + (article.slug || article.id)"
-                class="w-20 sm:w-28 aspect-square shrink-0 rounded-[8px] overflow-hidden bg-[#1c1c1c] relative block"
+                class="w-20 sm:w-28 aspect-square shrink-0 rounded-[12px] overflow-hidden bg-[#f4f4f5] relative block"
               >
                 <img
                   :src="article.cover_image"
                   :alt="article.title"
                   loading="lazy"
                   decoding="async"
-                  class="w-full h-full object-cover"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <!-- Floating Views Badge (Pojok Kanan Atas) -->
                 <div class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-[#171717]/85 text-white backdrop-blur-md border border-white/20 flex items-center gap-1 shadow-md z-10 pointer-events-none">
@@ -487,7 +487,7 @@ const toggleBookmark = (item) => {
             />
           </template>
 
-          <div v-if="filteredArticles.length === 0" class="text-center py-16 stitch-card p-8 text-[#707070]">
+          <div v-if="filteredArticles.length === 0" class="text-center py-16 bg-white rounded-[16px] shadow-xs border-0 p-8 text-[#707070]">
             Tidak ada artikel yang sesuai dengan kriteria filter.
           </div>
         </div>
@@ -497,7 +497,7 @@ const toggleBookmark = (item) => {
           <button
             @click="loadMoreArticles"
             :disabled="isLoadingMore"
-            class="stitch-button-secondary px-6 py-2.5 text-sm inline-flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+            class="bg-white hover:bg-[#f4f4f5] text-[#171717] font-semibold px-8 py-3 rounded-full text-sm shadow-xs border-0 transition-all inline-flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <span v-if="isLoadingMore" class="w-4 h-4 rounded-full border-2 border-[#171717] border-t-transparent animate-spin"></span>
             <span>{{ isLoadingMore ? 'Memuat Artikel...' : 'Muat Artikel Lainnya' }}</span>
@@ -518,23 +518,23 @@ const toggleBookmark = (item) => {
         />
 
         <!-- Most Read Articles Bento Card -->
-        <div v-if="siteSettings.showMostReadWidget" class="stitch-card p-6 sm:p-7 flex flex-col justify-between space-y-5 bg-[#ffffff]">
+        <div v-if="siteSettings.showMostReadWidget" class="bg-white rounded-[16px] p-6 sm:p-7 flex flex-col justify-between space-y-5 shadow-xs border-0">
           <div class="space-y-4">
-            <div class="flex items-center justify-between border-b border-[#dfdfdf] pb-3">
+            <div class="flex items-center justify-between border-b border-[#f4f4f5] pb-3">
               <span class="font-mono-eyebrow text-[#171717]">ARTIKEL TERPOPULER</span>
               <span class="w-2 h-2 rounded-full bg-[#2563eb] animate-pulse"></span>
             </div>
 
-            <div class="space-y-3.5 divide-y divide-[#dfdfdf]">
+            <div class="space-y-3.5 divide-y divide-[#f4f4f5]">
               <article
                 v-for="(item, index) in mostReadArticles"
                 :key="item.id"
                 class="pt-3 first:pt-0 space-y-1.5 group"
               >
-                <div class="flex items-center justify-between text-xs text-[#707070]">
-                  <span class="font-mono-eyebrow text-[#1d4ed8] font-semibold">#0{{ index + 1 }} • {{ getCategoryName(item.category) }}</span>
-                  <span class="font-mono text-[#707070] flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5 text-[#1d4ed8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex items-center justify-between text-xs text-[#888888]">
+                  <span class="font-mono-eyebrow text-[#2563eb] font-semibold">#0{{ index + 1 }} • {{ getCategoryName(item.category) }}</span>
+                  <span class="font-mono text-[#888888] flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-[#2563eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
@@ -543,7 +543,7 @@ const toggleBookmark = (item) => {
                 </div>
 
                 <RouterLink :to="'/article/' + (item.slug || item.id)" class="block">
-                  <h4 class="text-sm font-medium text-[#171717] line-clamp-2 leading-snug group-hover:text-[#1d4ed8] transition-colors">
+                  <h4 class="text-sm font-semibold text-[#171717] line-clamp-2 leading-snug group-hover:text-[#2563eb] transition-colors">
                     {{ item.title }}
                   </h4>
                 </RouterLink>
@@ -551,9 +551,9 @@ const toggleBookmark = (item) => {
             </div>
           </div>
 
-          <div class="pt-3 border-t border-[#dfdfdf] flex items-center justify-between text-xs text-[#707070]">
+          <div class="pt-3 border-t border-[#f4f4f5] flex items-center justify-between text-xs text-[#888888]">
             <span class="font-mono">DIURUTKAN POPULARITAS</span>
-            <RouterLink to="/archive" class="font-semibold text-[#171717] hover:text-[#1d4ed8] flex items-center gap-1">
+            <RouterLink to="/archive" class="font-semibold text-[#171717] hover:text-[#2563eb] flex items-center gap-1">
               Lihat Semua
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -563,7 +563,7 @@ const toggleBookmark = (item) => {
         </div>
 
         <!-- Publisher / Profile Gadget -->
-        <div v-if="siteSettings.showAuthorWidget" class="stitch-card p-6 space-y-4">
+        <div v-if="siteSettings.showAuthorWidget" class="bg-white rounded-[16px] p-6 space-y-4 shadow-xs border-0">
           <div class="flex items-center gap-4">
             <div class="relative">
               <img
@@ -574,7 +574,7 @@ const toggleBookmark = (item) => {
               <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#2563eb] rounded-full border-2 border-white"></span>
             </div>
             <div>
-              <h3 class="font-semibold text-[#171717] text-base">{{ siteSettings.authorName || 'Rizal Efendi' }}</h3>
+              <h3 class="font-bold text-[#171717] text-base">{{ siteSettings.authorName || 'Rizal Efendi' }}</h3>
               <p class="text-xs text-[#707070]">{{ siteSettings.authorTitle || 'Penulis & Pengembang Sistem' }}</p>
             </div>
           </div>
@@ -583,8 +583,8 @@ const toggleBookmark = (item) => {
             {{ siteSettings.authorBio || 'Berbagi pengalaman teknis seputar pemrograman, arsitektur web, dan desain sistem modern.' }}
           </p>
 
-          <div class="flex items-center justify-between pt-3 border-t border-[#dfdfdf]">
-            <span class="text-xs font-mono text-[#707070]">{{ siteSettings.authorFollowersCount || '5.2k Pembaca' }}</span>
+          <div class="flex items-center justify-between pt-3 border-t border-[#f4f4f5]">
+            <span class="text-xs font-mono text-[#888888]">{{ siteSettings.authorFollowersCount || '5.2k Pembaca' }}</span>
             <a
               :href="siteSettings.authorInstagramUrl || 'https://instagram.com'"
               target="_blank"
@@ -597,15 +597,15 @@ const toggleBookmark = (item) => {
         </div>
 
         <!-- TOPIK POPULER Gadget (Dynamic from Database) -->
-        <div v-if="siteSettings.showTopicsWidget && computedTopics.length > 0" class="stitch-card p-6 space-y-4">
+        <div v-if="siteSettings.showTopicsWidget && computedTopics.length > 0" class="bg-white rounded-[16px] p-6 space-y-4 shadow-xs border-0">
           <h4 class="font-mono-eyebrow text-[#171717]">TOPIK POPULER</h4>
           <div class="flex flex-wrap gap-2">
             <button
               v-for="tag in computedTopics"
               :key="tag.name"
               @click="selectedCategory = tag.name"
-              class="px-3 py-1 rounded-full text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
-              :class="selectedCategory === tag.name ? 'bg-[#2563eb] text-white font-semibold' : 'bg-[#fafafa] border border-[#dfdfdf] text-[#707070] hover:bg-[#2563eb] hover:text-white hover:border-[#2563eb]'"
+              class="px-3 py-1.5 rounded-full text-xs transition-colors flex items-center gap-1.5 cursor-pointer border-0 shadow-2xs"
+              :class="selectedCategory === tag.name ? 'bg-[#2563eb] text-white font-semibold' : 'bg-[#f4f4f5] text-[#666666] hover:bg-[#2563eb] hover:text-white'"
             >
               <span>{{ tag.name }}</span>
               <span class="text-[10px] opacity-70 font-mono">({{ tag.count }})</span>
