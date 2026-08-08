@@ -69,6 +69,9 @@ const handleActivate = async () => {
     const result = await activateToken(tokenInput.value)
     successMessage.value = result.message || 'Selamat! Berlangganan Premium berhasil.'
     tokenInput.value = ''
+    setTimeout(() => {
+      window.location.reload()
+    }, 1500)
   } catch (err) {
     errorMessage.value = err.message || 'Gagal mengaktifkan token.'
   } finally {
@@ -99,6 +102,9 @@ const startAdVerification = () => {
 
       activateFreeDayPremium()
       successMessage.value = '🎉 Selamat! Status Premium 1 Hari Gratis telah aktif!'
+      setTimeout(() => {
+        window.location.reload()
+      }, 1500)
     }
   }, 1000)
 }
@@ -106,6 +112,7 @@ const startAdVerification = () => {
 const handleLogout = () => {
   if (confirm('Apakah Anda yakin ingin mengakhiri sesi status Premium di perangkat ini?')) {
     clearPremium()
+    window.location.reload()
   }
 }
 </script>

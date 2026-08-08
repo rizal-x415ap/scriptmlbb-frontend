@@ -66,6 +66,7 @@ const handleActivate = async () => {
     successMessage.value = result.message || 'Selamat! Berlangganan Premium berhasil.'
     setTimeout(() => {
       isVisible.value = false
+      window.location.reload()
     }, 1500)
   } catch (err) {
     errorMessage.value = err.message || 'Gagal mengaktifkan token.'
@@ -101,10 +102,11 @@ const startAdVerification = () => {
       activateFreeDayPremium()
       successMessage.value = '🎉 Selamat! Status Premium 1 Hari Gratis berhasil diaktifkan!'
 
-      // Give 3.5 seconds for user to read the success confirmation card
+      // Show success message for 2 seconds then reload page for optimal state refresh
       setTimeout(() => {
         isVisible.value = false
-      }, 3500)
+        window.location.reload()
+      }, 2000)
     }
   }, 1000)
 }
