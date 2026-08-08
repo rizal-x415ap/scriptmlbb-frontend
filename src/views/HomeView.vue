@@ -524,9 +524,9 @@ const toggleBookmark = (item) => {
                 </RouterLink>
 
                 <!-- Tanggal & Meta Footer -->
-                <div class="pt-1.5 flex items-center gap-2 text-xs sm:text-sm text-[#888888] font-mono">
+                <div class="pt-1.5 flex items-center gap-2 text-xs sm:text-sm text-[#52525b] font-mono">
                   <span>{{ getFormattedDate(article.published_at || article.date) }}</span>
-                  <span class="text-[#cccccc]">•</span>
+                  <span class="text-[#a1a1aa]">•</span>
                   <span>{{ article.read_time }} mnt baca</span>
                 </div>
               </div>

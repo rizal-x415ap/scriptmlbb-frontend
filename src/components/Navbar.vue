@@ -138,6 +138,7 @@ const navLinks = [
         <button
           @click="isMobileMenuOpen = !isMobileMenuOpen"
           class="md:hidden p-2 rounded-full text-[#707070] hover:text-[#171717] hover:bg-[#f4f4f5]"
+          aria-label="Menu navigasi utama"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path v-if="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />

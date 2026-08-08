@@ -771,25 +771,25 @@ const handleConfirmDelete = async () => {
                         <span>{{ ratingStats.average }}</span>
                         <span class="text-amber-500 text-xs">★</span>
                       </div>
-                      <div class="text-[10px] sm:text-[11px] text-[#707070] font-medium">{{ ratingStats.total }} ulasan</div>
+                      <div class="text-[10px] sm:text-[11px] text-[#52525b] font-medium">{{ ratingStats.total }} ulasan</div>
                     </div>
                     <div class="space-y-0.5 px-1">
                       <div class="flex items-center justify-center gap-1 text-sm font-bold text-[#171717]">
                         <span>{{ formatDownloads(article.views_count) }}</span>
                       </div>
-                      <div class="text-[10px] sm:text-[11px] text-[#707070] font-medium">Unduhan</div>
+                      <div class="text-[10px] sm:text-[11px] text-[#52525b] font-medium">Unduhan</div>
                     </div>
                     <div class="space-y-0.5 px-1">
                       <div class="flex items-center justify-center gap-1 text-sm font-bold text-[#171717]">
                         <span>{{ article.app_size || '-' }}</span>
                       </div>
-                      <div class="text-[10px] sm:text-[11px] text-[#707070] font-medium">Ukuran File</div>
+                      <div class="text-[10px] sm:text-[11px] text-[#52525b] font-medium">Ukuran File</div>
                     </div>
                     <div class="space-y-0.5 px-1">
                       <div class="flex items-center justify-center gap-1 text-sm font-bold text-[#171717]">
                         <span class="border border-[#171717] px-1 py-0.2 rounded text-[10px]">3+</span>
                       </div>
-                      <div class="text-[10px] sm:text-[11px] text-[#707070] font-medium">Semua Umur</div>
+                      <div class="text-[10px] sm:text-[11px] text-[#52525b] font-medium">Semua Umur</div>
                     </div>
                   </div>
 
@@ -825,6 +825,8 @@ const handleConfirmDelete = async () => {
                       :src="article.cover_image"
                       :alt="article.title"
                       class="w-full h-full object-cover"
+                      fetchpriority="high"
+                      decoding="async"
                     />
                     <!-- Floating Views Badge (Pojok Kanan Atas) -->
                     <div class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold bg-[#171717]/80 text-white backdrop-blur-md border border-white/20 flex items-center gap-1.5 z-10 pointer-events-none">
@@ -885,6 +887,8 @@ const handleConfirmDelete = async () => {
                         :src="article.app_poster_35 || article.cover_image"
                         :alt="article.title"
                         class="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
                       />
                     </div>
 
