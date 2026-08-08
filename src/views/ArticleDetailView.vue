@@ -101,39 +101,54 @@ const getCleanCommentContent = (rawContent) => {
   return rawContent
 }
 
-const activeSection = ref('')
-const tocItems = ref([])
+const sidebarArticles = ref([])
 
-const scrollToSection = (id) => {
-  activeSection.value = id
-  const el = document.getElementById(id)
-  if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+const loadSidebarArticles = async () => {
+  try {
+    const res = await ApiService.getHomeFeed(1)
+    if (Array.isArray(res?.feed)) {
+      sidebarArticles.value = res.feed
+    }
+  } catch (e) {
+    // Fail silently
   }
 }
 
-// Render dynamic HTML / Markdown content & Auto-Generate TOC from <h2> headings
+const mostReadArticles = computed(() => {
+  return [...sidebarArticles.value]
+    .sort((a, b) => (b.views_count || 0) - (a.views_count || 0))
+    .slice(0, 5)
+})
+
+const computedTopics = computed(() => {
+  const counts = {}
+  sidebarArticles.value.forEach(art => {
+    const catName = getCategoryName(art.category)
+    if (catName && catName !== 'All') {
+      counts[catName] = (counts[catName] || 0) + 1
+    }
+  })
+  return Object.keys(counts).map(name => ({
+    name,
+    count: counts[name]
+  })).sort((a, b) => b.count - a.count).slice(0, 8)
+})
+
+// Render dynamic HTML / Markdown content
 const formattedContent = computed(() => {
   if (!article.value || !article.value.content) {
-    tocItems.value = []
     return ''
   }
 
   let raw = article.value.content
-  const extractedToc = []
-  let counter = 0
 
   // 1. Convert Markdown ## to <h2> tags if present
   raw = raw.replace(/^##\s+(.*$)/gim, '<h2>$1</h2>')
   raw = raw.replace(/^###\s+(.*$)/gim, '<h3>$1</h3>')
 
-  // 2. Parse ALL <h2> tags (both native HTML <h2> and converted Markdown ##)
+  // 2. Parse ALL <h2> tags
   raw = raw.replace(/<h2([^>]*)>(.*?)<\/h2>/gim, (match, attrs, titleHtml) => {
-    counter++
-    const sectionId = `heading-h2-${counter}`
-    const cleanTitle = titleHtml.replace(/<[^>]+>/g, '').trim()
-    extractedToc.push({ id: sectionId, label: cleanTitle })
-    return `<h2 id="${sectionId}" class="text-xl sm:text-2xl font-semibold text-[#171717] pt-6 pb-2 border-b border-[#dfdfdf] my-6 scroll-mt-24">${titleHtml}</h2>`
+    return `<h2 class="text-xl sm:text-2xl font-semibold text-[#171717] pt-6 pb-2 border-b border-[#dfdfdf] my-6">${titleHtml}</h2>`
   })
 
   // 3. Format blockquotes and code blocks
@@ -146,11 +161,6 @@ const formattedContent = computed(() => {
     if (attrs.includes('loading=')) return match
     return `<img${attrs} loading="lazy" decoding="async" class="rounded-[8px] max-w-full h-auto my-4 shadow-sm" />`
   })
-
-  tocItems.value = extractedToc
-  if (extractedToc.length > 0 && (!activeSection.value || !extractedToc.some(i => i.id === activeSection.value))) {
-    activeSection.value = extractedToc[0].id
-  }
 
   return sanitizeHtml(raw)
 })
@@ -237,38 +247,9 @@ const loadArticle = async () => {
   }
 }
 
-const mostReadArticles = ref([])
-const computedTopics = ref([])
-
-const loadSidebarData = async () => {
-  try {
-    const feedRes = await ApiService.getHomeFeed(1, 'All')
-    if (Array.isArray(feedRes?.feed)) {
-      mostReadArticles.value = [...feedRes.feed]
-        .sort((a, b) => (b.views_count || 0) - (a.views_count || 0))
-        .slice(0, 5)
-
-      const topicMap = {}
-      feedRes.feed.forEach(item => {
-        const catName = getCategoryName(item.category)
-        if (catName && catName !== 'Uncategorized') {
-          topicMap[catName] = (topicMap[catName] || 0) + 1
-        }
-      })
-
-      computedTopics.value = Object.entries(topicMap).map(([name, count]) => ({
-        name,
-        count
-      })).sort((a, b) => b.count - a.count).slice(0, 8)
-    }
-  } catch (err) {
-    console.error('Gagal memuat data sidebar:', err)
-  }
-}
-
 onMounted(() => {
   loadArticle()
-  loadSidebarData()
+  loadSidebarArticles()
 })
 
 watch(() => route.params.id, () => {
@@ -743,7 +724,7 @@ const handleConfirmDelete = async () => {
                   <div class="space-y-3">
                     <!-- ROW 1: Title (Full Width) -->
                     <div>
-                      <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-[#171717] leading-snug">
+                      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#171717] leading-tight">
                         {{ article.title }}
                       </h1>
                     </div>
@@ -855,8 +836,6 @@ const handleConfirmDelete = async () => {
                 v-if="!isPremium"
                 :enabled="siteSettings.showArticleMiddleAd !== false"
                 :scriptContent="siteSettings.articleMiddleAdScript"
-                :scriptContentDesktop="siteSettings.articleMiddleAdScriptDesktop"
-                :scriptContentMobile="siteSettings.articleMiddleAdScriptMobile"
                 label="IKLAN TENGAH ARTIKEL"
                 type="in-article"
               />
@@ -1111,8 +1090,6 @@ const handleConfirmDelete = async () => {
               v-if="!isPremium"
               :enabled="siteSettings.showArticleEndAd !== false"
               :scriptContent="siteSettings.articleEndAdScript"
-              :scriptContentDesktop="siteSettings.articleEndAdScriptDesktop"
-              :scriptContentMobile="siteSettings.articleEndAdScriptMobile"
               label="IKLAN AKHIR ARTIKEL"
               type="in-article"
             />
@@ -1396,17 +1373,15 @@ const handleConfirmDelete = async () => {
 
         </main>
 
-        <!-- Right Track: Sidebar Widgets (4 Columns - Matching Home Page Sidebar) -->
+        <!-- Right Track: Sidebar Widgets (Matching Home Page Sidebar) -->
         <aside class="lg:col-span-4 space-y-8 sticky top-32">
 
-          <!-- Home Sidebar Ad Slot 1 (Sisi Kanan Tempat 1) -->
+          <!-- Home Sidebar Ad Slot 1 -->
           <AdSlot
             v-if="!isPremium"
-            :enabled="siteSettings.showHomeSidebarAd1 !== false"
-            :scriptContent="siteSettings.homeSidebarAd1Script"
-            :scriptContentDesktop="siteSettings.homeSidebarAd1ScriptDesktop"
-            :scriptContentMobile="siteSettings.homeSidebarAd1ScriptMobile"
-            label="IKLAN SIDEBAR 1"
+            :enabled="siteSettings.showArticleSidebarAd !== false"
+            :scriptContent="siteSettings.articleSidebarAdScript"
+            label="IKLAN SIDEBAR DETAIL ARTIKEL"
             type="sidebar"
           />
 
@@ -1428,7 +1403,7 @@ const handleConfirmDelete = async () => {
                   <span class="font-mono text-[#888888] flex items-center gap-1">
                     <svg class="w-3.5 h-3.5 text-[#2563eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                     {{ item.views_count || 120 }}
                   </span>
@@ -1453,25 +1428,25 @@ const handleConfirmDelete = async () => {
             </div>
           </div>
 
-          <!-- Author Profile & Bio Gadget -->
+          <!-- Publisher / Profile Gadget -->
           <div v-if="siteSettings.showAuthorWidget" class="space-y-4 pb-6 border-b border-[#f0f0f0]">
-            <div class="flex items-center gap-3.5">
+            <div class="flex items-center gap-4">
               <div class="relative shrink-0">
                 <img
-                  :src="siteSettings.authorAvatarUrl || getAuthorAvatar(article.author)"
-                  :alt="siteSettings.authorName || getAuthorName(article.author)"
-                  class="w-12 h-12 rounded-full border border-[#e4e4e7] object-cover"
+                  :src="siteSettings.authorAvatarUrl || getCuteAvatar(siteSettings.authorName || 'Rizal Efendi')"
+                  :alt="siteSettings.authorName || 'Rizal Efendi'"
+                  class="w-12 h-12 rounded-full object-contain border border-[#e4e4e7] p-0.5 bg-[#f4f4f5]"
                 />
                 <span class="absolute bottom-0 right-0 w-3 h-3 bg-[#2563eb] rounded-full border-2 border-white"></span>
               </div>
               <div>
-                <h3 class="font-bold text-[#171717] text-sm">{{ siteSettings.authorName || getAuthorName(article.author) }}</h3>
-                <p class="text-xs text-[#707070]">{{ siteSettings.authorTitle || getAuthorTitle(article.author) }}</p>
+                <h3 class="font-bold text-[#171717] text-sm sm:text-base">{{ siteSettings.authorName || 'Rizal Efendi' }}</h3>
+                <p class="text-xs sm:text-sm text-[#707070]">{{ siteSettings.authorTitle || 'Penulis & Pengembang Sistem' }}</p>
               </div>
             </div>
 
             <p class="text-xs sm:text-sm text-[#707070] leading-relaxed">
-              {{ siteSettings.authorBio || (article.author && article.author.bio) || 'Berbagi pengalaman teknis seputar pemrograman, arsitektur web, dan desain sistem modern.' }}
+              {{ siteSettings.authorBio || 'Berbagi pengalaman teknis seputar pemrograman, arsitektur web, dan desain sistem modern.' }}
             </p>
 
             <div class="flex items-center justify-between pt-2 border-t border-[#f0f0f0]">
@@ -1487,7 +1462,7 @@ const handleConfirmDelete = async () => {
             </div>
           </div>
 
-          <!-- TOPIK POPULER Gadget (Dynamic from Database) -->
+          <!-- Topik Populer Gadget -->
           <div v-if="siteSettings.showTopicsWidget && computedTopics.length > 0" class="space-y-3 pb-6 border-b border-[#f0f0f0]">
             <h4 class="font-mono-eyebrow text-[#171717]">TOPIK POPULER</h4>
             <div class="flex flex-wrap gap-2">
@@ -1503,14 +1478,12 @@ const handleConfirmDelete = async () => {
             </div>
           </div>
 
-          <!-- Article Detail Sidebar Ad Slot (Sisi Kanan Detail Artikel) -->
+          <!-- Home Sidebar Ad Slot 2 -->
           <AdSlot
             v-if="!isPremium"
-            :enabled="siteSettings.showArticleSidebarAd !== false"
-            :scriptContent="siteSettings.articleSidebarAdScript"
-            :scriptContentDesktop="siteSettings.articleSidebarAdScriptDesktop"
-            :scriptContentMobile="siteSettings.articleSidebarAdScriptMobile"
-            label="IKLAN SIDEBAR DETAIL ARTIKEL"
+            :enabled="siteSettings.showHomeSidebarAd2 !== false"
+            :scriptContent="siteSettings.homeSidebarAd2Script"
+            label="IKLAN SIDEBAR 2"
             type="sidebar"
           />
 

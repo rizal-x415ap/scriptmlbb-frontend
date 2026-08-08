@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onUnmounted, ref, watch, computed, nextTick } from 'vue'
+import { onMounted, ref, watch, nextTick } from 'vue'
 
 const props = defineProps({
   enabled: {
@@ -7,14 +7,6 @@ const props = defineProps({
     default: true
   },
   scriptContent: {
-    type: String,
-    default: ''
-  },
-  scriptContentDesktop: {
-    type: String,
-    default: ''
-  },
-  scriptContentMobile: {
     type: String,
     default: ''
   },
@@ -29,24 +21,6 @@ const props = defineProps({
 })
 
 const containerRef = ref(null)
-const isMobileScreen = ref(false)
-
-const checkScreenSize = () => {
-  if (typeof window !== 'undefined') {
-    isMobileScreen.value = window.innerWidth < 768
-  }
-}
-
-// Compute active ad script depending on current screen width (Mobile vs Desktop)
-const activeScriptContent = computed(() => {
-  if (isMobileScreen.value) {
-    // Mobile screen (< 768px): prioritize Mobile script, fall back to generic or Desktop script
-    return (props.scriptContentMobile || '').trim() || (props.scriptContent || '').trim() || (props.scriptContentDesktop || '').trim()
-  } else {
-    // Desktop screen (>= 768px): prioritize Desktop script, fall back to generic or Mobile script
-    return (props.scriptContentDesktop || '').trim() || (props.scriptContent || '').trim() || (props.scriptContentMobile || '').trim()
-  }
-})
 
 const renderAd = async () => {
   if (!containerRef.value) return
@@ -54,7 +28,7 @@ const renderAd = async () => {
 
   containerRef.value.innerHTML = ''
 
-  const contentStr = activeScriptContent.value
+  const contentStr = (props.scriptContent || '').trim()
   if (!contentStr) return
 
   const parser = new DOMParser()
@@ -78,22 +52,12 @@ const renderAd = async () => {
 }
 
 onMounted(() => {
-  checkScreenSize()
-  if (typeof window !== 'undefined') {
-    window.addEventListener('resize', checkScreenSize)
-  }
-  if (props.enabled) {
+  if (props.enabled && props.scriptContent) {
     renderAd()
   }
 })
 
-onUnmounted(() => {
-  if (typeof window !== 'undefined') {
-    window.removeEventListener('resize', checkScreenSize)
-  }
-})
-
-watch([activeScriptContent, () => props.enabled], () => {
+watch(() => props.scriptContent, () => {
   if (props.enabled) {
     renderAd()
   }
@@ -104,7 +68,7 @@ watch([activeScriptContent, () => props.enabled], () => {
   <div v-if="enabled" class="w-full my-3 sm:my-4">
     <!-- Custom Ad Script Container -->
     <div
-      v-if="activeScriptContent"
+      v-if="scriptContent && scriptContent.trim()"
       ref="containerRef"
       class="w-full flex justify-center items-center overflow-hidden"
     ></div>
@@ -121,17 +85,17 @@ watch([activeScriptContent, () => props.enabled], () => {
       <div class="flex items-center justify-between text-[10px] font-mono tracking-wider text-[#707070] uppercase pb-2 border-b border-[#dfdfdf]/60">
         <span class="flex items-center gap-1.5 font-semibold text-[#171717]">
           <span class="w-2 h-2 rounded-full bg-[#2563eb]"></span>
-          {{ label }} ({{ isMobileScreen ? 'MOBILE' : 'DESKTOP' }})
+          {{ label }}
         </span>
         <span class="text-[9px] font-bold bg-[#2563eb]/10 text-[#1d4ed8] px-2 py-0.5 rounded border border-[#2563eb]/20">SLOT IKLAN</span>
       </div>
 
       <div class="py-2 space-y-1">
         <div class="text-xs sm:text-sm font-semibold text-[#171717]">
-          Ruang Iklan Digital ({{ isMobileScreen ? 'Mobile HP' : 'Desktop PC' }})
+          Ruang Iklan Digital (Ad Space)
         </div>
         <p class="text-[11px] text-[#707070] max-w-sm mx-auto leading-relaxed">
-          Aktifkan & tempelkan skrip iklan {{ isMobileScreen ? 'Mobile (320x50/300x250)' : 'Desktop (728x90/160x600/300x250)' }} di Panel Admin.
+          Aktifkan & tempelkan kode skrip iklan Anda (Google AdSense / Media Banner) melalui Panel Admin.
         </p>
       </div>
     </div>
