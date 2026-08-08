@@ -14,6 +14,7 @@ const isVerifyingAd = ref(false)
 const adTimerSeconds = ref(15)
 const isAdUnlocked = ref(false)
 let adInterval = null
+let interactionTriggered = false
 
 const whatsappBuyUrl = computed(() => {
   return siteSettings.premiumBuyUrl || 'https://wa.me/6285262335849?text=Min%20Saya%20mau%20beli%20token%20Script%20MLBB'
@@ -23,19 +24,46 @@ const priceText = computed(() => {
   return siteSettings.premiumMonthlyPrice || '5.000'
 })
 
+// Trigger Popup only upon first user activity / interaction (touch, click, scroll, keypress)
+const handleUserInteraction = () => {
+  if (interactionTriggered) return
+  interactionTriggered = true
+
+  removeActivityListeners()
+
+  if (!isPremium.value && shouldShowPopup()) {
+    isVisible.value = true
+  }
+}
+
+const addActivityListeners = () => {
+  window.addEventListener('touchstart', handleUserInteraction, { passive: true })
+  window.addEventListener('pointerdown', handleUserInteraction, { passive: true })
+  window.addEventListener('click', handleUserInteraction, { passive: true })
+  window.addEventListener('scroll', handleUserInteraction, { passive: true })
+  window.addEventListener('keydown', handleUserInteraction, { passive: true })
+}
+
+const removeActivityListeners = () => {
+  window.removeEventListener('touchstart', handleUserInteraction)
+  window.removeEventListener('pointerdown', handleUserInteraction)
+  window.removeEventListener('click', handleUserInteraction)
+  window.removeEventListener('scroll', handleUserInteraction)
+  window.removeEventListener('keydown', handleUserInteraction)
+}
+
 onMounted(async () => {
-  // Ensure background verification completes BEFORE deciding to display pop-up
+  // Ensure background verification completes BEFORE setting up interaction listeners
   await loadPremiumStatus()
 
-  setTimeout(() => {
-    if (!isPremium.value && shouldShowPopup()) {
-      isVisible.value = true
-    }
-  }, 2000)
+  if (!isPremium.value && shouldShowPopup()) {
+    addActivityListeners()
+  }
 })
 
 onUnmounted(() => {
   if (adInterval) clearInterval(adInterval)
+  removeActivityListeners()
 })
 
 const handleClose = () => {
