@@ -711,20 +711,15 @@ const handleConfirmDelete = async () => {
                 <!-- LEFT SIDE (lg:col-span-7): App Icon, Title, Developer, Metrics & CTA Download Button -->
                 <div class="lg:col-span-7 space-y-5">
                   <div class="space-y-3">
-                    <!-- ROW 1: App Icon (Left) & Title (Right) -->
-                    <div class="flex items-center gap-3.5 sm:gap-5">
-                      <img
-                        :src="article.app_icon || article.cover_image"
-                        :alt="article.title"
-                        class="w-16 h-16 sm:w-20 sm:h-20 rounded-[22%] object-cover border border-[#e4e4e7] shrink-0 bg-[#171717] aspect-square"
-                      />
-                      <h1 class="text-xl sm:text-2xl font-bold text-[#171717] leading-snug flex-1 min-w-0">
+                    <!-- ROW 1: Title (Full Width) -->
+                    <div>
+                      <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-[#171717] leading-snug">
                         {{ article.title }}
                       </h1>
                     </div>
 
                     <!-- ROW 2 (Below): Developer Name & Badges in its own full-width row (Centered Horizontally) -->
-                    <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 pt-1 text-xs sm:text-sm">
+                    <div class="flex flex-wrap gap-x-3 gap-y-1.5 pt-1 text-xs sm:text-sm">
                       <span class="font-semibold text-[#2563eb]">
                         {{ article.app_developer || getAuthorName(article.author) }}
                       </span>

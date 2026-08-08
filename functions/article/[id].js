@@ -35,7 +35,7 @@ export async function onRequest(context) {
     const title = article.title || 'Script MLBB'
     const rawExcerpt = article.excerpt || article.title || 'Artikel Script MLBB'
     const excerpt = cleanTextSnippet(rawExcerpt, 160)
-    const coverImage = article.cover_image || article.app_icon || `${url.origin}/favicon.svg`
+    const coverImage = article.cover_image || `${url.origin}/favicon.svg`
     const absoluteCover = coverImage.startsWith('http') ? coverImage : `${url.origin}${coverImage.startsWith('/') ? '' : '/'}${coverImage}`
     const finalTitle = title.toLowerCase().includes('script mlbb') ? title : `${title} — Script MLBB`
 

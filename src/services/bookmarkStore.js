@@ -45,7 +45,6 @@ export const toggleBookmark = (article) => {
       title: article.title,
       slug: article.slug,
       cover_image: article.cover_image || article.app_poster_35,
-      app_icon: article.app_icon,
       app_version: article.app_version || 'v1.8.94',
       app_size: article.app_size || '45.2 MB',
       read_time: article.read_time || '3 mnt baca',
