@@ -77,7 +77,7 @@ const handleLogout = () => {
   <div class="max-w-4xl mx-auto py-6 sm:py-10 space-y-8">
     
     <!-- Hero Header Banner (Vibrant Blue Theme) -->
-    <div class="stitch-card p-6 sm:p-10 bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white rounded-[14px] shadow-xl space-y-4 relative overflow-hidden">
+    <div class="p-6 sm:p-10 bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white rounded-3xl shadow-xl space-y-4 relative overflow-hidden">
       <div class="space-y-2 max-w-2xl relative z-10">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-white/20 text-blue-100 border border-white/30">
           <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
@@ -106,7 +106,7 @@ const handleLogout = () => {
       <div class="lg:col-span-7 space-y-6">
         
         <!-- Active Premium Status Box -->
-        <div v-if="isPremium" class="stitch-card p-6 sm:p-8 space-y-6 border border-emerald-300 bg-emerald-50/40">
+        <div v-if="isPremium" class="p-6 sm:p-8 space-y-6 rounded-2xl bg-emerald-50/60 border border-emerald-200">
           <div class="flex items-center justify-between border-b border-emerald-200 pb-4">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl font-bold shadow-xs">
@@ -140,7 +140,7 @@ const handleLogout = () => {
           <div class="pt-4 border-t border-emerald-200 flex justify-end">
             <button
               @click="handleLogout"
-              class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-[8px] transition-colors cursor-pointer"
+              class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-full transition-colors cursor-pointer"
             >
               Keluar Premium Perangkat Ini
             </button>
@@ -148,8 +148,8 @@ const handleLogout = () => {
         </div>
 
         <!-- Token Input Form -->
-        <div v-else class="stitch-card p-6 sm:p-8 space-y-6 bg-white border border-[#dfdfdf]">
-          <div class="border-b border-[#dfdfdf] pb-4">
+        <div v-else class="pb-6 space-y-6">
+          <div class="border-b border-[#f0f0f0] pb-4">
             <h3 class="text-base font-bold text-[#171717]">Aktivasi Kode Token Premium</h3>
             <p class="text-xs text-[#707070] mt-0.5">Masukkan 5 huruf kode token berlangganan Anda di bawah ini</p>
           </div>
@@ -163,22 +163,22 @@ const handleLogout = () => {
                 @input="handleInput"
                 placeholder="CONTOH: ABCDE"
                 maxlength="5"
-                class="w-full px-4 py-3 bg-[#fafafa] border border-[#dfdfdf] rounded-[8px] text-center font-mono font-bold text-xl uppercase tracking-widest text-[#171717] focus:bg-white focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] outline-none transition-all"
+                class="w-full px-4 py-3 bg-[#f4f4f5] border border-transparent rounded-2xl text-center font-mono font-bold text-xl uppercase tracking-widest text-[#171717] focus:bg-white focus:border-[#2563eb] outline-none transition-all"
               />
             </div>
 
             <!-- Feedback Messages -->
-            <div v-if="errorMessage" class="p-3 bg-red-50 text-red-700 border border-red-200 rounded-[8px] text-xs font-medium text-center">
+            <div v-if="errorMessage" class="p-3 bg-red-50 text-red-700 border border-red-200 rounded-full text-xs font-medium text-center">
               ⚠️ {{ errorMessage }}
             </div>
-            <div v-if="successMessage" class="p-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-[8px] text-xs font-medium text-center">
+            <div v-if="successMessage" class="p-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-medium text-center">
               ✅ {{ successMessage }}
             </div>
 
             <button
               type="submit"
               :disabled="isSubmitting || tokenInput.length !== 5"
-              class="w-full py-3 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold text-xs rounded-[8px] transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-sm opacity-100"
+              class="w-full py-3 stitch-button-primary font-bold text-xs rounded-full transition-colors cursor-pointer flex items-center justify-center gap-2"
             >
               <span v-if="isSubmitting" class="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
               <span>{{ isSubmitting ? 'Memverifikasi Token...' : 'Aktifkan Token Sekarang' }}</span>
@@ -186,13 +186,13 @@ const handleLogout = () => {
           </form>
 
           <!-- Buy Token CTA -->
-          <div class="pt-4 border-t border-[#dfdfdf] space-y-3 text-center">
+          <div class="pt-4 border-t border-[#f0f0f0] space-y-3 text-center">
             <p class="text-xs text-[#707070]">Belum memiliki kode token berlangganan?</p>
             <a
               :href="whatsappBuyUrl"
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center justify-center w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-[8px] transition-colors gap-2 shadow-sm"
+              class="inline-flex items-center justify-center w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-full transition-colors gap-2 cursor-pointer"
             >
               <span>Beli Token via WhatsApp (Rp {{ priceText }}/bulan)</span>
             </a>
@@ -203,12 +203,12 @@ const handleLogout = () => {
 
       <!-- RIGHT COLUMN: Premium Benefits Checklist (5 cols) -->
       <div class="lg:col-span-5 space-y-6">
-        <div class="stitch-card p-6 sm:p-8 space-y-5 bg-[#fafafa] border border-[#dfdfdf]">
-          <h3 class="text-sm font-bold text-[#171717] font-mono-eyebrow border-b border-[#dfdfdf] pb-3">MANFAAT AKUN PREMIUM</h3>
+        <div class="space-y-5 pb-6 border-b border-[#f0f0f0]">
+          <h3 class="text-sm font-bold text-[#171717] font-mono-eyebrow border-b border-[#f0f0f0] pb-3">MANFAAT AKUN PREMIUM</h3>
 
           <div class="space-y-4 text-xs">
             <div class="flex items-start gap-3">
-              <div class="w-7 h-7 rounded-[6px] bg-[#2563eb]/10 text-[#2563eb] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+              <div class="w-7 h-7 rounded-full bg-[#2563eb]/10 text-[#2563eb] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
                 🚫
               </div>
               <div>
@@ -218,7 +218,7 @@ const handleLogout = () => {
             </div>
 
             <div class="flex items-start gap-3">
-              <div class="w-7 h-7 rounded-[6px] bg-[#2563eb]/10 text-[#2563eb] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+              <div class="w-7 h-7 rounded-full bg-[#2563eb]/10 text-[#2563eb] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
                 ⚡
               </div>
               <div>
@@ -228,7 +228,7 @@ const handleLogout = () => {
             </div>
 
             <div class="flex items-start gap-3">
-              <div class="w-7 h-7 rounded-[6px] bg-[#2563eb]/10 text-[#2563eb] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+              <div class="w-7 h-7 rounded-full bg-[#2563eb]/10 text-[#2563eb] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
                 🎨
               </div>
               <div>
@@ -238,7 +238,7 @@ const handleLogout = () => {
             </div>
 
             <div class="flex items-start gap-3">
-              <div class="w-7 h-7 rounded-[6px] bg-[#2563eb]/10 text-[#2563eb] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+              <div class="w-7 h-7 rounded-full bg-[#2563eb]/10 text-[#2563eb] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
                 📱
               </div>
               <div>

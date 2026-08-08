@@ -88,7 +88,7 @@ watch(() => route.params.slug, () => {
     </div>
 
     <!-- Skeleton Loading State -->
-    <div v-if="isLoading" class="stitch-card p-6 sm:p-10 space-y-6 animate-pulse">
+    <div v-if="isLoading" class="space-y-6 animate-pulse">
       <div class="h-8 bg-gray-200 rounded w-1/2"></div>
       <div class="h-4 bg-gray-200 rounded w-1/4"></div>
       <div class="space-y-3 pt-4">
@@ -99,17 +99,17 @@ watch(() => route.params.slug, () => {
     </div>
 
     <!-- Error State -->
-    <div v-else-if="errorMessage" class="stitch-card p-8 text-center space-y-4">
+    <div v-else-if="errorMessage" class="py-16 text-center space-y-4">
       <h2 class="text-xl font-bold text-[#171717]">{{ errorMessage }}</h2>
       <p class="text-xs text-[#707070]">Halaman yang Anda cari mungkin telah dipindahkan atau dihapus.</p>
-      <RouterLink to="/" class="inline-block px-4 py-2 bg-[#2563eb] text-white text-xs font-semibold rounded-[6px]">
+      <RouterLink to="/" class="stitch-button-primary inline-block px-5 py-2.5 text-xs font-semibold">
         Kembali ke Beranda
       </RouterLink>
     </div>
 
     <!-- Static Page Content -->
-    <article v-else-if="page" class="stitch-card p-6 sm:p-10 space-y-6 bg-[#ffffff]">
-      <header class="border-b border-[#dfdfdf] pb-5 space-y-2">
+    <article v-else-if="page" class="space-y-6">
+      <header class="border-b border-[#f0f0f0] pb-5 space-y-2">
         <h1 class="text-2xl sm:text-4xl font-bold tracking-tight text-[#171717] leading-tight">
           {{ page.title }}
         </h1>

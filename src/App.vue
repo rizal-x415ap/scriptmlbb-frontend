@@ -26,7 +26,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div :class="['min-h-screen flex flex-col bg-[#f9f9f9] text-[#171717] selection:bg-[#3b82f6] selection:text-white', { 'premium-theme': isPremium }]">
+  <div :class="['min-h-screen flex flex-col bg-white text-[#171717] selection:bg-[#3b82f6] selection:text-white', { 'premium-theme': isPremium }]">
     
     <!-- Premium Status Bar (Always at top if premium) -->
     <PremiumStatusBar />
@@ -35,7 +35,7 @@ onMounted(() => {
     <PremiumPopup />
     
     <!-- Sticky Top Wrapper (Announcement Bar above Navbar - Stays Fixed on Scroll) -->
-    <div class="sticky top-0 z-50 shadow-sm">
+    <div class="sticky top-0 z-50 border-b border-[#f0f0f0]">
       <!-- Sticky Announcement Bar at Very Top -->
       <div
         v-if="siteSettings.showAnnouncementBar"

@@ -150,18 +150,18 @@ const formattedContent = computed(() => {
       <main class="lg:col-span-8 space-y-8 min-w-0">
 
         <!-- Skeleton Loading State -->
-        <div v-if="isLoading" class="stitch-card p-8 space-y-6">
+        <div v-if="isLoading" class="space-y-6">
           <SkeletonLoader height="32px" width="70%" />
           <SkeletonLoader height="400px" width="100%" />
           <SkeletonLoader height="200px" width="100%" />
         </div>
 
         <!-- Error State -->
-        <div v-else-if="errorMessage" class="stitch-card p-8 text-center space-y-4">
+        <div v-else-if="errorMessage" class="py-16 text-center space-y-4">
           <div class="text-4xl">⚠️</div>
           <h2 class="text-xl font-bold text-gray-900">Terjadi Kesalahan</h2>
           <p class="text-xs text-gray-600 max-w-md mx-auto">{{ errorMessage }}</p>
-          <RouterLink to="/" class="inline-block px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700">
+          <RouterLink to="/" class="stitch-button-primary inline-block px-5 py-2.5 text-xs font-semibold">
             Kembali ke Beranda
           </RouterLink>
         </div>
@@ -169,16 +169,14 @@ const formattedContent = computed(() => {
         <!-- MAIN SHORTENER INTEGRATED ARTICLE LAYOUT -->
         <div v-else-if="article" class="space-y-8">
 
-          <!-- ========================================== -->
-          <!-- MINIMALIST SHORTENER TOP BOX (EDITORIAL STYLE) -->
-          <!-- ========================================== -->
-          <div class="stitch-card p-5 sm:p-6 bg-white border border-[#dfdfdf] rounded-[12px] space-y-4">
-            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#dfdfdf] pb-3">
+          <!-- MINIMALIST SHORTENER TOP BOX -->
+          <div class="p-5 sm:p-6 bg-[#f4f4f5] rounded-2xl space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#e4e4e7] pb-3">
               <div class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-[#2563eb] animate-pulse"></span>
                 <span class="font-mono-eyebrow text-[#2563eb]">LINK GENERATOR // FILE UNDUHAN</span>
               </div>
-              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-[#fafafa] text-[#171717] border border-[#dfdfdf]">
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-white text-[#171717] border border-[#e4e4e7]">
                 File: {{ shortLinkData?.link_name || 'Download File' }}
               </span>
             </div>
@@ -196,24 +194,24 @@ const formattedContent = computed(() => {
                 <button
                   v-if="!isCountingDown && !isUnlocked"
                   @click="startCountdown"
-                  class="stitch-button-primary w-full sm:w-auto px-6 py-2.5 text-xs font-bold rounded-[6px] transition-all cursor-pointer flex items-center justify-center gap-2"
+                  class="stitch-button-primary w-full sm:w-auto px-6 py-2.5 text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <span>⚡ GET LINK UNDUHAN</span>
                 </button>
 
-                <div v-else-if="isCountingDown" class="px-4 py-2 bg-[#fafafa] border border-[#dfdfdf] text-[#171717] rounded-[6px] text-xs font-mono font-semibold flex items-center justify-center gap-2">
+                <div v-else-if="isCountingDown" class="px-4 py-2 bg-white text-[#171717] rounded-full text-xs font-mono font-semibold flex items-center justify-center gap-2">
                   <span class="w-2 h-2 rounded-full bg-[#2563eb] animate-ping"></span>
                   <span>Countdown 10s Berjalan...</span>
                 </div>
 
-                <div v-else-if="isUnlocked" class="px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-[6px] text-xs font-mono font-semibold flex items-center justify-center gap-2">
+                <div v-else-if="isUnlocked" class="px-4 py-2 bg-emerald-50 text-emerald-800 rounded-full text-xs font-mono font-semibold flex items-center justify-center gap-2">
                   <span>✓ Link Unduhan Terbuka di Bawah</span>
                 </div>
               </div>
             </div>
 
             <!-- Premium Bypasser Notice -->
-            <div v-if="isPremium" class="p-2.5 bg-amber-50 border border-amber-200 rounded-[6px] text-xs text-amber-900 text-center font-medium">
+            <div v-if="isPremium" class="p-2.5 bg-amber-50 rounded-full text-xs text-amber-900 text-center font-medium">
               👑 Status Premium Aktif — Mengalihkan langsung ke link file...
             </div>
           </div>
@@ -227,15 +225,13 @@ const formattedContent = computed(() => {
             type="in-article"
           />
 
-          <!-- ========================================== -->
           <!-- FULL STANDARD EDITORIAL ARTICLE CONTENT -->
-          <!-- ========================================== -->
-          <article class="stitch-card p-6 sm:p-10 space-y-8 bg-white">
+          <article class="space-y-8">
             
             <!-- Article Header Block -->
-            <header class="space-y-4">
-              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-blue-50 border border-blue-200">
-                <span class="font-mono text-blue-700 font-bold uppercase tracking-wider text-[11px]">{{ getCategoryName(article.category) }}</span>
+            <header class="space-y-4 pb-6 border-b border-[#f0f0f0]">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-[#2563eb]/10">
+                <span class="font-mono-eyebrow text-[#2563eb]">{{ getCategoryName(article.category) }}</span>
               </div>
 
               <h1 class="text-2xl sm:text-4xl font-bold tracking-tight text-gray-900 leading-snug">
@@ -247,21 +243,21 @@ const formattedContent = computed(() => {
               </p>
 
               <!-- Author Metadata Row -->
-              <div class="flex items-center gap-3.5 pt-4 border-t border-gray-200">
-                <img :src="getAuthorAvatar(article.author)" :alt="getAuthorName(article.author)" class="w-10 h-10 rounded-full object-cover border border-gray-200" />
+              <div class="flex items-center gap-3.5 pt-4 border-t border-[#f0f0f0]">
+                <img :src="getAuthorAvatar(article.author)" :alt="getAuthorName(article.author)" class="w-10 h-10 rounded-full object-cover border border-[#e4e4e7]" />
                 <div>
                   <div class="font-bold text-gray-900 text-sm">{{ getAuthorName(article.author) }}</div>
                   <div class="text-xs text-gray-500 flex items-center gap-2 font-mono">
                     <span>{{ getFormattedDate(article.published_at || article.created_at) }}</span>
                     <span>•</span>
-                    <span class="text-blue-600 font-semibold">{{ article.read_time || '5 min read' }}</span>
+                    <span class="text-[#2563eb] font-semibold">{{ article.read_time || '5 min read' }}</span>
                   </div>
                 </div>
               </div>
             </header>
 
             <!-- Main Cover Image Container -->
-            <div v-if="article.cover_image" class="w-full h-64 sm:h-96 rounded-xl overflow-hidden border border-gray-200 bg-gray-900 relative shadow-sm">
+            <div v-if="article.cover_image" class="w-full h-64 sm:h-96 rounded-2xl overflow-hidden bg-gray-900 relative">
               <img :src="article.cover_image" :alt="article.title" class="w-full h-full object-cover" />
             </div>
 
@@ -287,10 +283,8 @@ const formattedContent = computed(() => {
               type="in-article"
             />
 
-            <!-- ========================================== -->
             <!-- MINIMALIST SHORTENER BOTTOM BOX (BAWAH ARTIKEL) -->
-            <!-- ========================================== -->
-            <div id="download-unlock-area" class="mt-8 p-6 sm:p-8 bg-[#fafafa] border border-[#dfdfdf] rounded-[12px] space-y-4 text-center scroll-mt-28">
+            <div id="download-unlock-area" class="mt-8 p-6 sm:p-8 bg-[#f4f4f5] rounded-2xl space-y-4 text-center scroll-mt-28">
               
               <div class="space-y-1">
                 <span class="font-mono-eyebrow text-[#2563eb]">LANGKAH 2 // UNDUH FILE</span>
@@ -300,11 +294,11 @@ const formattedContent = computed(() => {
               </div>
 
               <!-- State 1: Before Countdown Started -->
-              <div v-if="!isCountingDown && !isUnlocked" class="p-4 bg-white border border-[#dfdfdf] rounded-[8px] text-xs text-[#707070] max-w-md mx-auto space-y-3">
+              <div v-if="!isCountingDown && !isUnlocked" class="p-4 bg-white rounded-xl text-xs text-[#707070] max-w-md mx-auto space-y-3">
                 <p>Silakan klik tombol <strong>"GET LINK UNDUHAN"</strong> di bagian atas artikel untuk memulai countdown 10 detik.</p>
                 <button
                   @click="startCountdown"
-                  class="stitch-button-primary px-5 py-2 text-xs font-semibold rounded-[6px] transition-colors cursor-pointer"
+                  class="stitch-button-primary px-5 py-2 text-xs font-semibold cursor-pointer"
                 >
                   Klik Di Sini Untuk Memulai Countdown
                 </button>
@@ -326,7 +320,7 @@ const formattedContent = computed(() => {
                   :href="originalUrl"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="stitch-button-primary bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-6 py-3 rounded-[6px] inline-flex items-center justify-center gap-2 transition-colors shadow-xs"
+                  class="stitch-button-primary bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-6 py-3 inline-flex items-center justify-center gap-2 transition-colors cursor-pointer"
                 >
                   <span>📥 Download File Sekarang →</span>
                 </a>

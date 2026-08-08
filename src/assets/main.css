@@ -4,7 +4,7 @@
   body {
     font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     color: #171717;
-    background-color: #f9f9f9;
+    background-color: #ffffff;
   }
 
   h1, h2, h3, h4, h5, h6, .font-display, .font-heading {
@@ -30,41 +30,43 @@
   font-weight: 500;
 }
 
-/* Stitch Design System Card Elevation & Border Tokens */
-.stitch-card {
-  background-color: #ffffff;
-  border: 1px solid #dfdfdf;
-  border-radius: 12px;
+/* Open-Canvas Minimalist Section Divider & Border Tokens */
+.section-divider {
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.stitch-card:hover {
-  border-color: #c7c7c7;
+/* Minimalist Card (Flat Borderless Open Layout) */
+.stitch-card {
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
 }
 
 .stitch-button-primary {
   background-color: #2563eb;
   color: #ffffff;
   font-weight: 600;
-  border-radius: 6px;
-  transition: background-color 0.2s ease;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
 }
 
 .stitch-button-primary:hover {
   background-color: #1d4ed8;
+  transform: translateY(-1px);
 }
 
 .stitch-button-secondary {
-  background-color: #ffffff;
-  border: 1px solid #c7c7c7;
+  background-color: #f4f4f5;
+  border: 1px solid transparent;
   color: #171717;
   font-weight: 500;
-  border-radius: 6px;
+  border-radius: 9999px;
   transition: all 0.2s ease;
 }
 
 .stitch-button-secondary:hover {
-  background-color: #fafafa;
-  border-color: #171717;
+  background-color: #e4e4e7;
+  border-color: transparent;
 }
 
 .stitch-pill {
@@ -76,20 +78,21 @@
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f9f9f9;
+  background: #ffffff;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #dfdfdf;
+  background: #e4e4e7;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #707070;
+  background: #a1a1aa;
 }
 
 /* Premium Gold/Amber Theme Styles */
@@ -113,4 +116,5 @@
 .premium-theme .bg-\[\#2563eb\] {
   background-color: #d97706;
 }
+
 

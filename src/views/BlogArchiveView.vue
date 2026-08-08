@@ -203,12 +203,12 @@ onMounted(() => {
   <div class="space-y-10 py-4">
 
     <!-- Header & Hero Search Bar -->
-    <header class="stitch-card p-8 sm:p-10 space-y-6 bg-gradient-to-b from-[#ffffff] via-[#fafafa] to-[#ffffff]">
+    <header class="pb-8 border-b border-[#f0f0f0] space-y-5">
       <div class="max-w-2xl space-y-3">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-[#2563eb]/10 border border-[#2563eb]/20">
-          <span class="font-mono-eyebrow text-[#1d4ed8] font-semibold">ARSIP & PENCARIAN</span>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-[#2563eb]/10">
+          <span class="font-mono-eyebrow text-[#2563eb]">ARSIP & PENCARIAN</span>
         </div>
-        <h1 class="text-3xl sm:text-4xl font-medium tracking-tight text-[#171717]">
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-[#171717]">
           {{ siteSettings.archiveTitle || 'Jelajahi Arsip Artikel & Catatan Teknis' }}
         </h1>
         <p class="text-[#707070] text-sm sm:text-base leading-relaxed">
@@ -222,16 +222,16 @@ onMounted(() => {
           v-model="searchInput"
           type="text"
           placeholder="Cari berdasarkan kata kunci, judul, penulis, atau topik..."
-          class="w-full pl-11 pr-10 py-3 text-sm bg-[#ffffff] border border-[#dfdfdf] rounded-[6px] text-[#171717] placeholder-[#707070] focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] shadow-sm transition-all"
+          class="w-full pl-11 pr-10 py-3 text-xs sm:text-sm bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] placeholder-[#a1a1aa] focus:outline-none focus:border-[#2563eb] focus:bg-white transition-all"
         />
-        <svg class="w-5 h-5 text-[#707070] absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-[#707070] absolute left-4 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
 
         <button
           v-if="searchInput"
           @click="searchInput = ''"
-          class="absolute right-3.5 top-3 text-[#707070] hover:text-[#171717] font-mono text-xs"
+          class="absolute right-4 top-3.5 text-[#707070] hover:text-[#171717] font-mono text-xs cursor-pointer"
         >
           ✕
         </button>
@@ -239,7 +239,7 @@ onMounted(() => {
     </header>
 
     <!-- Multi-dimensional Filters Control Surface -->
-    <div class="stitch-card p-6 space-y-4">
+    <div class="pb-6 border-b border-[#f0f0f0] space-y-4">
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         
         <!-- Category Dropdown Filter -->
@@ -247,7 +247,7 @@ onMounted(() => {
           <label class="font-mono-eyebrow text-[#707070]">Kategori</label>
           <select
             v-model="selectedCategory"
-            class="w-full px-3 py-2 text-xs bg-[#fafafa] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb]"
+            class="w-full px-3 py-2 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb] focus:bg-white"
           >
             <option v-for="cat in categories" :key="cat" :value="cat">
               {{ cat === 'All' ? 'Semua Kategori' : cat }}
@@ -260,7 +260,7 @@ onMounted(() => {
           <label class="font-mono-eyebrow text-[#707070]">Tahun Terbit</label>
           <select
             v-model="selectedYear"
-            class="w-full px-3 py-2 text-xs bg-[#fafafa] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb]"
+            class="w-full px-3 py-2 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb] focus:bg-white"
           >
             <option v-for="year in yearsList" :key="year" :value="year">
               {{ year === 'All' ? 'Semua Tahun' : year }}
@@ -273,7 +273,7 @@ onMounted(() => {
           <label class="font-mono-eyebrow text-[#707070]">Urutkan Berdasarkan</label>
           <select
             v-model="sortBy"
-            class="w-full px-3 py-2 text-xs bg-[#fafafa] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb]"
+            class="w-full px-3 py-2 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb] focus:bg-white"
           >
             <option value="newest">Terbaru Diterbitkan</option>
             <option value="popular">Paling Banyak Disukai</option>
@@ -288,7 +288,7 @@ onMounted(() => {
         <div class="flex items-center gap-2">
           <span>Ditemukan <strong class="text-[#171717] font-mono">{{ filteredArchive.length }}</strong> artikel</span>
           <span v-if="activeFilterCount > 0" class="text-[#b2b2b2]">•</span>
-          <span v-if="activeFilterCount > 0" class="text-[#1d4ed8] font-semibold font-mono">
+          <span v-if="activeFilterCount > 0" class="text-[#2563eb] font-semibold font-mono">
             {{ activeFilterCount }} filter aktif
           </span>
         </div>
@@ -296,7 +296,7 @@ onMounted(() => {
         <button
           v-if="activeFilterCount > 0"
           @click="clearFilters"
-          class="text-[#1d4ed8] hover:underline font-medium flex items-center gap-1"
+          class="text-[#2563eb] hover:underline font-medium flex items-center gap-1 cursor-pointer"
         >
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -307,26 +307,26 @@ onMounted(() => {
     </div>
 
     <!-- Asymmetric 8:4 Grid Layout (8 Cols Archive List : 4 Cols Archive Gadgets) -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
 
       <!-- Main Archive Stream Track (8 Columns) -->
       <main class="lg:col-span-8 space-y-4">
         <!-- Skeleton Loading State -->
-        <div v-if="isLoading" class="space-y-4">
+        <div v-if="isLoading" class="divide-y divide-[#f0f0f0]">
           <ArticleCardSkeleton v-for="n in 3" :key="n" />
         </div>
 
         <!-- Archive Articles List -->
-        <div v-else class="space-y-4">
+        <div v-else class="divide-y divide-[#f0f0f0]">
           <article
             v-for="item in filteredArchive"
             :key="item.id"
-            class="stitch-card p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group hover:border-[#2563eb] transition-colors"
+            class="py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group"
           >
             <div class="space-y-2 flex-1">
               <!-- Kategori & Tanggal -->
               <div class="flex items-center gap-3">
-                <span class="font-mono-eyebrow text-[#1d4ed8] bg-[#2563eb]/10 px-2 py-0.5 rounded border border-[#2563eb]/20 font-semibold text-xs">
+                <span class="font-mono-eyebrow text-[#2563eb]">
                   {{ getCategoryName(item.category) }}
                 </span>
                 <span v-if="getFormattedDate(item.published_at || item.date)" class="text-xs text-[#707070] font-mono">
@@ -346,8 +346,8 @@ onMounted(() => {
             <div class="flex items-center gap-2 self-end sm:self-center pt-2 sm:pt-0">
               <button
                 @click="toggleLike(item)"
-                class="px-2.5 py-1.5 rounded-[6px] border text-xs font-semibold flex items-center gap-1.5 transition-colors"
-                :class="checkIsItemLiked(item) ? 'bg-rose-50 border-rose-300 text-rose-600' : 'border-[#dfdfdf] text-[#707070] hover:text-[#171717] hover:bg-[#fafafa]'"
+                class="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                :class="checkIsItemLiked(item) ? 'bg-rose-50 text-rose-600' : 'bg-[#f4f4f5] text-[#707070] hover:text-[#171717] hover:bg-[#e4e4e7]'"
               >
                 <svg class="w-3.5 h-3.5" :fill="checkIsItemLiked(item) ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -357,8 +357,8 @@ onMounted(() => {
 
               <button
                 @click="toggleBookmark(item)"
-                class="p-1.5 rounded-[6px] border text-xs transition-colors"
-                :class="checkIsItemBookmarked(item) ? 'bg-amber-50 border-amber-300 text-amber-600' : 'border-[#dfdfdf] text-[#707070] hover:text-[#171717] hover:bg-[#fafafa]'"
+                class="p-1.5 rounded-full text-xs transition-colors cursor-pointer"
+                :class="checkIsItemBookmarked(item) ? 'bg-amber-50 text-amber-600' : 'bg-[#f4f4f5] text-[#707070] hover:text-[#171717] hover:bg-[#e4e4e7]'"
               >
                 <svg class="w-3.5 h-3.5" :fill="checkIsItemBookmarked(item) ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
@@ -368,10 +368,10 @@ onMounted(() => {
           </article>
 
           <!-- Empty Results Message -->
-          <div v-if="filteredArchive.length === 0" class="text-center py-16 stitch-card p-8 space-y-3">
+          <div v-if="filteredArchive.length === 0" class="text-center py-16 space-y-3">
             <p class="text-base text-[#171717] font-semibold">Tidak ada artikel yang sesuai</p>
             <p class="text-xs text-[#707070]">Coba sesuaikan kata kunci pencarian Anda atau hapus filter yang aktif.</p>
-            <button @click="clearFilters" class="stitch-button-secondary px-4 py-2 text-xs">
+            <button @click="clearFilters" class="stitch-button-secondary px-4 py-2 text-xs cursor-pointer">
               Hapus Filter Pencarian
             </button>
           </div>
@@ -379,25 +379,25 @@ onMounted(() => {
       </main>
 
       <!-- Sidebar Gadgets Track (4 Columns) -->
-      <aside class="lg:col-span-4 space-y-6">
+      <aside class="lg:col-span-4 space-y-8">
 
         <!-- Timeline Archive Gadget -->
-        <div class="stitch-card p-6 space-y-4">
-          <div class="flex items-center justify-between border-b border-[#dfdfdf] pb-3">
+        <div class="space-y-4 pb-6 border-b border-[#f0f0f0]">
+          <div class="flex items-center justify-between pb-2 border-b border-[#f0f0f0]">
             <span class="font-mono-eyebrow text-[#171717]">ARSIP PER BULAN</span>
             <span class="text-xs text-[#2563eb] font-mono">KRONOLOGI</span>
           </div>
 
           <div class="space-y-2 text-xs">
-            <div class="flex items-center justify-between py-1.5 px-3 rounded-[6px] bg-[#fafafa] border border-[#dfdfdf]">
+            <div class="flex items-center justify-between py-1.5 px-3 rounded-full bg-[#f4f4f5]">
               <span class="font-medium text-[#171717]">Agustus 2026</span>
               <span class="font-mono text-[#2563eb] font-semibold">3 artikel</span>
             </div>
-            <div class="flex items-center justify-between py-1.5 px-3 rounded-[6px] hover:bg-[#fafafa] transition-colors text-[#707070]">
+            <div class="flex items-center justify-between py-1.5 px-3 rounded-full hover:bg-[#f4f4f5] transition-colors text-[#707070]">
               <span>Juli 2026</span>
               <span class="font-mono">2 artikel</span>
             </div>
-            <div class="flex items-center justify-between py-1.5 px-3 rounded-[6px] hover:bg-[#fafafa] transition-colors text-[#707070]">
+            <div class="flex items-center justify-between py-1.5 px-3 rounded-full hover:bg-[#f4f4f5] transition-colors text-[#707070]">
               <span>Desember 2025</span>
               <span class="font-mono">1 artikel</span>
             </div>
@@ -405,9 +405,9 @@ onMounted(() => {
         </div>
 
         <!-- RSS & Export Gadget -->
-        <div class="stitch-card p-6 bg-[#fafafa] border border-[#dfdfdf] space-y-3">
+        <div class="space-y-3 pb-6 border-b border-[#f0f0f0]">
           <span class="font-mono-eyebrow text-[#2563eb]">UMPAN RSS EDITORIAL</span>
-          <h4 class="font-medium text-[#171717] text-sm">Berlangganan Umpan RSS</h4>
+          <h4 class="font-semibold text-[#171717] text-sm">Berlangganan Umpan RSS</h4>
           <p class="text-xs text-[#707070] leading-relaxed">
             Dapatkan pembaruan format XML instan setiap kali artikel baru diterbitkan.
           </p>

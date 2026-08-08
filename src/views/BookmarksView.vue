@@ -33,11 +33,11 @@ const getCategoryName = (cat) => {
 <template>
   <div class="space-y-8 py-4">
     <!-- Header Section -->
-    <header class="stitch-card p-6 sm:p-8 bg-[#ffffff] space-y-4">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#dfdfdf] pb-4">
+    <header class="pb-6 border-b border-[#f0f0f0] space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="space-y-1">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-[#2563eb]/10 border border-[#2563eb]/20">
-            <span class="font-mono-eyebrow text-[#1d4ed8] font-semibold">KOLEKSI PRIBADI</span>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-[#2563eb]/10">
+            <span class="font-mono-eyebrow text-[#2563eb]">KOLEKSI PRIBADI</span>
           </div>
           <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-[#171717]">
             Artikel Disimpan
@@ -48,7 +48,7 @@ const getCategoryName = (cat) => {
         </div>
 
         <!-- Count Pill -->
-        <div class="px-3.5 py-1.5 rounded-full bg-[#2563eb]/10 border border-[#2563eb]/20 text-[#1d4ed8] text-xs font-semibold flex items-center gap-1.5 shrink-0 self-start sm:self-center">
+        <div class="px-3.5 py-1.5 rounded-full bg-[#2563eb]/10 text-[#2563eb] text-xs font-semibold flex items-center gap-1.5 shrink-0 self-start sm:self-center">
           <svg class="w-4 h-4 text-[#2563eb]" fill="currentColor" viewBox="0 0 24 24">
             <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
           </svg>
@@ -60,9 +60,9 @@ const getCategoryName = (cat) => {
     <!-- Empty Bookmarks State -->
     <div
       v-if="bookmarkedArticles.length === 0"
-      class="stitch-card p-12 text-center space-y-5 bg-[#ffffff]"
+      class="py-16 text-center space-y-5"
     >
-      <div class="w-16 h-16 rounded-full bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center mx-auto text-[#2563eb]">
+      <div class="w-16 h-16 rounded-full bg-[#2563eb]/10 flex items-center justify-center mx-auto text-[#2563eb]">
         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
         </svg>
@@ -76,7 +76,7 @@ const getCategoryName = (cat) => {
       <div class="pt-2">
         <RouterLink
           to="/"
-          class="stitch-button-primary px-5 py-2.5 text-xs inline-flex items-center gap-2 shadow-sm"
+          class="stitch-button-primary px-5 py-2.5 text-xs inline-flex items-center gap-2"
         >
           <span>Jelajahi Artikel Terbaru</span>
           <span>→</span>
@@ -84,18 +84,18 @@ const getCategoryName = (cat) => {
       </div>
     </div>
 
-    <!-- Bookmarks Feed Stream List (Super Neat Mobile & Desktop Row Layout) -->
-    <div v-else class="space-y-4">
+    <!-- Bookmarks Feed Stream List -->
+    <div v-else class="divide-y divide-[#f0f0f0]">
       <article
         v-for="item in bookmarkedArticles"
         :key="item.id || item.slug"
-        class="stitch-card p-4 sm:p-5 flex flex-row items-center justify-between gap-3.5 sm:gap-6 group hover:border-[#2563eb] transition-colors bg-[#ffffff]"
+        class="py-4 flex flex-row items-center justify-between gap-3.5 sm:gap-6 group"
       >
         <!-- Left Side: Category, Title, Date & Actions -->
         <div class="flex flex-col justify-between flex-1 min-w-0 space-y-2">
           <!-- Category & Date -->
           <div class="flex flex-wrap items-center gap-2">
-            <span class="font-mono-eyebrow text-[#1d4ed8] bg-[#2563eb]/10 px-2 py-0.5 rounded border border-[#2563eb]/20 font-semibold text-[11px] sm:text-xs">
+            <span class="font-mono-eyebrow text-[#2563eb]">
               {{ getCategoryName(item.category) }}
             </span>
             <span v-if="item.saved_at" class="text-[11px] sm:text-xs text-[#707070] font-mono">
@@ -111,7 +111,7 @@ const getCategoryName = (cat) => {
           </RouterLink>
 
           <!-- Footer Actions Row -->
-          <div class="pt-1.5 flex items-center justify-start border-t border-[#dfdfdf]/60">
+          <div class="pt-1.5 flex items-center justify-start">
             <button
               @click="removeBookmark(item.id || item.slug)"
               class="text-xs text-[#707070] hover:text-rose-600 font-medium flex items-center gap-1 transition-colors cursor-pointer"
@@ -128,12 +128,12 @@ const getCategoryName = (cat) => {
         <!-- Right Side: 1:1 Square Thumbnail Image -->
         <RouterLink
           :to="'/article/' + (item.slug || item.id)"
-          class="w-20 sm:w-28 aspect-square shrink-0 rounded-[8px] overflow-hidden bg-[#171717] relative border border-[#dfdfdf] block"
+          class="w-20 sm:w-28 aspect-square shrink-0 rounded-[14px] overflow-hidden bg-[#f4f4f5] relative block"
         >
           <img
             :src="item.cover_image"
             :alt="item.title"
-            class="w-full h-full object-cover"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         </RouterLink>
       </article>

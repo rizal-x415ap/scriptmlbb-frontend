@@ -33,7 +33,7 @@ const navLinks = [
 </script>
 
 <template>
-  <header class="relative z-40 bg-[#ffffff]/95 backdrop-blur-md border-b border-[#dfdfdf]">
+  <header class="relative z-40 bg-white/95 backdrop-blur-md">
     <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16 gap-4">
 
@@ -43,11 +43,11 @@ const navLinks = [
             v-if="siteSettings.brandLogoUrl"
             :src="siteSettings.brandLogoUrl"
             :alt="siteSettings.brandLogoText || 'Logo'"
-            class="w-8 h-8 rounded-[8px] object-contain shrink-0 border border-[#dfdfdf]"
+            class="w-8 h-8 rounded-[8px] object-contain shrink-0 border border-[#e4e4e7]"
           />
           <div
             v-else
-            class="w-8 h-8 rounded-[8px] bg-[#171717] text-white flex items-center justify-center shadow-xs border border-[#171717]/10 group-hover:bg-[#2563eb] transition-colors shrink-0"
+            class="w-8 h-8 rounded-[8px] bg-[#171717] text-white flex items-center justify-center border border-[#171717]/10 group-hover:bg-[#2563eb] transition-colors shrink-0"
           >
             <!-- Minimalist Script Terminal Emblem -->
             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -69,10 +69,10 @@ const navLinks = [
               @input="handleSearchInput"
               type="text"
               placeholder="Cari artikel, script skin..."
-              class="w-full pl-9 pr-4 py-1.5 text-sm bg-[#fafafa] border border-[#dfdfdf] rounded-[6px] text-[#171717] placeholder-[#707070] focus:outline-none focus:border-[#2563eb] focus:bg-[#ffffff] transition-all"
+              class="w-full pl-9 pr-4 py-1.5 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] placeholder-[#a1a1aa] focus:outline-none focus:border-[#2563eb] focus:bg-white transition-all"
             />
-            <button type="submit" class="absolute left-3 top-2.5 text-[#707070] hover:text-[#2563eb] transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <button type="submit" class="absolute left-3 top-2 text-[#707070] hover:text-[#2563eb] transition-colors cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
             </button>
@@ -85,25 +85,25 @@ const navLinks = [
             v-for="link in navLinks"
             :key="link.path"
             :to="link.path"
-            class="text-sm font-medium transition-colors inline-flex items-center gap-1.5"
+            class="text-xs font-semibold transition-colors inline-flex items-center gap-1.5"
             :class="[
               route.path === link.path
-                ? 'text-[#171717] font-bold'
+                ? 'text-[#2563eb]'
                 : 'text-[#707070] hover:text-[#171717]'
             ]"
           >
             <!-- Beranda Icon -->
-            <svg v-if="link.path === '/'" class="w-4 h-4 shrink-0" :class="route.path === '/' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <svg v-if="link.path === '/'" class="w-3.5 h-3.5 shrink-0" :class="route.path === '/' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
             </svg>
 
             <!-- Arsip Icon -->
-            <svg v-else-if="link.path === '/archive'" class="w-4 h-4 shrink-0" :class="route.path === '/archive' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <svg v-else-if="link.path === '/archive'" class="w-3.5 h-3.5 shrink-0" :class="route.path === '/archive' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
             </svg>
 
             <!-- Disimpan / Bookmark Icon -->
-            <svg v-else-if="link.isBookmark" class="w-4 h-4 shrink-0 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
+            <svg v-else-if="link.isBookmark" class="w-3.5 h-3.5 shrink-0 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
               <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
             </svg>
 
@@ -119,8 +119,8 @@ const navLinks = [
 
         <!-- CTA Buttons -->
         <div class="hidden sm:flex items-center gap-3 shrink-0">
-          <RouterLink to="/archive" class="stitch-button-primary px-4 py-2 text-sm flex items-center gap-1.5 shadow-xs">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <RouterLink to="/archive" class="stitch-button-primary px-4 py-2 text-xs flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
             Jelajahi Arsip
@@ -130,9 +130,9 @@ const navLinks = [
         <!-- Mobile Menu Hamburger -->
         <button
           @click="isMobileMenuOpen = !isMobileMenuOpen"
-          class="md:hidden p-2 rounded-[6px] text-[#707070] hover:text-[#171717] hover:bg-[#fafafa]"
+          class="md:hidden p-2 rounded-full text-[#707070] hover:text-[#171717] hover:bg-[#f4f4f5]"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path v-if="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -140,14 +140,14 @@ const navLinks = [
       </div>
 
       <!-- Mobile Search & Drawer -->
-      <div v-if="isMobileMenuOpen" class="md:hidden py-4 border-t border-[#dfdfdf] space-y-3">
+      <div v-if="isMobileMenuOpen" class="md:hidden py-4 border-t border-[#f0f0f0] space-y-3">
         <form @submit.prevent="handleSearchSubmit" class="px-2">
           <input
             v-model="searchQuery"
             @input="handleSearchInput"
             type="text"
             placeholder="Cari artikel, script skin..."
-            class="w-full px-3 py-2 text-sm bg-[#fafafa] border border-[#dfdfdf] rounded-[6px] text-[#171717] placeholder-[#707070] focus:outline-none focus:border-[#2563eb]"
+            class="w-full px-3 py-2 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] placeholder-[#a1a1aa] focus:outline-none focus:border-[#2563eb]"
           />
         </form>
         <div class="space-y-1">
@@ -156,21 +156,21 @@ const navLinks = [
             :key="link.path"
             :to="link.path"
             @click="isMobileMenuOpen = false"
-            class="flex items-center gap-2.5 px-3 py-2 text-base font-medium rounded-[6px] transition-colors"
+            class="flex items-center gap-2.5 px-3 py-2 text-sm font-medium rounded-full transition-colors"
             :class="[
               route.path === link.path
                 ? 'bg-[#2563eb]/10 text-[#1d4ed8] font-semibold'
-                : 'text-[#707070] hover:text-[#171717] hover:bg-[#fafafa]'
+                : 'text-[#707070] hover:text-[#171717] hover:bg-[#f4f4f5]'
             ]"
           >
             <!-- Mobile Icons -->
-            <svg v-if="link.path === '/'" class="w-5 h-5 shrink-0" :class="route.path === '/' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <svg v-if="link.path === '/'" class="w-4 h-4 shrink-0" :class="route.path === '/' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
             </svg>
-            <svg v-else-if="link.path === '/archive'" class="w-5 h-5 shrink-0" :class="route.path === '/archive' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <svg v-else-if="link.path === '/archive'" class="w-4 h-4 shrink-0" :class="route.path === '/archive' ? 'text-[#2563eb]' : 'text-[#707070]'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
             </svg>
-            <svg v-else-if="link.isBookmark" class="w-5 h-5 shrink-0 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
+            <svg v-else-if="link.isBookmark" class="w-4 h-4 shrink-0 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
               <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
             </svg>
 

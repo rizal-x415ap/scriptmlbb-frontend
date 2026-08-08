@@ -11,9 +11,9 @@ const isExternalLink = (url) => {
 </script>
 
 <template>
-  <footer v-if="siteSettings.showFooter" class="mt-20 border-t border-[#dfdfdf] bg-[#ffffff] text-[#707070] py-14">
+  <footer v-if="siteSettings.showFooter" class="mt-20 border-t border-[#f0f0f0] bg-white text-[#707070] py-14">
     <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-12 border-b border-[#dfdfdf]">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-12 border-b border-[#f0f0f0]">
         
         <!-- Brand Info & Motto Column -->
         <div class="md:col-span-2 space-y-4">
@@ -33,7 +33,7 @@ const isExternalLink = (url) => {
             <span class="font-semibold text-lg text-[#171717]">{{ siteSettings.brandLogoText || 'Script MLBB' }}</span>
           </div>
           
-          <p class="text-sm leading-relaxed text-[#707070] max-w-sm">
+          <p class="text-xs sm:text-sm leading-relaxed text-[#707070] max-w-sm">
             {{ siteSettings.footerBio || 'An editorial tech publication dedicated to high-performance web architecture, developer tooling, design systems, and software craftsmanship.' }}
           </p>
 
@@ -45,21 +45,21 @@ const isExternalLink = (url) => {
         <!-- Column 2 Links -->
         <div class="space-y-3">
           <h4 class="font-mono-eyebrow text-[#171717]">{{ siteSettings.footerCol2Title || 'Categories' }}</h4>
-          <ul class="space-y-2 text-sm">
+          <ul class="space-y-2 text-xs sm:text-sm">
             <li v-if="siteSettings.footerCol2Link1Text">
               <a
                 v-if="isExternalLink(siteSettings.footerCol2Link1Url)"
                 :href="siteSettings.footerCol2Link1Url"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="hover:text-[#171717] transition-colors"
+                class="hover:text-[#2563eb] transition-colors"
               >
                 {{ siteSettings.footerCol2Link1Text }}
               </a>
               <RouterLink
                 v-else
                 :to="siteSettings.footerCol2Link1Url || '#'"
-                class="hover:text-[#171717] transition-colors"
+                class="hover:text-[#2563eb] transition-colors"
               >
                 {{ siteSettings.footerCol2Link1Text }}
               </RouterLink>
@@ -71,14 +71,14 @@ const isExternalLink = (url) => {
                 :href="siteSettings.footerCol2Link2Url"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="hover:text-[#171717] transition-colors"
+                class="hover:text-[#2563eb] transition-colors"
               >
                 {{ siteSettings.footerCol2Link2Text }}
               </a>
               <RouterLink
                 v-else
                 :to="siteSettings.footerCol2Link2Url || '#'"
-                class="hover:text-[#171717] transition-colors"
+                class="hover:text-[#2563eb] transition-colors"
               >
                 {{ siteSettings.footerCol2Link2Text }}
               </RouterLink>
@@ -90,14 +90,14 @@ const isExternalLink = (url) => {
                 :href="siteSettings.footerCol2Link3Url"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="hover:text-[#171717] transition-colors"
+                class="hover:text-[#2563eb] transition-colors"
               >
                 {{ siteSettings.footerCol2Link3Text }}
               </a>
               <RouterLink
                 v-else
                 :to="siteSettings.footerCol2Link3Url || '#'"
-                class="hover:text-[#171717] transition-colors"
+                class="hover:text-[#2563eb] transition-colors"
               >
                 {{ siteSettings.footerCol2Link3Text }}
               </RouterLink>
@@ -109,14 +109,14 @@ const isExternalLink = (url) => {
                 :href="siteSettings.footerCol2Link4Url"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="hover:text-[#171717] transition-colors"
+                class="hover:text-[#2563eb] transition-colors"
               >
                 {{ siteSettings.footerCol2Link4Text }}
               </a>
               <RouterLink
                 v-else
                 :to="siteSettings.footerCol2Link4Url || '#'"
-                class="hover:text-[#171717] transition-colors"
+                class="hover:text-[#2563eb] transition-colors"
               >
                 {{ siteSettings.footerCol2Link4Text }}
               </RouterLink>
@@ -127,21 +127,21 @@ const isExternalLink = (url) => {
         <!-- Column 3 Links -->
         <div class="space-y-3">
           <h4 class="font-mono-eyebrow text-[#171717]">{{ siteSettings.footerCol3Title || 'Resources' }}</h4>
-          <ul class="space-y-2 text-sm">
+          <ul class="space-y-2 text-xs sm:text-sm">
             <li v-if="siteSettings.footerCol3Link1Text">
               <a
                 v-if="isExternalLink(siteSettings.footerCol3Link1Url)"
                 :href="siteSettings.footerCol3Link1Url"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="hover:text-[#171717] transition-colors"
+                class="hover:text-[#2563eb] transition-colors"
               >
                 {{ siteSettings.footerCol3Link1Text }}
               </a>
               <RouterLink
                 v-else
                 :to="siteSettings.footerCol3Link1Url || '#'"
-                class="hover:text-[#171717] transition-colors"
+                class="hover:text-[#2563eb] transition-colors"
               >
                 {{ siteSettings.footerCol3Link1Text }}
               </RouterLink>
@@ -153,14 +153,14 @@ const isExternalLink = (url) => {
                 :href="siteSettings.footerCol3Link2Url"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="hover:text-[#171717] transition-colors"
+                class="hover:text-[#2563eb] transition-colors"
               >
                 {{ siteSettings.footerCol3Link2Text }}
               </a>
               <RouterLink
                 v-else
                 :to="siteSettings.footerCol3Link2Url || '#'"
-                class="hover:text-[#171717] transition-colors"
+                class="hover:text-[#2563eb] transition-colors"
               >
                 {{ siteSettings.footerCol3Link2Text }}
               </RouterLink>
@@ -172,14 +172,14 @@ const isExternalLink = (url) => {
                 :href="siteSettings.footerCol3Link3Url"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="hover:text-[#171717] transition-colors"
+                class="hover:text-[#2563eb] transition-colors"
               >
                 {{ siteSettings.footerCol3Link3Text }}
               </a>
               <RouterLink
                 v-else
                 :to="siteSettings.footerCol3Link3Url || '#'"
-                class="hover:text-[#171717] transition-colors"
+                class="hover:text-[#2563eb] transition-colors"
               >
                 {{ siteSettings.footerCol3Link3Text }}
               </RouterLink>
@@ -191,14 +191,14 @@ const isExternalLink = (url) => {
                 :href="siteSettings.footerCol3Link4Url"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="hover:text-[#171717] transition-colors"
+                class="hover:text-[#2563eb] transition-colors"
               >
                 {{ siteSettings.footerCol3Link4Text }}
               </a>
               <RouterLink
                 v-else
                 :to="siteSettings.footerCol3Link4Url || '#'"
-                class="hover:text-[#171717] transition-colors"
+                class="hover:text-[#2563eb] transition-colors"
               >
                 {{ siteSettings.footerCol3Link4Text }}
               </RouterLink>
@@ -208,7 +208,7 @@ const isExternalLink = (url) => {
       </div>
 
       <!-- Bottom Bar -->
-      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#888888]">
         <p>{{ siteSettings.footerCopyright || `© ${currentYear} Supabaze Editorial. All rights reserved.` }}</p>
         <div class="flex flex-wrap items-center gap-4 sm:gap-6">
           <RouterLink to="/page/tentang-kami" class="hover:text-[#171717] transition-colors">

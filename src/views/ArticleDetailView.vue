@@ -631,7 +631,7 @@ const handleConfirmDelete = async () => {
     <!-- Article Content -->
     <template v-else-if="article">
       <!-- Top Back Navigation & Action Bar (Clean Single Row on Mobile & Desktop) -->
-      <div class="flex flex-row items-center justify-between gap-2 border-b border-[#dfdfdf] pb-3.5">
+      <div class="flex flex-row items-center justify-between gap-2 border-b border-[#f0f0f0] pb-4">
         <RouterLink
           to="/"
           class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#707070] hover:text-[#171717] transition-colors group shrink-0"
@@ -647,8 +647,8 @@ const handleConfirmDelete = async () => {
           <!-- Like Button -->
           <button
             @click="toggleLike"
-            class="px-2.5 sm:px-3.5 py-1.5 rounded-[8px] border text-xs font-semibold flex items-center gap-1 transition-all shadow-2xs cursor-pointer"
-            :class="isLiked ? 'bg-rose-600 border-rose-600 text-white' : 'bg-rose-50/80 border-rose-200/90 text-rose-600 hover:bg-rose-100/80 hover:border-rose-300'"
+            class="px-3 sm:px-4 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer"
+            :class="isLiked ? 'bg-rose-600 text-white' : 'bg-rose-50 text-rose-600 hover:bg-rose-100'"
           >
             <svg class="w-3.5 h-3.5" :fill="isLiked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -659,8 +659,8 @@ const handleConfirmDelete = async () => {
           <!-- Bookmark Button -->
           <button
             @click="toggleBookmark"
-            class="p-1.5 sm:p-2 rounded-[8px] border text-xs transition-all shadow-2xs cursor-pointer"
-            :class="isBookmarked ? 'bg-amber-500 border-amber-500 text-white' : 'bg-amber-50/80 border-amber-200/90 text-amber-600 hover:bg-amber-100/80 hover:border-amber-300'"
+            class="p-2 rounded-full text-xs transition-all cursor-pointer"
+            :class="isBookmarked ? 'bg-amber-500 text-white' : 'bg-amber-50 text-amber-600 hover:bg-amber-100'"
             aria-label="Simpan artikel"
           >
             <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" :fill="isBookmarked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
@@ -671,8 +671,8 @@ const handleConfirmDelete = async () => {
           <!-- Share Button -->
           <button
             @click="copyShareLink"
-            class="px-2.5 sm:px-3.5 py-1.5 rounded-[8px] border text-xs font-semibold transition-all shadow-2xs flex items-center gap-1 cursor-pointer"
-            :class="isCopied ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-blue-50/80 border-blue-200/90 text-blue-600 hover:bg-blue-100/80 hover:border-blue-300'"
+            class="px-3 sm:px-4 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer"
+            :class="isCopied ? 'bg-emerald-600 text-white' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -694,8 +694,8 @@ const handleConfirmDelete = async () => {
           <!-- ========================================== -->
           <div v-if="isPlayStoreStyle" class="space-y-8">
             
-            <!-- Unified Master App Hero Card (Play Store Info + Integrated 1:1 Square Thumbnail) -->
-            <div class="stitch-card p-6 sm:p-8 bg-[#ffffff]">
+            <!-- Unified Master App Hero Section -->
+            <div class="pb-8 border-b border-[#f0f0f0]">
               <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
                 
                 <!-- LEFT SIDE (lg:col-span-7): App Icon, Title, Developer, Metrics & CTA Download Button -->
@@ -706,7 +706,7 @@ const handleConfirmDelete = async () => {
                       <img
                         :src="article.app_icon || article.cover_image"
                         :alt="article.title"
-                        class="w-16 h-16 sm:w-20 sm:h-20 rounded-[20%] object-cover border border-[#dfdfdf] shadow-md shrink-0 bg-[#171717] aspect-square"
+                        class="w-16 h-16 sm:w-20 sm:h-20 rounded-[22%] object-cover border border-[#e4e4e7] shrink-0 bg-[#171717] aspect-square"
                       />
                       <h1 class="text-lg sm:text-2xl font-bold text-[#171717] leading-snug flex-1 min-w-0">
                         {{ article.title }}
@@ -714,7 +714,7 @@ const handleConfirmDelete = async () => {
                     </div>
 
                     <!-- ROW 2 (Below): Developer Name & Badges in its own full-width row -->
-                    <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 pt-1 text-xs sm:text-sm">
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 pt-1 text-xs sm:text-sm">
                       <span class="font-semibold text-[#2563eb]">
                         {{ article.app_developer || getAuthorName(article.author) }}
                       </span>
@@ -726,7 +726,7 @@ const handleConfirmDelete = async () => {
                   </div>
 
                   <!-- Play Store Metrics Row (Rating, Reviews, Downloads, File Size, Safety) -->
-                  <div class="grid grid-cols-4 divide-x divide-[#dfdfdf] border-y border-[#dfdfdf] py-3 text-center bg-[#fafafa]/80 rounded-[8px]">
+                  <div class="grid grid-cols-4 divide-x divide-[#e4e4e7] border-y border-[#f0f0f0] py-3 text-center bg-[#f4f4f5] rounded-2xl">
                     <div class="space-y-0.5 px-1">
                       <div class="flex items-center justify-center gap-1 text-sm font-bold text-[#171717]">
                         <span>{{ ratingStats.average }}</span>
@@ -759,17 +759,17 @@ const handleConfirmDelete = async () => {
                     <a
                       href="#download-section"
                       @click.prevent="scrollToDownloadSection"
-                      class="w-full sm:w-auto flex-1 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-semibold py-3 px-6 rounded-[8px] text-center text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer group"
+                      class="w-full sm:w-auto flex-1 stitch-button-primary py-3 px-6 text-center text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer group"
                     >
                       <!-- Down Arrow Circle Indicator Icon -->
-                      <svg class="w-5 h-5 group-hover:translate-y-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-4 h-4 group-hover:translate-y-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                       </svg>
                       <span>Link Download Script</span>
                     </a>
                     <button
                       @click="copyShareLink"
-                      class="w-full sm:w-auto px-4 py-3 border border-[#dfdfdf] rounded-[8px] text-xs font-semibold text-[#707070] hover:text-[#171717] hover:bg-[#fafafa] transition-colors flex items-center justify-center gap-1.5"
+                      class="w-full sm:w-auto px-4 py-3 stitch-button-secondary text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -781,14 +781,14 @@ const handleConfirmDelete = async () => {
 
                 <!-- RIGHT SIDE (lg:col-span-5): Integrated 1:1 Square Thumbnail Photo -->
                 <div class="lg:col-span-5 w-full shrink-0">
-                  <div class="w-full aspect-square rounded-[10px] overflow-hidden border border-[#dfdfdf] bg-[#171717] relative">
+                  <div class="w-full aspect-square rounded-2xl overflow-hidden bg-[#171717] relative">
                     <img
                       :src="article.cover_image"
                       :alt="article.title"
                       class="w-full h-full object-cover"
                     />
                     <!-- Floating Views Badge (Pojok Kanan Atas) -->
-                    <div class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold bg-[#171717]/85 text-white backdrop-blur-md border border-white/20 flex items-center gap-1.5 shadow-md z-10 pointer-events-none">
+                    <div class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold bg-[#171717]/80 text-white backdrop-blur-md border border-white/20 flex items-center gap-1.5 z-10 pointer-events-none">
                       <svg class="w-3.5 h-3.5 text-[#2563eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -801,9 +801,9 @@ const handleConfirmDelete = async () => {
               </div>
             </div>
 
-            <!-- About This App & Feature Highlights -->
-            <div class="stitch-card p-6 sm:p-8 space-y-5">
-              <div class="flex items-center justify-between border-b border-[#dfdfdf] pb-3">
+            <!-- About This App & Feature Highlights Section -->
+            <div class="space-y-5 pb-8 border-b border-[#f0f0f0]">
+              <div class="flex items-center justify-between border-b border-[#f0f0f0] pb-3">
                 <h2 class="text-lg font-bold text-[#171717]">Tentang Script Ini</h2>
                 <span v-if="article.app_version" class="text-xs text-[#2563eb] font-semibold flex items-center gap-1">
                   <span>Versi {{ article.app_version }}</span>
@@ -825,11 +825,11 @@ const handleConfirmDelete = async () => {
               />
 
               <!-- App Technical Specs & Download Links Box -->
-              <div id="download-section" class="mt-8 p-5 sm:p-6 bg-[#fafafa] rounded-[12px] border border-[#dfdfdf] space-y-5 sm:space-y-6 scroll-mt-36">
+              <div id="download-section" class="mt-8 p-5 sm:p-6 bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] space-y-5 sm:space-y-6 scroll-mt-36">
                 <!-- Header Title (Using Article Title across top) -->
-                <div class="border-b border-[#dfdfdf] pb-3">
+                <div class="border-b border-[#e2e8f0] pb-3">
                   <h2 class="text-base font-bold text-[#171717] line-clamp-1">
-                  Download  {{ article.title }}
+                  Download {{ article.title }}
                   </h2>
                 </div>
 
@@ -839,7 +839,7 @@ const handleConfirmDelete = async () => {
                   <!-- LEFT COLUMN (Desktop lg:col-span-7): Poster 3:5 on Left + Badges & Specs on Right -->
                   <div class="lg:col-span-7 flex flex-row items-start gap-3 sm:gap-5">
                     <!-- LEFT SIDE: 3:5 Aspect Ratio Poster Thumbnail Image -->
-                    <div class="w-24 sm:w-36 aspect-[3/5] rounded-[10px] overflow-hidden border border-[#dfdfdf] shadow-xs bg-[#171717] shrink-0 relative">
+                    <div class="w-24 sm:w-36 aspect-[3/5] rounded-[10px] overflow-hidden border border-[#e2e8f0] bg-[#171717] shrink-0 relative">
                       <img
                         :src="article.app_poster_35 || article.cover_image"
                         :alt="article.title"
@@ -854,7 +854,7 @@ const handleConfirmDelete = async () => {
                         <span
                           v-for="(feature, fIdx) in appFeaturesList"
                           :key="fIdx"
-                          class="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-medium bg-[#ffffff] text-[#1d4ed8] border border-[#2563eb]/25"
+                          class="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-medium bg-white text-[#1d4ed8] border border-[#2563eb]/25"
                         >
                           {{ feature.startsWith('✓') ? feature : '✓ ' + feature }}
                         </span>
@@ -870,10 +870,10 @@ const handleConfirmDelete = async () => {
                   </div>
 
                   <!-- RIGHT COLUMN (Desktop lg:col-span-5): Compact Download Links List on Far Right -->
-                  <div class="lg:col-span-5 pt-4 lg:pt-0 border-t lg:border-t-0 border-[#dfdfdf] space-y-3">
+                  <div class="lg:col-span-5 pt-4 lg:pt-0 border-t lg:border-t-0 border-[#e2e8f0] space-y-3">
                     <h4 class="text-xs font-bold text-[#171717] uppercase tracking-wider font-mono">LINK UNDUHAN FILE</h4>
 
-                    <div class="divide-y divide-[#dfdfdf]/70 border border-[#dfdfdf] rounded-[8px] bg-[#ffffff] text-xs max-h-[220px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 hover:scrollbar-thumb-gray-300">
+                    <div class="divide-y divide-[#e2e8f0] border border-[#e2e8f0] rounded-xl bg-white text-xs max-h-[220px] overflow-y-auto scrollbar-thin">
                       
                       <!-- Dynamic Download Links Loop -->
                       <template v-for="(link, lIdx) in parsedDownloadLinks" :key="lIdx">
@@ -897,7 +897,7 @@ const handleConfirmDelete = async () => {
                           class="flex items-center gap-2.5 p-2.5 sm:p-3 hover:bg-[#2563eb]/5 transition-colors group min-w-0"
                         >
                           <svg class="w-4 h-4 text-[#2563eb] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m4 4V4" />
                           </svg>
                           <span class="font-medium text-[#171717] group-hover:text-[#2563eb] transition-colors truncate">
                             {{ link.name }}
@@ -913,10 +913,10 @@ const handleConfirmDelete = async () => {
             </div>
 
             <!-- Rating & Reviews Play Store Section -->
-            <div class="stitch-card p-6 sm:p-8 space-y-6">
+            <div class="space-y-6 pb-8 border-b border-[#f0f0f0]">
               <h3 class="text-lg font-bold text-[#171717]">Rating & Ulasan Pengguna</h3>
               
-              <div class="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-[#dfdfdf]">
+              <div class="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-[#f0f0f0]">
                 <div class="text-center shrink-0 space-y-1">
                   <div class="text-5xl font-black text-[#171717]">{{ ratingStats.average }}</div>
                   <div class="flex justify-center text-amber-500 text-sm gap-0.5">
@@ -929,7 +929,7 @@ const handleConfirmDelete = async () => {
                 <div class="flex-1 w-full space-y-1.5 text-xs">
                   <div v-for="star in [5, 4, 3, 2, 1]" :key="star" class="flex items-center gap-2">
                     <span class="w-3 text-right font-mono text-[#707070]">{{ star }}</span>
-                    <div class="flex-1 h-2 bg-[#dfdfdf] rounded-full overflow-hidden">
+                    <div class="flex-1 h-2 bg-[#f4f4f5] rounded-full overflow-hidden">
                       <div class="h-full bg-[#2563eb] rounded-full transition-all duration-500" :style="{ width: ratingStats.getPercent(star) + '%' }"></div>
                     </div>
                     <span class="w-8 text-left font-mono text-[10px] text-[#707070]">{{ ratingStats.getPercent(star) }}%</span>
@@ -937,7 +937,7 @@ const handleConfirmDelete = async () => {
                 </div>
               </div>
 
-              <!-- Featured 4 & 5 Star Reviews List (Otomatis 1 Ulasan Bawaan + DB Reviews 4★ & 5★) -->
+              <!-- Featured 4 & 5 Star Reviews List -->
               <div class="space-y-3 pt-2">
                 <div class="text-xs font-bold text-[#171717] font-mono uppercase tracking-wider">
                   ULASAN UNGGULAN VERIFIKASI ({{ featuredReviews.length }})
@@ -947,14 +947,14 @@ const handleConfirmDelete = async () => {
                   <div
                     v-for="(rev, rIdx) in featuredReviews"
                     :key="rev.id || rIdx"
-                    class="p-4 bg-[#fafafa] rounded-[10px] border border-[#dfdfdf] space-y-2"
+                    class="p-4 bg-[#f4f4f5] rounded-2xl space-y-2"
                   >
                     <div class="flex items-center justify-between">
                       <div class="flex items-center gap-2.5">
                         <img
                           :src="getCuteAvatar(rev.author_name)"
                           :alt="rev.author_name"
-                          class="w-8 h-8 rounded-full bg-[#2563eb]/10 border border-[#2563eb]/30 object-contain p-0.5 shrink-0"
+                          class="w-8 h-8 rounded-full bg-white object-contain p-0.5 shrink-0"
                         />
                         <div>
                           <div class="text-xs font-bold text-[#171717]">{{ rev.author_name }}</div>
@@ -989,12 +989,12 @@ const handleConfirmDelete = async () => {
           <!-- DEFAULT EDITORIAL ARTICLE TEMPLATE (FOR STANDARD ARTICLES) -->
           <template v-else>
             <!-- Article Header Block -->
-            <header class="space-y-5">
-              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-[#2563eb]/10 border border-[#2563eb]/20">
-                <span class="font-mono-eyebrow text-[#1d4ed8] font-semibold">{{ getCategoryName(article.category) }}</span>
+            <header class="space-y-5 pb-6 border-b border-[#f0f0f0]">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-[#2563eb]/10">
+                <span class="font-mono-eyebrow text-[#2563eb]">{{ getCategoryName(article.category) }}</span>
               </div>
 
-              <h1 class="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-[#171717] leading-[1.15]">
+              <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#171717] leading-[1.15]">
                 {{ article.title }}
               </h1>
 
@@ -1003,16 +1003,16 @@ const handleConfirmDelete = async () => {
               </p>
 
               <!-- Author Metadata Row -->
-              <div class="flex items-center gap-3.5 pt-4 border-t border-[#dfdfdf]">
-                <img :src="getAuthorAvatar(article.author)" :alt="getAuthorName(article.author)" loading="lazy" decoding="async" width="44" height="44" class="w-11 h-11 rounded-full object-cover border border-[#dfdfdf]" />
+              <div class="flex items-center gap-3.5 pt-4 border-t border-[#f0f0f0]">
+                <img :src="getAuthorAvatar(article.author)" :alt="getAuthorName(article.author)" loading="lazy" decoding="async" width="44" height="44" class="w-11 h-11 rounded-full object-cover border border-[#e4e4e7]" />
                 <div>
                   <div class="font-semibold text-[#171717] text-sm sm:text-base">{{ getAuthorName(article.author) }}</div>
-                  <div class="text-xs text-[#707070] flex items-center gap-2">
+                  <div class="text-xs text-[#707070] flex items-center gap-2 font-mono">
                     <span>{{ article.author?.title || 'Penulis' }}</span>
                     <span>•</span>
                     <span>{{ getFormattedDate(article.published_at || article.date) }}</span>
                     <span>•</span>
-                    <span class="font-mono text-[#1d4ed8] font-semibold">{{ article.read_time }}</span>
+                    <span class="text-[#2563eb] font-semibold">{{ article.read_time }}</span>
                   </div>
                 </div>
               </div>
@@ -1055,20 +1055,20 @@ const handleConfirmDelete = async () => {
           </template>
 
           <!-- Comments Thread Section -->
-          <section class="pt-10 border-t border-[#dfdfdf] space-y-8">
+          <section class="pt-10 border-t border-[#f0f0f0] space-y-8">
             <div class="flex items-center justify-between">
-              <h3 class="text-2xl font-medium text-[#171717] tracking-tight">
+              <h3 class="text-2xl font-bold text-[#171717] tracking-tight">
                 Diskusi & Ulasan ({{ articleComments.length }})
               </h3>
-              <span class="font-mono-eyebrow text-[#1d4ed8] font-semibold">UTAS ULAAN</span>
+              <span class="font-mono-eyebrow text-[#2563eb]">UTAS ULASAN</span>
             </div>
 
             <!-- Add Comment / Review Form -->
-            <div class="stitch-card p-6 space-y-4 bg-[#fafafa]">
+            <div class="space-y-4 pb-8 border-b border-[#f0f0f0]">
               <h4 class="text-sm font-semibold text-[#171717]">Tulis Ulasan & Rating Anda</h4>
 
               <!-- Interactive Star Rating Picker -->
-              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 bg-[#ffffff] border border-[#dfdfdf] rounded-[6px]">
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 bg-[#f4f4f5] rounded-xl">
                 <div class="flex items-center gap-2">
                   <span class="text-xs font-semibold text-[#171717]">Beri Rating:</span>
                   <div class="flex items-center gap-1 cursor-pointer">
@@ -1096,14 +1096,14 @@ const handleConfirmDelete = async () => {
                   type="text"
                   placeholder="Nama Anda *"
                   required
-                  class="px-3.5 py-2 text-xs bg-[#ffffff] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb]"
+                  class="px-4 py-2.5 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb] focus:bg-white"
                 />
                 <input
                   v-model="commentEmailInput"
                   type="email"
                   placeholder="Email Anda (Rahasia/Verifikasi) *"
                   required
-                  class="px-3.5 py-2 text-xs bg-[#ffffff] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb]"
+                  class="px-4 py-2.5 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb] focus:bg-white"
                 />
               </div>
 
@@ -1117,10 +1117,10 @@ const handleConfirmDelete = async () => {
                 rows="3"
                 placeholder="Tuliskan ulasan atau pengalaman Anda menggunakan aplikasi / script ini..."
                 required
-                class="w-full p-3.5 text-xs bg-[#ffffff] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb] resize-none"
+                class="w-full p-4 text-xs bg-[#f4f4f5] border border-transparent rounded-2xl text-[#171717] focus:outline-none focus:border-[#2563eb] focus:bg-white resize-none"
               ></textarea>
 
-              <p v-if="commentSubmitMessage" class="text-xs font-semibold text-[#1d4ed8]">
+              <p v-if="commentSubmitMessage" class="text-xs font-semibold text-[#2563eb]">
                 {{ commentSubmitMessage }}
               </p>
               <p v-if="commentErrorMessage" class="text-xs font-semibold text-red-600">
@@ -1131,7 +1131,7 @@ const handleConfirmDelete = async () => {
                 <button
                   @click="handleAddComment(null)"
                   :disabled="isSubmittingComment"
-                  class="stitch-button-primary px-4 py-2 text-xs font-semibold flex items-center gap-1.5"
+                  class="stitch-button-primary px-5 py-2 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
                 >
                   <span v-if="isSubmittingComment" class="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
                   <span>{{ isSubmittingComment ? 'Mengirim...' : 'Kirim Ulasan & Rating' }}</span>
@@ -1140,144 +1140,138 @@ const handleConfirmDelete = async () => {
             </div>
 
             <!-- Comments Thread List -->
-            <div v-if="articleComments.length > 0" class="space-y-4">
+            <div v-if="articleComments.length > 0" class="divide-y divide-[#f0f0f0]">
               <div
                 v-for="comment in articleComments"
                 :key="comment.id"
-                class="stitch-card p-5 bg-[#ffffff] space-y-4 hover:border-[#2563eb]/40 transition-colors"
+                class="py-5 space-y-4"
               >
                 <!-- Root Comment -->
                 <div class="space-y-2">
-                  <div class="flex items-center justify-between text-xs">
-                    <div class="flex items-center gap-3">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
                       <img
-                        :src="getCuteAvatar(comment.author_name || comment.author || 'User')"
-                        :alt="comment.author_name || comment.author"
-                        loading="lazy"
-                        decoding="async"
-                        width="40"
-                        height="40"
-                        class="w-10 h-10 rounded-full bg-[#2563eb]/10 border border-[#2563eb]/30 object-contain p-0.5"
+                        :src="getCuteAvatar(comment.author_name)"
+                        :alt="comment.author_name"
+                        class="w-8 h-8 rounded-full bg-[#f4f4f5] object-contain p-0.5 shrink-0"
                       />
                       <div>
-                        <div class="flex items-center gap-2">
-                          <span class="font-semibold text-[#171717] text-sm">{{ comment.author_name || comment.author }}</span>
-                          <span v-if="comment.is_author_reply" class="font-mono-eyebrow text-[#1d4ed8] bg-[#2563eb]/10 px-2 py-0.5 rounded text-[10px]">PENULIS</span>
-                          <div v-if="comment.rating" class="flex items-center text-amber-500 text-xs">
-                            <span v-for="s in comment.rating" :key="s">★</span>
-                          </div>
+                        <div class="text-xs font-bold text-[#171717] flex items-center gap-1.5">
+                          <span>{{ comment.author_name }}</span>
+                          <span v-if="comment.rating" class="text-amber-500 font-normal">★ {{ comment.rating }}.0</span>
                         </div>
-                        <div class="text-[#707070] text-[11px] font-mono">{{ getFormattedDate(comment.created_at || comment.date) }}</div>
+                        <div class="text-[10px] text-[#707070] font-mono">
+                          {{ getFormattedDate(comment.created_at || comment.date) }}
+                        </div>
                       </div>
                     </div>
 
-                    <!-- Action Controls -->
-                    <div class="flex items-center gap-2 font-mono text-[11px]">
+                    <div class="flex items-center gap-2">
                       <button
                         @click="openReplyForm(comment.id)"
-                        class="text-[#1d4ed8] hover:underline font-semibold flex items-center gap-1"
+                        class="text-xs text-[#2563eb] hover:underline font-semibold cursor-pointer"
                       >
-                        <span>💬</span>
-                        <span>Balas</span>
+                        Balas
                       </button>
-                      <span class="text-[#dfdfdf]">•</span>
                       <button
                         @click="openDeleteModal(comment.id)"
-                        class="text-red-500 hover:text-red-700 hover:underline font-medium flex items-center gap-1"
+                        class="text-xs text-red-500 hover:underline cursor-pointer"
                       >
-                        <span>🗑️</span>
-                        <span>Hapus</span>
+                        Hapus
                       </button>
                     </div>
                   </div>
 
-                  <p class="text-sm text-[#707070] pt-1 leading-relaxed pl-1">
+                  <p class="text-xs sm:text-sm text-[#333333] pl-10 leading-relaxed">
                     {{ getCleanCommentContent(comment.content) }}
                   </p>
-                </div>
 
-                <!-- Inline User Reply Form -->
-                <div v-if="activeReplyParentId === comment.id" class="ml-6 sm:ml-9 bg-[#fafafa] p-4 rounded-[8px] border border-[#2563eb]/30 space-y-3">
-                  <div class="flex items-center justify-between text-xs font-semibold text-[#171717]">
-                    <span>Membalas {{ comment.author_name || comment.author }}</span>
-                    <button @click="activeReplyParentId = null" class="text-[#707070] hover:text-black text-xs font-mono">✕ Batal</button>
-                  </div>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    <input
-                      v-model="replyAuthorInput"
-                      type="text"
-                      placeholder="Nama Anda *"
-                      class="px-3 py-1.5 text-xs bg-[#ffffff] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb]"
-                    />
-                    <input
-                      v-model="replyEmailInput"
-                      type="email"
-                      placeholder="Email Anda (Rahasia) *"
-                      class="px-3 py-1.5 text-xs bg-[#ffffff] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb]"
-                    />
-                  </div>
-                  <textarea
-                    v-model="replyTextInput"
-                    rows="2"
-                    placeholder="Tulis balasan Anda (Teks biasa)..."
-                    class="w-full p-2.5 text-xs bg-[#ffffff] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb] resize-none"
-                  ></textarea>
-                  <div class="flex justify-end">
-                    <button
-                      @click="handleAddComment(comment.id)"
-                      :disabled="isSubmittingReply"
-                      class="stitch-button-primary px-3.5 py-1.5 text-xs font-semibold flex items-center gap-1.5"
-                    >
-                      <span v-if="isSubmittingReply" class="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
-                      <span>{{ isSubmittingReply ? 'Mengirim...' : 'Kirim Balasan' }}</span>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Nested Replies -->
-                <div v-if="comment.replies && comment.replies.length > 0" class="ml-6 sm:ml-9 border-l-2 border-[#2563eb]/30 pl-4 sm:pl-6 space-y-3 pt-2">
-                  <div v-for="reply in comment.replies" :key="reply.id" class="bg-[#fafafa] p-3.5 rounded-[8px] border border-[#dfdfdf]/60 space-y-1.5">
-                    <div class="flex items-center justify-between text-xs">
-                      <div class="flex items-center gap-2.5">
-                        <img
-                          :src="getCuteAvatar(reply.author_name || reply.author || 'User')"
-                          :alt="reply.author_name || reply.author"
-                          class="w-7 h-7 rounded-full bg-[#2563eb]/10 border border-[#2563eb]/30 object-contain p-0.5"
-                        />
-                        <span class="font-semibold text-[#171717]">
-                          {{ (reply.author_name === 'Admin' || reply.author_name === 'Admin (Author)' || reply.is_author_reply) ? (siteSettings.authorName || reply.author_name || reply.author) : (reply.author_name || reply.author) }}
-                        </span>
-                        <!-- Verified Badge Icon for Author Reply -->
-                        <span
-                          v-if="reply.is_author_reply || reply.author_name === siteSettings.authorName || reply.author_name === 'Rizal Efendi' || reply.author_name === 'Admin (Author)'"
-                          class="inline-flex items-center text-[#2563eb] shrink-0"
-                          title="Penulis Terverifikasi"
-                        >
-                          <svg class="w-4 h-4 text-[#2563eb]" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                          </svg>
-                        </span>
-                      </div>
-                      <div class="flex items-center gap-2 font-mono text-[10px]">
-                        <span class="text-[#707070]">{{ getFormattedDate(reply.created_at || reply.date) }}</span>
-                        <span class="text-[#dfdfdf]">•</span>
-                        <button
-                          @click="openDeleteModal(reply.id)"
-                          class="text-red-500 hover:underline font-medium"
-                        >
-                          Hapus
-                        </button>
-                      </div>
+                  <!-- Inline Reply Box -->
+                  <div v-if="activeReplyParentId === comment.id" class="pl-10 pt-3 space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <input
+                        v-model="replyAuthorInput"
+                        type="text"
+                        placeholder="Nama Anda *"
+                        class="px-3 py-2 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb]"
+                      />
+                      <input
+                        v-model="replyEmailInput"
+                        type="email"
+                        placeholder="Email Anda *"
+                        class="px-3 py-2 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb]"
+                      />
                     </div>
-                    <p class="text-xs sm:text-sm text-[#707070] pl-9 leading-relaxed">
-                      {{ getCleanCommentContent(reply.content) }}
-                    </p>
+                    <textarea
+                      v-model="replyTextInput"
+                      rows="2"
+                      placeholder="Tulis balasan Anda..."
+                      class="w-full p-3 text-xs bg-[#f4f4f5] border border-transparent rounded-xl text-[#171717] focus:outline-none focus:border-[#2563eb] resize-none"
+                    ></textarea>
+                    <div class="flex justify-end gap-2">
+                      <button
+                        @click="activeReplyParentId = null"
+                        class="px-3 py-1.5 text-xs text-[#707070] hover:text-[#171717] cursor-pointer"
+                      >
+                        Batal
+                      </button>
+                      <button
+                        @click="handleAddComment(comment.id)"
+                        :disabled="isSubmittingReply"
+                        class="stitch-button-primary px-4 py-1.5 text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                      >
+                        <span v-if="isSubmittingReply" class="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+                        <span>Kirim Balasan</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Replies list -->
+                  <div v-if="comment.replies && comment.replies.length > 0" class="pl-10 pt-3 space-y-3 divide-y divide-[#f0f0f0]">
+                    <div
+                      v-for="reply in comment.replies"
+                      :key="reply.id"
+                      class="pt-3 first:pt-0 space-y-1"
+                    >
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                          <img
+                            :src="getCuteAvatar(reply.author_name)"
+                            :alt="reply.author_name"
+                            class="w-6 h-6 rounded-full bg-[#f4f4f5] object-contain p-0.5 shrink-0"
+                          />
+                          <span class="text-xs font-bold text-[#171717]">{{ reply.author_name }}</span>
+                          <span
+                            v-if="reply.is_author_reply || reply.author_name === siteSettings.authorName || reply.author_name === 'Rizal Efendi' || reply.author_name === 'Admin (Author)'"
+                            class="inline-flex items-center text-[#2563eb] shrink-0"
+                            title="Penulis Terverifikasi"
+                          >
+                            <svg class="w-4 h-4 text-[#2563eb]" fill="currentColor" viewBox="0 0 20 20">
+                              <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                          </span>
+                        </div>
+                        <div class="flex items-center gap-2 font-mono text-[10px]">
+                          <span class="text-[#707070]">{{ getFormattedDate(reply.created_at || reply.date) }}</span>
+                          <span class="text-[#cccccc]">•</span>
+                          <button
+                            @click="openDeleteModal(reply.id)"
+                            class="text-red-500 hover:underline font-medium cursor-pointer"
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      </div>
+                      <p class="text-xs text-[#707070] pl-8 leading-relaxed">
+                        {{ getCleanCommentContent(reply.content) }}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div v-else class="stitch-card p-8 text-center text-[#707070] text-sm space-y-1">
+            <div v-else class="py-8 text-center text-[#707070] text-sm space-y-1">
               <div class="text-2xl">💬</div>
               <div class="font-medium text-[#171717]">Belum ada komentar pada artikel ini.</div>
               <div class="text-xs text-[#707070]">Jadilah yang pertama berbagi pandangan dan memulai diskusi!</div>
@@ -1287,15 +1281,15 @@ const handleConfirmDelete = async () => {
           <!-- Comment Deletion Email Verification Modal -->
           <div
             v-if="deletingCommentId"
-            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
           >
-            <div class="bg-white rounded-[12px] p-6 max-w-md w-full border border-[#dfdfdf] shadow-2xl space-y-4">
-              <div class="flex items-center justify-between border-b border-[#dfdfdf] pb-3">
+            <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+              <div class="flex items-center justify-between border-b border-[#f0f0f0] pb-3">
                 <h3 class="text-base font-semibold text-[#171717] flex items-center gap-2">
                   <span>🔐</span>
                   <span>Konfirmasi Hapus Komentar</span>
                 </h3>
-                <button @click="deletingCommentId = null" class="text-[#707070] hover:text-black font-mono">✕</button>
+                <button @click="deletingCommentId = null" class="text-[#707070] hover:text-black font-mono cursor-pointer">✕</button>
               </div>
 
               <p class="text-xs text-[#707070] leading-relaxed">
@@ -1306,28 +1300,28 @@ const handleConfirmDelete = async () => {
                 v-model="deleteEmailInput"
                 type="email"
                 placeholder="Email Anda *"
-                class="w-full px-3.5 py-2 text-xs bg-[#fafafa] border border-[#dfdfdf] rounded-[6px] text-[#171717] focus:outline-none focus:border-[#2563eb]"
+                class="w-full px-4 py-2.5 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb]"
                 @keyup.enter="handleConfirmDelete"
               />
 
               <p v-if="deleteErrorMessage" class="text-xs font-medium text-red-600">
                 {{ deleteErrorMessage }}
               </p>
-              <p v-if="deleteSuccessMessage" class="text-xs font-semibold text-[#1d4ed8] bg-[#2563eb]/10 p-2.5 rounded border border-[#2563eb]/30">
+              <p v-if="deleteSuccessMessage" class="text-xs font-semibold text-[#2563eb] bg-[#2563eb]/10 p-2.5 rounded-full border border-[#2563eb]/30">
                 {{ deleteSuccessMessage }}
               </p>
 
-              <div class="flex justify-end gap-2 pt-2 border-t border-[#dfdfdf]">
+              <div class="flex justify-end gap-2 pt-2 border-t border-[#f0f0f0]">
                 <button
                   @click="closeDeleteModal"
-                  class="px-4 py-2 text-xs font-medium text-[#707070] bg-[#fafafa] border border-[#dfdfdf] rounded-[6px] hover:text-[#171717] transition-colors"
+                  class="stitch-button-secondary px-4 py-2 text-xs cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   @click="handleConfirmDelete"
                   :disabled="isDeletingComment"
-                  class="px-4 py-2 text-xs font-semibold bg-red-600 text-white rounded-[6px] hover:bg-red-700 transition-colors flex items-center gap-1.5"
+                  class="px-4 py-2 text-xs font-semibold bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <span v-if="isDeletingComment" class="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
                   <span>{{ isDeletingComment ? 'Memverifikasi...' : 'Hapus Komentar' }}</span>
@@ -1339,21 +1333,21 @@ const handleConfirmDelete = async () => {
         </main>
 
         <!-- Right Track: Sidebar Widgets (4 Columns) -->
-        <aside class="lg:col-span-4 space-y-6 sticky top-20">
+        <aside class="lg:col-span-4 space-y-8 sticky top-20">
 
-          <!-- Author Profile & Bio Card -->
-          <div class="stitch-card p-6 space-y-4">
+          <!-- Author Profile & Bio Gadget -->
+          <div class="space-y-4 pb-6 border-b border-[#f0f0f0]">
             <div class="flex items-center gap-3.5">
               <div class="relative shrink-0">
                 <img
                   :src="siteSettings.authorAvatarUrl || article.author?.avatar || getCuteAvatar(article.author?.name)"
                   :alt="siteSettings.authorName || article.author?.name"
-                  class="w-14 h-14 rounded-full border-2 border-[#2563eb] object-cover"
+                  class="w-12 h-12 rounded-full border border-[#e4e4e7] object-cover"
                 />
-                <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#2563eb] rounded-full border-2 border-white"></span>
+                <span class="absolute bottom-0 right-0 w-3 h-3 bg-[#2563eb] rounded-full border-2 border-white"></span>
               </div>
               <div>
-                <h3 class="font-semibold text-[#171717] text-base">{{ siteSettings.authorName || article.author?.name }}</h3>
+                <h3 class="font-bold text-[#171717] text-sm">{{ siteSettings.authorName || article.author?.name }}</h3>
                 <p class="text-xs text-[#707070]">{{ siteSettings.authorTitle || article.author?.title }}</p>
               </div>
             </div>
@@ -1362,13 +1356,13 @@ const handleConfirmDelete = async () => {
               {{ siteSettings.authorBio || article.author?.bio }}
             </p>
 
-            <div class="flex items-center justify-between pt-3 border-t border-[#dfdfdf]">
-              <span class="text-xs font-mono text-[#707070]">{{ siteSettings.authorFollowersCount || '5.2k Pembaca' }}</span>
+            <div class="flex items-center justify-between pt-2 border-t border-[#f0f0f0]">
+              <span class="text-xs font-mono text-[#888888]">{{ siteSettings.authorFollowersCount || '5.2k Pembaca' }}</span>
               <a
                 :href="siteSettings.authorInstagramUrl || 'https://instagram.com'"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="stitch-button-primary px-3.5 py-1.5 text-xs font-semibold flex items-center gap-1"
+                class="stitch-button-primary px-3 py-1 text-xs inline-flex items-center gap-1"
               >
                 <span>Ikuti {{ siteSettings.authorInstagramHandle || 'Penulis' }}</span>
               </a>
@@ -1376,22 +1370,22 @@ const handleConfirmDelete = async () => {
           </div>
 
           <!-- Table of Contents (TOC) Widget (Auto-Generated strictly from <h2> tags) -->
-          <div v-if="tocItems.length > 0" class="stitch-card p-6 space-y-4">
-            <div class="flex items-center justify-between border-b border-[#dfdfdf] pb-3">
+          <div v-if="tocItems.length > 0" class="space-y-3 pb-6 border-b border-[#f0f0f0]">
+            <div class="flex items-center justify-between pb-2 border-b border-[#f0f0f0]">
               <span class="font-mono-eyebrow text-[#171717]">DAFTAR ISI ARTIKEL</span>
-              <span class="text-xs text-[#1d4ed8] font-mono font-semibold">{{ tocItems.length }} SUB-JUDUL</span>
+              <span class="text-xs text-[#2563eb] font-mono font-semibold">{{ tocItems.length }} SUB-JUDUL</span>
             </div>
 
-            <nav class="space-y-1.5 text-xs">
+            <nav class="space-y-1 text-xs">
               <button
                 v-for="item in tocItems"
                 :key="item.id"
                 @click="scrollToSection(item.id)"
-                class="w-full text-left py-2 px-3 rounded-[6px] transition-colors font-medium flex items-center justify-between group"
+                class="w-full text-left py-1.5 px-3 rounded-full transition-colors font-medium flex items-center justify-between group cursor-pointer"
                 :class="[
                   activeSection === item.id
-                    ? 'bg-[#2563eb]/10 text-[#1d4ed8] font-semibold border-l-2 border-[#2563eb]'
-                    : 'text-[#707070] hover:text-[#171717] hover:bg-[#fafafa]'
+                    ? 'bg-[#2563eb]/10 text-[#2563eb] font-semibold'
+                    : 'text-[#707070] hover:text-[#171717] hover:bg-[#f4f4f5]'
                 ]"
               >
                 <span class="line-clamp-1">{{ item.label }}</span>
