@@ -211,7 +211,7 @@ const formattedContent = computed(() => {
                   <svg class="w-4 h-4 text-emerald-600 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                   </svg>
-                  <span>↓ Silakan Scroll Ke Bawah Halaman</span>
+                  <span>Silakan Scroll Ke Bawah Halaman</span>
                 </div>
               </div>
             </div>
