@@ -99,11 +99,12 @@ const startAdVerification = () => {
 
       // Activate 1-Day Free Premium
       activateFreeDayPremium()
-      successMessage.value = '🎉 Selamat! Status Premium 1 Hari Gratis telah aktif!'
+      successMessage.value = '🎉 Selamat! Status Premium 1 Hari Gratis berhasil diaktifkan!'
 
+      // Give 3.5 seconds for user to read the success confirmation card
       setTimeout(() => {
         isVisible.value = false
-      }, 2000)
+      }, 3500)
     }
   }, 1000)
 }
@@ -208,8 +209,9 @@ const startAdVerification = () => {
                 </div>
               </div>
 
-              <div v-else-if="isAdUnlocked" class="p-2.5 bg-emerald-100 text-emerald-900 rounded-xl text-xs font-bold text-center border border-emerald-300">
-                🎉 Premium 1 Hari Gratis Aktif!
+              <div v-else-if="isAdUnlocked" class="p-3.5 bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-600 text-white rounded-xl text-xs sm:text-sm font-bold text-center border border-emerald-400 shadow-md space-y-1">
+                <div class="font-extrabold text-xs sm:text-sm tracking-wide">🎉 VERIFIKASI IKLAN BERHASIL!</div>
+                <div class="text-[11px] font-mono text-emerald-100 font-medium">Status Premium 1 Hari Gratis telah aktif. Modal tertutup otomatis...</div>
               </div>
             </div>
           </div>
