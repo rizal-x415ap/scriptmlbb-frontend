@@ -49,6 +49,7 @@ const mostReadArticles = computed(() => {
 // Featured Section Category Filter & Horizontal Slider Ref
 const selectedFeaturedCategory = ref('All')
 const featuredContainerRef = ref(null)
+const topSliderArticles = ref([])
 
 const scrollFeaturedLeft = () => {
   if (featuredContainerRef.value) {
@@ -62,14 +63,13 @@ const scrollFeaturedRight = () => {
   }
 }
 
+// Top Featured Slider Articles (Fixed Max 5 Newest Articles, Independent from Feed Load More)
 const featuredArticlesList = computed(() => {
-  if (!Array.isArray(articles.value)) return []
-  let list = articles.value
-  const targetCategory = siteSettings.featuredPostCategory || 'All'
-  if (targetCategory !== 'All') {
-    list = list.filter(a => getCategoryName(a.category).toLowerCase() === targetCategory.toLowerCase())
+  let list = topSliderArticles.value
+  if (selectedCategory.value !== 'All') {
+    list = articles.value.filter(a => getCategoryName(a.category).toLowerCase() === selectedCategory.value.toLowerCase())
   }
-  return list
+  return list.slice(0, 5)
 })
 
 // Interactive Newsletter Subscription State
@@ -181,6 +181,10 @@ const loadHomeFeed = async () => {
     const data = await ApiService.getHomeFeed(1)
     featuredArticle.value = data?.featured || null
     articles.value = data?.feed || []
+    
+    // Store top 5 newest articles for top slider independently
+    topSliderArticles.value = (data?.feed || []).slice(0, 5)
+
     if (Array.isArray(data?.topics)) {
       dynamicTopics.value = data.topics
     }
@@ -378,6 +382,22 @@ const toggleBookmark = (item) => {
             <span>{{ getFormattedDate(item.published_at || item.date) }}</span>
           </div>
         </article>
+
+        <!-- Card "Lihat Artikel Lainnya" di Akhir Slider Track -->
+        <RouterLink
+          :to="selectedCategory !== 'All' ? '/archive?category=' + encodeURIComponent(selectedCategory) : '/archive'"
+          class="w-[200px] sm:w-[220px] shrink-0 snap-start flex flex-col items-center justify-center text-center p-6 bg-[#f4f4f5] hover:bg-[#2563eb] text-[#171717] hover:text-white rounded-[14px] transition-all group cursor-pointer border border-transparent"
+        >
+          <div class="w-12 h-12 rounded-full bg-white group-hover:bg-white/20 flex items-center justify-center text-[#2563eb] group-hover:text-white mb-3 transition-colors shadow-xs">
+            <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </div>
+          <span class="font-bold text-sm leading-snug">Lihat Artikel Lainnya</span>
+          <span class="text-xs font-mono opacity-70 mt-1">
+            {{ selectedCategory !== 'All' ? selectedCategory : 'Jelajahi Arsip' }} →
+          </span>
+        </RouterLink>
       </div>
 
       <div v-else class="py-12 text-center text-[#707070] text-sm">
