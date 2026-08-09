@@ -12,7 +12,7 @@ const isCalculated = ref(false)
 const isCopied = ref(false)
 
 // Quick Preset Options for Target WR
-const presetWrList = [55, 60, 65, 70, 75, 80, 85, 90]
+const presetWrList = [75, 80, 85, 90, 95, 98]
 
 const setTargetWrPreset = (val) => {
   wrReq.value = val
@@ -186,7 +186,7 @@ onMounted(() => {
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
             <label for="tMatch" class="text-sm font-bold text-[#171717] uppercase tracking-wider font-mono">
-              1. Total Match Kamu
+              Total Match Kamu
             </label>
             <span class="text-[10px] text-[#707070] font-mono">Pertandingan</span>
           </div>
@@ -208,7 +208,7 @@ onMounted(() => {
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
             <label for="tWr" class="text-sm font-bold text-[#171717] uppercase tracking-wider font-mono">
-              2. Total WR Kamu Saat Ini (%)
+              Total WR Kamu Saat Ini
             </label>
             <span class="text-[10px] text-[#707070] font-mono">Persentase</span>
           </div>
@@ -232,7 +232,7 @@ onMounted(() => {
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
             <label for="wrReq" class="text-sm font-bold text-[#171717] uppercase tracking-wider font-mono">
-              3. Target WR Yang Kamu Inginkan (%)
+              Target WR Yang Kamu Inginkan
             </label>
             <span class="text-[10px] text-[#2563eb] font-semibold font-mono">Target</span>
           </div>
