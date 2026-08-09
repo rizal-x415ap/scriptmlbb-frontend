@@ -354,7 +354,9 @@ const copyShareLink = () => {
 
 const isPlayStoreStyle = computed(() => {
   if (!article.value) return false
-  if (article.value.template === 'playstore') return true
+  if (article.value.template === 'standard') return false
+  if (article.value.template === 'playstore' || article.value.template === 'app') return true
+
   const cat = getCategoryName(article.value.category).toLowerCase()
   const title = (article.value.title || '').toLowerCase()
   const slug = (article.value.slug || '').toLowerCase()
