@@ -56,7 +56,7 @@ onMounted(() => {
             class="shrink-0 font-semibold text-[#60a5fa] hover:text-[#93c5fd] hover:underline flex items-center gap-1 transition-colors"
           >
             <span 
-            class="shrink-0 px-3 py-1 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white transition-colors text-[11px] font-semibold cursor-pointer"
+            class="text-bold shrink-0 px-3 py-1 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white transition-colors text-[11px] font-semibold cursor-pointer"
             >Join Now</span>
           </a>
 
