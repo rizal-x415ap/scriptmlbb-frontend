@@ -143,13 +143,16 @@ const formattedContent = computed(() => {
 
   let raw = article.value.content
 
-  // 1. Convert Markdown ## to <h2> tags if present
+  // 1. Convert Markdown ## to <h2> and ### to <h3> if present
   raw = raw.replace(/^##\s+(.*$)/gim, '<h2>$1</h2>')
   raw = raw.replace(/^###\s+(.*$)/gim, '<h3>$1</h3>')
 
-  // 2. Parse ALL <h2> tags
+  // 2. Format <h2> and <h3> tags for clean editorial styling
   raw = raw.replace(/<h2([^>]*)>(.*?)<\/h2>/gim, (match, attrs, titleHtml) => {
     return `<h2 class="text-xl sm:text-2xl font-semibold text-[#171717] pt-6 pb-2 border-b border-[#dfdfdf] my-6">${titleHtml}</h2>`
+  })
+  raw = raw.replace(/<h3([^>]*)>(.*?)<\/h3>/gim, (match, attrs, titleHtml) => {
+    return `<h3 class="text-lg sm:text-xl font-semibold text-[#171717] pt-4 pb-1 my-4">${titleHtml}</h3>`
   })
 
   // 3. Format blockquotes and code blocks
@@ -157,25 +160,7 @@ const formattedContent = computed(() => {
     .replace(/^>\s+(.*$)/gim, '<blockquote class="border-l-2 border-[#3ecf8e] pl-6 py-2 italic text-[#171717] bg-[#fafafa] rounded-r-[6px] my-6">$1</blockquote>')
     .replace(/```([\s\S]*?)```/gim, '<div class="rounded-[6px] bg-[#1c1c1c] text-[#fafafa] p-6 border border-white/10 overflow-x-auto my-6 font-mono text-sm"><pre><code>$1</code></pre></div>')
 
-  // 4. Convert Markdown Unordered Lists (- or *) if present as plain text
-  raw = raw.replace(/(?:^\s*[-*]\s+.+(?:\r?\n|$))+/gm, (match) => {
-    const items = match.trim().split(/\r?\n/).map(line => {
-      const clean = line.replace(/^\s*[-*]\s+/, '')
-      return `<li>${clean}</li>`
-    }).join('')
-    return `<ul>${items}</ul>`
-  })
-
-  // 5. Convert Markdown Ordered Lists (1. 2. 3.) if present as plain text
-  raw = raw.replace(/(?:^\s*\d+\.\s+.+(?:\r?\n|$))+/gm, (match) => {
-    const items = match.trim().split(/\r?\n/).map(line => {
-      const clean = line.replace(/^\s*\d+\.\s+/, '')
-      return `<li>${clean}</li>`
-    }).join('')
-    return `<ol>${items}</ol>`
-  })
-
-  // 6. Auto-inject loading="lazy" & decoding="async" to all inline article content <img> tags
+  // 4. Auto-inject loading="lazy" & decoding="async" to all inline article content <img> tags
   raw = raw.replace(/<img([^>]+)>/gim, (match, attrs) => {
     if (attrs.includes('loading=')) return match
     return `<img${attrs} loading="lazy" decoding="async" class="rounded-[8px] max-w-full h-auto my-4 shadow-sm" />`
