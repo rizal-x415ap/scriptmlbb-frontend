@@ -76,7 +76,7 @@ export function loadPremiumStatus() {
     try {
       const fingerprint = getDeviceFingerprint()
       const response = await ApiService.verifyPremium(savedToken, fingerprint)
-      
+
       if (response && response.is_premium) {
         isPremium.value = true
         premiumToken.value = savedToken
@@ -116,12 +116,12 @@ export async function activateToken(inputToken) {
     isPremium.value = true
     premiumToken.value = cleanToken
     localStorage.setItem('blog_premium_token', cleanToken)
-    
+
     if (response.data?.expires_at) {
       premiumExpiresAt.value = response.data.expires_at
       localStorage.setItem('blog_premium_expires', response.data.expires_at)
     }
-    
+
     return response
   } else {
     throw new Error(response?.message || 'Aktivasi token gagal.')
@@ -155,7 +155,7 @@ export function shouldShowPopup() {
   const lastDismiss = localStorage.getItem('blog_premium_dismiss_time')
   if (!lastDismiss) return true
 
-  const FIVE_MINUTES = 5 * 60 * 1000
+  const FIVE_MINUTES = 3 * 60 * 1000
   return (Date.now() - parseInt(lastDismiss, 10)) > FIVE_MINUTES
 }
 
