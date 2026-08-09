@@ -33,6 +33,12 @@ const getCategoryName = (cat) => {
   return typeof cat === 'object' ? (cat.name || '') : cat
 }
 
+// Returns hex color_code from category object, or default blue
+const getCategoryColor = (cat) => {
+  if (!cat) return '#2563eb'
+  return (typeof cat === 'object' && cat.color_code) ? cat.color_code : '#2563eb'
+}
+
 const getCuteAvatar = (name) => {
   const seed = encodeURIComponent(name || 'Rizal Efendi')
   return `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`
@@ -1084,8 +1090,11 @@ const handleConfirmDelete = async () => {
             <!-- Article Header Block -->
             <header class="space-y-5 pb-6 border-b border-[#f0f0f0]">
               <div class="flex items-center gap-2 font-mono text-xs">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2563eb]/10">
-                  <span class="font-mono-eyebrow text-[#2563eb]">{{ getCategoryName(article.category) }}</span>
+                <div
+                  class="inline-flex items-center gap-2 px-3 py-1 rounded-full"
+                  :style="{ backgroundColor: getCategoryColor(article.category) + '1a', color: getCategoryColor(article.category) }"
+                >
+                  <span class="font-mono-eyebrow">{{ getCategoryName(article.category) }}</span>
                 </div>
                 <span v-if="getFormattedDate(article.published_at || article.date)" class="text-[#707070]">•</span>
                 <span v-if="getFormattedDate(article.published_at || article.date)" class="text-[#707070]">{{ getFormattedDate(article.published_at || article.date) }}</span>

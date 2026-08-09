@@ -143,6 +143,12 @@ const getCategoryName = (cat) => {
   return typeof cat === 'object' ? cat.name : cat
 }
 
+// Returns hex color_code from category object, or default blue
+const getCategoryColor = (cat) => {
+  if (!cat) return '#2563eb'
+  return (typeof cat === 'object' && cat.color_code) ? cat.color_code : '#2563eb'
+}
+
 const getAuthorName = (author) => {
   if (!author) return ''
   return typeof author === 'object' ? (author.name || '') : author
@@ -422,7 +428,10 @@ const toggleBookmark = (item) => {
 
             <!-- Category Badge -->
             <div>
-              <span class="font-mono-eyebrow text-[#2563eb]">
+              <span
+                class="font-mono-eyebrow"
+                :style="{ color: getCategoryColor(item.category) }"
+              >
                 {{ getCategoryName(item.category) }}
               </span>
             </div>
@@ -520,7 +529,10 @@ const toggleBookmark = (item) => {
               <div class="flex flex-col justify-between flex-1 min-w-0 space-y-2">
                 <!-- Kategori Badge & Pin Disematkan -->
                 <div class="flex flex-wrap items-center gap-2">
-                  <span class="font-mono-eyebrow text-[#2563eb]">
+                  <span
+                    class="font-mono-eyebrow"
+                    :style="{ color: getCategoryColor(article.category) }"
+                  >
                     {{ getCategoryName(article.category) }}
                   </span>
                   <span
