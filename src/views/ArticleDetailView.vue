@@ -1378,7 +1378,7 @@ const handleConfirmDelete = async () => {
                           <span class="text-[#cccccc]">•</span>
                           <button
                             @click="openDeleteModal(reply.id)"
-                            class="text-red-500 hover:underline font-medium cursor-pointer"
+                            class="text-xs text-red-500 hover:underline font-medium cursor-pointer"
                           >
                             Hapus
                           </button>

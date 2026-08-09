@@ -163,7 +163,7 @@ const navLinks = [
             :key="link.path"
             :to="link.path"
             @click="isMobileMenuOpen = false"
-            class="flex items-center gap-3 px-4 py-3 text-base sm:text-lg font-bold rounded-xl transition-colors"
+            class="flex items-center gap-3 px-4 py-3 text-sm sm:text-lg font-bold rounded-xl transition-colors"
             :class="[
               route.path === link.path
                 ? 'bg-[#2563eb]/10 text-[#1d4ed8]'
