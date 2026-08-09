@@ -160,11 +160,11 @@ export function shouldShowPopup() {
 }
 
 /**
- * Activate 1-Day Free Premium via Ad Click
+ * Activate 1-Hour Free Premium via Ad Click
  */
 export function activateFreeDayPremium() {
-  const expiresDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-  const freeToken = 'FREE1DAY'
+  const expiresDate = new Date(Date.now() + 1 * 60 * 60 * 1000).toISOString()
+  const freeToken = 'FREE1HOUR'
 
   isPremium.value = true
   premiumToken.value = freeToken

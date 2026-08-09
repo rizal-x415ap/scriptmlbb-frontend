@@ -123,9 +123,9 @@ const startAdVerification = () => {
       isVerifyingAd.value = false
       isAdUnlocked.value = true
 
-      // Activate 1-Day Free Premium
+      // Activate 1-Hour Free Premium
       activateFreeDayPremium()
-      successMessage.value = '🎉 Selamat! Status Premium 1 Hari Gratis berhasil diaktifkan!'
+      successMessage.value = '🎉 Selamat! Status Premium 1 Jam Gratis berhasil diaktifkan!'
       window.location.reload()
     }
   }, 1000)
@@ -193,7 +193,7 @@ const startAdVerification = () => {
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-1.5 font-bold text-amber-900 text-xs sm:text-sm">
                 <span>🎁</span>
-                <span>Opsi 1: Gratis 1 Hari</span>
+                <span>Opsi 1: Gratis 1 Jam</span>
               </div>
               <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-200 text-amber-900 font-mono">
                 KLIK 15 DETIK
@@ -201,7 +201,7 @@ const startAdVerification = () => {
             </div>
 
             <p class="text-xs text-amber-950/80 leading-relaxed">
-              Klik iklan sponsor di bawah & lihat selama 15 detik untuk aktifkan Premium 1 Hari tanpa token.
+              Klik iklan sponsor di bawah & lihat selama 15 detik untuk aktifkan Premium 1 Jam tanpa token.
             </p>
 
             <!-- Ad Click Button / Progress -->
@@ -211,7 +211,7 @@ const startAdVerification = () => {
                 @click="startAdVerification"
                 class="w-full py-2.5 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs active:scale-95"
               >
-                <span>🚀 Klik Iklan 15s (Gratis 1 Hari)</span>
+                <span>🚀 Klik Iklan 15s (Gratis 1 Jam)</span>
               </button>
 
               <!-- Live 15s Countdown Progress State -->
@@ -233,7 +233,7 @@ const startAdVerification = () => {
 
               <div v-else-if="isAdUnlocked" class="p-3.5 bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-600 text-white rounded-xl text-xs sm:text-sm font-bold text-center border border-emerald-400 shadow-md space-y-1">
                 <div class="font-extrabold text-xs sm:text-sm tracking-wide">🎉 VERIFIKASI IKLAN BERHASIL!</div>
-                <div class="text-[11px] font-mono text-emerald-100 font-medium">Status Premium 1 Hari Gratis telah aktif. Modal tertutup otomatis...</div>
+                <div class="text-[11px] font-mono text-emerald-100 font-medium">Status Premium 1 Jam Gratis telah aktif. Modal tertutup otomatis...</div>
               </div>
             </div>
           </div>

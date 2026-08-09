@@ -99,7 +99,7 @@ const startAdVerification = () => {
       isAdUnlocked.value = true
 
       activateFreeDayPremium()
-      successMessage.value = '🎉 Selamat! Status Premium 1 Hari Gratis telah aktif!'
+      successMessage.value = '🎉 Selamat! Status Premium 1 Jam Gratis telah aktif!'
       window.location.reload()
     }
   }, 1000)
@@ -195,7 +195,7 @@ const handleLogout = () => {
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2 font-bold text-amber-900 text-sm">
                 <span class="text-base">🎁</span>
-                <span>Coba Premium 1 Hari GRATIS</span>
+                <span>Coba Premium 1 Jam GRATIS</span>
               </div>
               <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-200 text-amber-900 uppercase font-mono">
                 GRATIS
@@ -203,7 +203,7 @@ const handleLogout = () => {
             </div>
 
             <p class="text-sm sm:text-sm text-amber-950/80 leading-relaxed">
-              Klik iklan sponsor di bawah ini dan buka selama <strong>15 detik</strong> untuk langsung mengaktifkan status Premium 1 Hari tanpa membeli token!
+              Klik iklan sponsor di bawah ini dan buka selama <strong>15 detik</strong> untuk langsung mengaktifkan status Premium <strong>1 Jam</strong> tanpa membeli token!
             </p>
 
             <!-- Ad Click Verification Trigger Area -->
@@ -239,7 +239,7 @@ const handleLogout = () => {
 
               <!-- Unlocked State Banner -->
               <div v-else-if="isAdUnlocked" class="p-3 bg-emerald-100 text-emerald-900 rounded-xl text-sm sm:text-sm font-bold text-center border border-emerald-300">
-                🎉 Premium 1 Hari Gratis Berhasil Diaktifkan!
+                🎉 Premium 1 Jam Gratis Berhasil Diaktifkan!
               </div>
             </div>
           </div>
