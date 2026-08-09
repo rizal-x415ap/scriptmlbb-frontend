@@ -1139,7 +1139,7 @@ const handleConfirmDelete = async () => {
             </header>
 
             <!-- Main Thumbnail Image Container with Floating Views Badge -->
-            <div class="w-full h-72 sm:h-96 rounded-[12px] overflow-hidden border border-[#dfdfdf] bg-[#1c1c1c] shadow-sm relative">
+            <div class="w-full aspect-video rounded-2xl overflow-hidden border border-[#dfdfdf] bg-[#1c1c1c] shadow-sm relative">
               <img :src="article.cover_image" :alt="article.title" fetchpriority="high" decoding="async" width="800" height="450" class="w-full h-full object-cover" />
               <!-- Floating Views Badge (Pojok Kanan Atas) -->
               <div class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold bg-[#171717]/85 text-white backdrop-blur-md border border-white/20 flex items-center gap-1.5 shadow-md z-10 pointer-events-none">
@@ -1161,7 +1161,7 @@ const handleConfirmDelete = async () => {
             />
 
             <!-- Rich Text Article Content Body -->
-            <div class="max-w-[65ch] space-y-6 text-[#171717] text-base sm:text-lg leading-[1.75] article-content-body" v-html="formattedContent">
+            <div class="space-y-6 text-[#171717] text-base sm:text-lg leading-[1.75] article-content-body" v-html="formattedContent">
             </div>
 
             <!-- In-Article End Ad Slot for Standard Template -->
