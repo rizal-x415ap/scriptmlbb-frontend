@@ -941,8 +941,8 @@ const handleConfirmDelete = async () => {
                         </h3>
                       </div>
 
-                      <!-- Horizontal Line Separator -->
-                      <div class="border-b border-[#e2e8f0]"></div>
+                      <!-- Horizontal Line Separator (Thicker Vibrant Blue Accent Line) -->
+                      <div class="h-0.5 w-full bg-gradient-to-r from-[#2563eb] via-[#3b82f6] to-[#60a5fa] rounded-full my-2"></div>
 
                       <!-- Tags / Feature Pills Below Line -->
                       <div class="flex flex-wrap gap-1 sm:gap-1.5">
