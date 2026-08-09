@@ -1384,7 +1384,7 @@ const handleConfirmDelete = async () => {
                           </button>
                         </div>
                       </div>
-                      <p class="text-xs text-[#707070] pl-8 leading-relaxed">
+                      <p class="text-sm text-[#707070] pl-8 leading-relaxed">
                         {{ getCleanCommentContent(reply.content) }}
                       </p>
                     </div>
