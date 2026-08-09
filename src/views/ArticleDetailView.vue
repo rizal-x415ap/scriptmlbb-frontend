@@ -792,11 +792,14 @@ const handleConfirmDelete = async () => {
                 <!-- LEFT SIDE (lg:col-span-7): App Icon, Title, Developer, Metrics & CTA Download Button -->
                 <div class="lg:col-span-7 space-y-5">
                   <div class="space-y-3">
-                    <!-- ROW 1: Title (Full Width) -->
-                    <div>
+                    <!-- ROW 1: Title & Subtitle (Full Width) -->
+                    <div class="space-y-1.5">
                       <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#171717] leading-tight">
                         {{ article.title }}
                       </h1>
+                      <p v-if="article.subtitle" class="text-sm sm:text-base text-[#52525b] font-medium leading-relaxed">
+                        {{ article.subtitle }}
+                      </p>
                     </div>
 
                     <!-- ROW 2 (Below): Developer Name & Badges in its own full-width row (Distinct Colorful Pill Badges) -->
