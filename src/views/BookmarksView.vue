@@ -36,19 +36,19 @@ const getCategoryName = (cat) => {
     <header class="pb-6 border-b border-[#f0f0f0] space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="space-y-1">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-[#2563eb]/10">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm bg-[#2563eb]/10">
             <span class="font-mono-eyebrow text-[#2563eb]">KOLEKSI PRIBADI</span>
           </div>
           <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-[#171717]">
             Artikel Disimpan
           </h1>
-          <p class="text-xs sm:text-sm text-[#707070]">
+          <p class="text-sm sm:text-sm text-[#707070]">
             Koleksi artikel dan script skin pilihan yang Anda simpan di peramban.
           </p>
         </div>
 
         <!-- Count Pill -->
-        <div class="px-3.5 py-1.5 rounded-full bg-[#2563eb]/10 text-[#2563eb] text-xs font-semibold flex items-center gap-1.5 shrink-0 self-start sm:self-center">
+        <div class="px-3.5 py-1.5 rounded-full bg-[#2563eb]/10 text-[#2563eb] text-sm font-semibold flex items-center gap-1.5 shrink-0 self-start sm:self-center">
           <svg class="w-4 h-4 text-[#2563eb]" fill="currentColor" viewBox="0 0 24 24">
             <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
           </svg>
@@ -69,14 +69,14 @@ const getCategoryName = (cat) => {
       </div>
       <div class="space-y-1 max-w-md mx-auto">
         <h2 class="text-xl font-bold text-[#171717]">Belum Ada Artikel Disimpan</h2>
-        <p class="text-xs sm:text-sm text-[#707070]">
+        <p class="text-sm sm:text-sm text-[#707070]">
           Klik tombol penanda buku (🔖 Simpan) pada artikel atau script yang Anda sukai untuk menyimpannya di sini.
         </p>
       </div>
       <div class="pt-2">
         <RouterLink
           to="/"
-          class="stitch-button-primary px-5 py-2.5 text-xs inline-flex items-center gap-2"
+          class="stitch-button-primary px-5 py-2.5 text-sm inline-flex items-center gap-2"
         >
           <span>Jelajahi Artikel Terbaru</span>
           <span>→</span>
@@ -98,7 +98,7 @@ const getCategoryName = (cat) => {
             <span class="font-mono-eyebrow text-[#2563eb]">
               {{ getCategoryName(item.category) }}
             </span>
-            <span v-if="item.saved_at" class="text-[11px] sm:text-xs text-[#707070] font-mono">
+            <span v-if="item.saved_at" class="text-[11px] sm:text-sm text-[#707070] font-mono">
               {{ getFormattedDate(item.saved_at) }}
             </span>
           </div>
@@ -114,7 +114,7 @@ const getCategoryName = (cat) => {
           <div class="pt-1.5 flex items-center justify-start">
             <button
               @click="removeBookmark(item.id || item.slug)"
-              class="text-xs text-[#707070] hover:text-rose-600 font-medium flex items-center gap-1 transition-colors cursor-pointer"
+              class="text-sm text-[#707070] hover:text-rose-600 font-medium flex items-center gap-1 transition-colors cursor-pointer"
               title="Hapus dari simpanan"
             >
               <svg class="w-3.5 h-3.5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

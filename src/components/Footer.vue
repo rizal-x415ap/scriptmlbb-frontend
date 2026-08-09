@@ -44,7 +44,7 @@ const isExternalLink = (url) => {
 
         <!-- Column 2 Links -->
         <div class="space-y-3">
-          <h4 class="text-xs sm:text-sm font-bold text-[#171717] tracking-wider uppercase font-mono">{{ siteSettings.footerCol2Title || 'Categories' }}</h4>
+          <h4 class="text-sm sm:text-sm font-bold text-[#171717] tracking-wider uppercase font-mono">{{ siteSettings.footerCol2Title || 'Categories' }}</h4>
           <ul class="space-y-2.5 text-sm sm:text-base font-medium">
             <li v-if="siteSettings.footerCol2Link1Text">
               <a
@@ -126,7 +126,7 @@ const isExternalLink = (url) => {
 
         <!-- Column 3 Links -->
         <div class="space-y-3">
-          <h4 class="text-xs sm:text-sm font-bold text-[#171717] tracking-wider uppercase font-mono">{{ siteSettings.footerCol3Title || 'Resources' }}</h4>
+          <h4 class="text-sm sm:text-sm font-bold text-[#171717] tracking-wider uppercase font-mono">{{ siteSettings.footerCol3Title || 'Resources' }}</h4>
           <ul class="space-y-2.5 text-sm sm:text-base font-medium">
             <li v-if="siteSettings.footerCol3Link1Text">
               <a

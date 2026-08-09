@@ -113,7 +113,7 @@ watch(() => route.params.slug, () => {
 <template>
   <div class="space-y-8 py-4">
     <!-- Breadcrumb Navigation -->
-    <div class="flex items-center gap-2 text-xs text-[#707070] font-mono">
+    <div class="flex items-center gap-2 text-sm text-[#707070] font-mono">
       <RouterLink to="/" class="hover:text-[#171717] transition-colors">Beranda</RouterLink>
       <span>/</span>
       <span class="text-[#171717] font-semibold truncate">{{ page?.title || 'Halaman' }}</span>
@@ -133,8 +133,8 @@ watch(() => route.params.slug, () => {
     <!-- Error State -->
     <div v-else-if="errorMessage" class="py-16 text-center space-y-4">
       <h2 class="text-xl font-bold text-[#171717]">{{ errorMessage }}</h2>
-      <p class="text-xs text-[#707070]">Halaman yang Anda cari mungkin telah dipindahkan atau dihapus.</p>
-      <RouterLink to="/" class="stitch-button-primary inline-block px-5 py-2.5 text-xs font-semibold">
+      <p class="text-sm text-[#707070]">Halaman yang Anda cari mungkin telah dipindahkan atau dihapus.</p>
+      <RouterLink to="/" class="stitch-button-primary inline-block px-5 py-2.5 text-sm font-semibold">
         Kembali ke Beranda
       </RouterLink>
     </div>
@@ -145,7 +145,7 @@ watch(() => route.params.slug, () => {
         <h1 class="text-2xl sm:text-4xl font-bold tracking-tight text-[#171717] leading-tight">
           {{ page.title }}
         </h1>
-        <div class="text-xs text-[#707070] font-mono flex items-center gap-2">
+        <div class="text-sm text-[#707070] font-mono flex items-center gap-2">
           <span>Diperbarui pada {{ getFormattedDate(page.updated_at) }}</span>
         </div>
       </header>

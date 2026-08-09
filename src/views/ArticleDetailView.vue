@@ -1192,7 +1192,7 @@ const handleConfirmDelete = async () => {
               <!-- Interactive Star Rating Picker -->
               <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 bg-[#f4f4f5] rounded-xl">
                 <div class="flex items-center gap-2">
-                  <span class="text-xs font-semibold text-[#171717]">Beri Rating:</span>
+                  <span class="text-sm font-semibold text-[#171717]">Beri Rating:</span>
                   <div class="flex items-center gap-1 cursor-pointer">
                     <button
                       v-for="star in 5"
@@ -1218,14 +1218,14 @@ const handleConfirmDelete = async () => {
                   type="text"
                   placeholder="Nama Anda *"
                   required
-                  class="px-4 py-2.5 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb] focus:bg-white"
+                  class="px-4 py-2.5 text-sm bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb] focus:bg-white"
                 />
                 <input
                   v-model="commentEmailInput"
                   type="email"
                   placeholder="Email Anda (Rahasia/Verifikasi) *"
                   required
-                  class="px-4 py-2.5 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb] focus:bg-white"
+                  class="px-4 py-2.5 text-sm bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb] focus:bg-white"
                 />
               </div>
 
@@ -1239,7 +1239,7 @@ const handleConfirmDelete = async () => {
                 rows="3"
                 placeholder="Tuliskan ulasan atau pengalaman Anda menggunakan aplikasi / script ini..."
                 required
-                class="w-full p-4 text-xs bg-[#f4f4f5] border border-transparent rounded-2xl text-[#171717] focus:outline-none focus:border-[#2563eb] focus:bg-white resize-none"
+                class="w-full p-4 text-sm bg-[#f4f4f5] border border-transparent rounded-2xl text-[#171717] focus:outline-none focus:border-[#2563eb] focus:bg-white resize-none"
               ></textarea>
 
               <p v-if="commentSubmitMessage" class="text-xs font-semibold text-[#2563eb]">
@@ -1253,7 +1253,7 @@ const handleConfirmDelete = async () => {
                 <button
                   @click="handleAddComment(null)"
                   :disabled="isSubmittingComment"
-                  class="stitch-button-primary px-5 py-2 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                  class="stitch-button-primary px-5 py-2 text-sm font-semibold flex items-center gap-1.5 cursor-pointer"
                 >
                   <span v-if="isSubmittingComment" class="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
                   <span>{{ isSubmittingComment ? 'Mengirim...' : 'Kirim Ulasan & Rating' }}</span>
@@ -1278,7 +1278,7 @@ const handleConfirmDelete = async () => {
                         class="w-8 h-8 rounded-full bg-[#f4f4f5] object-contain p-0.5 shrink-0"
                       />
                       <div>
-                        <div class="text-xs font-bold text-[#171717] flex items-center gap-1.5">
+                        <div class="text-sm font-bold text-[#171717] flex items-center gap-1.5">
                           <span>{{ comment.author_name }}</span>
                           <span v-if="comment.rating" class="text-amber-500 font-normal">★ {{ comment.rating }}.0</span>
                         </div>
@@ -1304,7 +1304,7 @@ const handleConfirmDelete = async () => {
                     </div>
                   </div>
 
-                  <p class="text-xs sm:text-sm text-[#333333] pl-10 leading-relaxed">
+                  <p class="text-sm sm:text-sm text-[#333333] pl-10 leading-relaxed">
                     {{ getCleanCommentContent(comment.content) }}
                   </p>
 
@@ -1315,32 +1315,32 @@ const handleConfirmDelete = async () => {
                         v-model="replyAuthorInput"
                         type="text"
                         placeholder="Nama Anda *"
-                        class="px-3 py-2 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb]"
+                        class="px-3 py-2 text-sm bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb]"
                       />
                       <input
                         v-model="replyEmailInput"
                         type="email"
                         placeholder="Email Anda *"
-                        class="px-3 py-2 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb]"
+                        class="px-3 py-2 text-sm bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb]"
                       />
                     </div>
                     <textarea
                       v-model="replyTextInput"
                       rows="2"
                       placeholder="Tulis balasan Anda..."
-                      class="w-full p-3 text-xs bg-[#f4f4f5] border border-transparent rounded-xl text-[#171717] focus:outline-none focus:border-[#2563eb] resize-none"
+                      class="w-full p-3 text-sm bg-[#f4f4f5] border border-transparent rounded-xl text-[#171717] focus:outline-none focus:border-[#2563eb] resize-none"
                     ></textarea>
                     <div class="flex justify-end gap-2">
                       <button
                         @click="activeReplyParentId = null"
-                        class="px-3 py-1.5 text-xs text-[#707070] hover:text-[#171717] cursor-pointer"
+                        class="px-3 py-1.5 text-sm text-[#707070] hover:text-[#171717] cursor-pointer"
                       >
                         Batal
                       </button>
                       <button
                         @click="handleAddComment(comment.id)"
                         :disabled="isSubmittingReply"
-                        class="stitch-button-primary px-4 py-1.5 text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                        class="stitch-button-primary px-4 py-1.5 text-sm font-semibold flex items-center gap-1 cursor-pointer"
                       >
                         <span v-if="isSubmittingReply" class="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
                         <span>Kirim Balasan</span>
@@ -1362,7 +1362,7 @@ const handleConfirmDelete = async () => {
                             :alt="reply.author_name"
                             class="w-6 h-6 rounded-full bg-[#f4f4f5] object-contain p-0.5 shrink-0"
                           />
-                          <span class="text-xs font-bold text-[#171717]">{{ reply.author_name }}</span>
+                          <span class="text-sm font-bold text-[#171717]">{{ reply.author_name }}</span>
                           <span
                             v-if="reply.is_author_reply || reply.author_name === siteSettings.authorName || reply.author_name === 'Rizal Efendi' || reply.author_name === 'Admin (Author)'"
                             class="inline-flex items-center text-[#2563eb] shrink-0"
@@ -1422,7 +1422,7 @@ const handleConfirmDelete = async () => {
                 v-model="deleteEmailInput"
                 type="email"
                 placeholder="Email Anda *"
-                class="w-full px-4 py-2.5 text-xs bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb]"
+                class="w-full px-4 py-2.5 text-sm bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] focus:outline-none focus:border-[#2563eb]"
                 @keyup.enter="handleConfirmDelete"
               />
 

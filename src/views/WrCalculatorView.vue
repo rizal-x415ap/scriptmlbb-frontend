@@ -173,7 +173,7 @@ onMounted(() => {
         Hitung Win Rate Mobile Legends
       </h1>
 
-      <blockquote class="text-xs sm:text-sm text-[#707070] leading-relaxed italic bg-[#f8fafc] p-3.5 sm:p-4 rounded-xl border-l-4 border-[#2563eb] text-left">
+      <blockquote class="text-sm sm:text-sm text-[#707070] leading-relaxed italic bg-[#f8fafc] p-3.5 sm:p-4 rounded-xl border-l-4 border-[#2563eb] text-left">
         "Kalkulator ini memungkinkan kamu untuk menghitung WR (Win Rate) Mobile Legend. Cukup masukkan total pertandingan yang sudah kamu jalani, winrate sejauh ini, dan Jumlah Winrate yang kamu mau di kolom yang disediakan."
       </blockquote>
     </header>
@@ -185,7 +185,7 @@ onMounted(() => {
         <!-- Input 1: Total Match -->
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
-            <label for="tMatch" class="text-xs font-bold text-[#171717] uppercase tracking-wider font-mono">
+            <label for="tMatch" class="text-sm font-bold text-[#171717] uppercase tracking-wider font-mono">
               1. Total Match Kamu
             </label>
             <span class="text-[10px] text-[#707070] font-mono">Pertandingan</span>
@@ -207,7 +207,7 @@ onMounted(() => {
         <!-- Input 2: Current WR -->
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
-            <label for="tWr" class="text-xs font-bold text-[#171717] uppercase tracking-wider font-mono">
+            <label for="tWr" class="text-sm font-bold text-[#171717] uppercase tracking-wider font-mono">
               2. Total WR Kamu Saat Ini (%)
             </label>
             <span class="text-[10px] text-[#707070] font-mono">Persentase</span>
@@ -231,7 +231,7 @@ onMounted(() => {
         <!-- Input 3: Target WR & Quick Presets -->
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
-            <label for="wrReq" class="text-xs font-bold text-[#171717] uppercase tracking-wider font-mono">
+            <label for="wrReq" class="text-sm font-bold text-[#171717] uppercase tracking-wider font-mono">
               3. Target WR Yang Kamu Inginkan (%)
             </label>
             <span class="text-[10px] text-[#2563eb] font-semibold font-mono">Target</span>
@@ -271,7 +271,7 @@ onMounted(() => {
         <div class="flex flex-col sm:flex-row items-center gap-2.5 pt-2">
           <button
             type="submit"
-            class="w-full sm:flex-1 bg-[#2563eb] hover:bg-[#1d4ed8] active:scale-[0.98] text-white py-3.5 px-6 rounded-xl text-xs font-bold uppercase tracking-wider inline-flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md shadow-[#2563eb]/20"
+            class="w-full sm:flex-1 bg-[#2563eb] hover:bg-[#1d4ed8] active:scale-[0.98] text-white py-3.5 px-6 rounded-xl text-sm font-bold uppercase tracking-wider inline-flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md shadow-[#2563eb]/20"
           >
             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-3-2.25V18m-3-2.25V18m9-6V18M3 4.5h18a1.5 1.5 0 011.5 1.5v12a1.5 1.5 0 01-1.5 1.5H3a1.5 1.5 0 01-1.5-1.5V6a1.5 1.5 0 01-1.5-1.5zM6 7.5h12v3H6v-3z" />
@@ -282,7 +282,7 @@ onMounted(() => {
           <button
             type="button"
             @click="resetForm"
-            class="w-full sm:w-auto px-5 py-3 bg-[#f4f4f5] hover:bg-[#e4e4e7] active:bg-[#d4d4d8] text-[#171717] text-xs font-semibold rounded-xl transition-colors cursor-pointer text-center"
+            class="w-full sm:w-auto px-5 py-3 bg-[#f4f4f5] hover:bg-[#e4e4e7] active:bg-[#d4d4d8] text-[#171717] text-sm font-semibold rounded-xl transition-colors cursor-pointer text-center"
           >
             Reset Form
           </button>
@@ -315,10 +315,10 @@ onMounted(() => {
               <div class="text-3xl sm:text-5xl font-black text-[#2563eb] font-mono tracking-tight">
                 {{ resultData.winsNeeded }}
               </div>
-              <div class="text-xs sm:text-sm font-extrabold text-[#171717]">
+              <div class="text-sm sm:text-sm font-extrabold text-[#171717]">
                 Kemenangan Beruntun (Win Streak) Tanpa Kalah
               </div>
-              <p class="text-[11px] sm:text-xs text-[#707070] pt-1">
+              <p class="text-[11px] sm:text-sm text-[#707070] pt-1">
                 Dibutuhkan untuk menaikkan WR dari <strong class="text-[#171717] font-mono">{{ resultData.initialWr }}%</strong> ke <strong class="text-[#2563eb] font-mono">{{ resultData.targetWr }}%</strong>
               </p>
             </div>
@@ -327,15 +327,15 @@ onMounted(() => {
             <div class="grid grid-cols-3 gap-1.5 sm:gap-3 text-center">
               <div class="bg-white p-2.5 rounded-xl border border-[#e4e4e7]">
                 <div class="text-[9px] sm:text-[10px] font-mono text-[#707070] uppercase">Match Awal</div>
-                <div class="text-xs sm:text-sm font-bold text-[#171717] font-mono">{{ resultData.initialMatches }}</div>
+                <div class="text-sm sm:text-sm font-bold text-[#171717] font-mono">{{ resultData.initialMatches }}</div>
               </div>
               <div class="bg-white p-2.5 rounded-xl border border-[#e4e4e7]">
                 <div class="text-[9px] sm:text-[10px] font-mono text-[#707070] uppercase">Target WR</div>
-                <div class="text-xs sm:text-sm font-bold text-[#2563eb] font-mono">{{ resultData.targetWr }}%</div>
+                <div class="text-sm sm:text-sm font-bold text-[#2563eb] font-mono">{{ resultData.targetWr }}%</div>
               </div>
               <div class="bg-white p-2.5 rounded-xl border border-[#e4e4e7]">
                 <div class="text-[9px] sm:text-[10px] font-mono text-[#707070] uppercase">Total Match</div>
-                <div class="text-xs sm:text-sm font-bold text-[#171717] font-mono">{{ resultData.finalMatches }}</div>
+                <div class="text-sm sm:text-sm font-bold text-[#171717] font-mono">{{ resultData.finalMatches }}</div>
               </div>
             </div>
 
@@ -344,7 +344,7 @@ onMounted(() => {
           <!-- Warning & Info States -->
           <div
             v-else
-            class="p-4 rounded-xl text-xs sm:text-sm leading-relaxed"
+            class="p-4 rounded-xl text-sm sm:text-sm leading-relaxed"
             :class="{
               'bg-amber-50 text-amber-900 border border-amber-200': resultData.type === 'warning' || resultData.type === 'info',
               'bg-rose-50 text-rose-900 border border-rose-200': resultData.type === 'error'
@@ -368,8 +368,8 @@ onMounted(() => {
     </div>
 
     <!-- Tips & Information Section -->
-    <div class="bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl p-4 sm:p-6 space-y-3 text-xs text-[#707070] leading-relaxed">
-      <h4 class="font-bold text-[#171717] text-xs sm:text-sm flex items-center gap-2">
+    <div class="bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl p-4 sm:p-6 space-y-3 text-sm text-[#707070] leading-relaxed">
+      <h4 class="font-bold text-[#171717] text-sm sm:text-sm flex items-center gap-2">
         <svg class="w-4 h-4 text-[#2563eb] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
         </svg>

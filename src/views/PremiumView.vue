@@ -119,7 +119,7 @@ const handleLogout = () => {
     <!-- Hero Header Banner (Vibrant Blue Theme) -->
     <div class="p-6 sm:p-10 bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white rounded-3xl shadow-xl space-y-4 relative overflow-hidden">
       <div class="space-y-2 max-w-2xl relative z-10">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-white/20 text-blue-100 border border-white/30">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-mono bg-white/20 text-blue-100 border border-white/30">
           <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
           <span class="font-bold tracking-wider uppercase text-[11px]">LAYANAN BERLANGGANAN PREMIUM</span>
         </div>
@@ -128,7 +128,7 @@ const handleLogout = () => {
           Akses Bebas Iklan & Direct File Download
         </h1>
 
-        <p class="text-xs sm:text-sm text-blue-100 leading-relaxed">
+        <p class="text-sm sm:text-sm text-blue-100 leading-relaxed">
           Tingkatkan kenyamanan membaca artikel tanpa gangguan banner iklan dan unduh file aplikasi/script secara instan tanpa melewati shortener. Hanya Rp {{ priceText }}/bulan!
         </p>
       </div>
@@ -154,15 +154,15 @@ const handleLogout = () => {
               </div>
               <div>
                 <h3 class="text-base font-bold text-[#171717]">Status Premium Aktif</h3>
-                <p class="text-xs text-emerald-800 font-mono">Kode Token: <strong>{{ premiumToken }}</strong></p>
+                <p class="text-sm text-emerald-800 font-mono">Kode Token: <strong>{{ premiumToken }}</strong></p>
               </div>
             </div>
-            <span class="px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-100 text-emerald-800 border border-emerald-300">
+            <span class="px-3 py-1 rounded-full text-sm font-bold font-mono bg-emerald-100 text-emerald-800 border border-emerald-300">
               AKTIF
             </span>
           </div>
 
-          <div class="space-y-3 text-xs text-[#171717]">
+          <div class="space-y-3 text-sm text-[#171717]">
             <div class="flex justify-between py-2 border-b border-emerald-200/60">
               <span class="text-[#707070]">Berlaku Hingga:</span>
               <span class="font-bold text-[#171717] font-mono">{{ formattedExpiry }}</span>
@@ -180,7 +180,7 @@ const handleLogout = () => {
           <div class="pt-4 border-t border-emerald-200 flex justify-end">
             <button
               @click="handleLogout"
-              class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-full transition-colors cursor-pointer"
+              class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-full transition-colors cursor-pointer"
             >
               Keluar Premium Perangkat Ini
             </button>
@@ -202,7 +202,7 @@ const handleLogout = () => {
               </span>
             </div>
 
-            <p class="text-xs sm:text-sm text-amber-950/80 leading-relaxed">
+            <p class="text-sm sm:text-sm text-amber-950/80 leading-relaxed">
               Klik iklan sponsor di bawah ini dan buka selama <strong>15 detik</strong> untuk langsung mengaktifkan status Premium 1 Hari tanpa membeli token!
             </p>
 
@@ -211,7 +211,7 @@ const handleLogout = () => {
               <button
                 v-if="!isVerifyingAd && !isAdUnlocked"
                 @click="startAdVerification"
-                class="w-full py-3 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs sm:text-sm rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm active:scale-95"
+                class="w-full py-3 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm sm:text-sm rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm active:scale-95"
               >
                 <span>🚀 Klik Iklan 15 Detik Untuk Premium Gratis</span>
                 <span>→</span>
@@ -219,7 +219,7 @@ const handleLogout = () => {
 
               <!-- Live 15s Countdown Progress State -->
               <div v-else-if="isVerifyingAd" class="p-4 bg-white rounded-xl border border-amber-300 space-y-2 text-center">
-                <div class="flex items-center justify-between text-xs sm:text-sm font-mono font-bold text-amber-900">
+                <div class="flex items-center justify-between text-sm sm:text-sm font-mono font-bold text-amber-900">
                   <span class="flex items-center gap-1.5">
                     <span class="w-2.5 h-2.5 rounded-full bg-amber-600 animate-ping"></span>
                     <span>Memverifikasi Kunjungan Iklan...</span>
@@ -232,13 +232,13 @@ const handleLogout = () => {
                     :style="{ width: ((15 - adTimerSeconds) / 15 * 100) + '%' }"
                   ></div>
                 </div>
-                <p class="text-xs text-amber-800/90 font-mono">
+                <p class="text-sm text-amber-800/90 font-mono">
                   Mohon buka & tonton tab iklan selama {{ adTimerSeconds }} detik...
                 </p>
               </div>
 
               <!-- Unlocked State Banner -->
-              <div v-else-if="isAdUnlocked" class="p-3 bg-emerald-100 text-emerald-900 rounded-xl text-xs sm:text-sm font-bold text-center border border-emerald-300">
+              <div v-else-if="isAdUnlocked" class="p-3 bg-emerald-100 text-emerald-900 rounded-xl text-sm sm:text-sm font-bold text-center border border-emerald-300">
                 🎉 Premium 1 Hari Gratis Berhasil Diaktifkan!
               </div>
             </div>
@@ -246,12 +246,12 @@ const handleLogout = () => {
 
           <div class="border-b border-[#f0f0f0] pb-4 pt-2">
             <h3 class="text-base font-bold text-[#171717]">Atau Aktivasi Kode Token 30 Hari</h3>
-            <p class="text-xs text-[#707070] mt-0.5">Masukkan 5 huruf kode token berlangganan Anda di bawah ini</p>
+            <p class="text-sm text-[#707070] mt-0.5">Masukkan 5 huruf kode token berlangganan Anda di bawah ini</p>
           </div>
 
           <form @submit.prevent="handleActivate" class="space-y-4">
             <div>
-              <label class="block text-xs font-mono text-[#707070] uppercase font-semibold mb-1.5">Kode Token (5 Huruf Besar)</label>
+              <label class="block text-sm font-mono text-[#707070] uppercase font-semibold mb-1.5">Kode Token (5 Huruf Besar)</label>
               <input
                 type="text"
                 :value="tokenInput"
@@ -263,17 +263,17 @@ const handleLogout = () => {
             </div>
 
             <!-- Feedback Messages -->
-            <div v-if="errorMessage" class="p-3 bg-red-50 text-red-700 border border-red-200 rounded-full text-xs font-medium text-center">
+            <div v-if="errorMessage" class="p-3 bg-red-50 text-red-700 border border-red-200 rounded-full text-sm font-medium text-center">
               ⚠️ {{ errorMessage }}
             </div>
-            <div v-if="successMessage" class="p-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-medium text-center">
+            <div v-if="successMessage" class="p-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-sm font-medium text-center">
               ✅ {{ successMessage }}
             </div>
 
             <button
               type="submit"
               :disabled="isSubmitting || tokenInput.length !== 5"
-              class="w-full py-3 stitch-button-primary font-bold text-xs rounded-full transition-colors cursor-pointer flex items-center justify-center gap-2"
+              class="w-full py-3 stitch-button-primary font-bold text-sm rounded-full transition-colors cursor-pointer flex items-center justify-center gap-2"
             >
               <span v-if="isSubmitting" class="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
               <span>{{ isSubmitting ? 'Memverifikasi Token...' : 'Aktifkan Token Sekarang' }}</span>
@@ -282,12 +282,12 @@ const handleLogout = () => {
 
           <!-- Buy Token CTA -->
           <div class="pt-4 border-t border-[#f0f0f0] space-y-3 text-center">
-            <p class="text-xs text-[#707070]">Belum memiliki kode token berlangganan 30 hari?</p>
+            <p class="text-sm text-[#707070]">Belum memiliki kode token berlangganan 30 hari?</p>
             <a
               :href="whatsappBuyUrl"
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center justify-center w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-full transition-colors gap-2 cursor-pointer"
+              class="inline-flex items-center justify-center w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-full transition-colors gap-2 cursor-pointer"
             >
               <span>Beli Token via WhatsApp (Rp {{ priceText }}/bulan)</span>
             </a>
@@ -301,9 +301,9 @@ const handleLogout = () => {
         <div class="space-y-5 pb-6 border-b border-[#f0f0f0]">
           <h3 class="text-sm font-bold text-[#171717] font-mono-eyebrow border-b border-[#f0f0f0] pb-3">MANFAAT AKUN PREMIUM</h3>
 
-          <div class="space-y-4 text-xs">
+          <div class="space-y-4 text-sm">
             <div class="flex items-start gap-3">
-              <div class="w-7 h-7 rounded-full bg-[#2563eb]/10 text-[#2563eb] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+              <div class="w-7 h-7 rounded-full bg-[#2563eb]/10 text-[#2563eb] flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
                 🚫
               </div>
               <div>
@@ -313,7 +313,7 @@ const handleLogout = () => {
             </div>
 
             <div class="flex items-start gap-3">
-              <div class="w-7 h-7 rounded-full bg-[#2563eb]/10 text-[#2563eb] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+              <div class="w-7 h-7 rounded-full bg-[#2563eb]/10 text-[#2563eb] flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
                 ⚡
               </div>
               <div>
@@ -323,7 +323,7 @@ const handleLogout = () => {
             </div>
 
             <div class="flex items-start gap-3">
-              <div class="w-7 h-7 rounded-full bg-[#2563eb]/10 text-[#2563eb] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+              <div class="w-7 h-7 rounded-full bg-[#2563eb]/10 text-[#2563eb] flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
                 🎁
               </div>
               <div>
@@ -334,7 +334,7 @@ const handleLogout = () => {
           </div>
         </div>
 
-        <div class="p-4 rounded-2xl bg-[#f4f4f5] text-xs text-[#707070] space-y-2">
+        <div class="p-4 rounded-2xl bg-[#f4f4f5] text-sm text-[#707070] space-y-2">
           <h4 class="font-bold text-[#171717]">Butuh Bantuan Aktivasi?</h4>
           <p class="leading-relaxed">Jika Anda mengalami kendala saat mengaktifkan token atau klaim gratis, silakan hubungi tim dukungan kami melalui kontak yang tersedia.</p>
         </div>

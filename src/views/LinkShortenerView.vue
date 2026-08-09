@@ -173,8 +173,8 @@ const formattedContent = computed(() => {
         <div v-else-if="errorMessage" class="py-16 text-center space-y-4">
           <div class="text-4xl">⚠️</div>
           <h2 class="text-xl font-bold text-gray-900">Terjadi Kesalahan</h2>
-          <p class="text-xs text-gray-600 max-w-md mx-auto">{{ errorMessage }}</p>
-          <RouterLink to="/" class="stitch-button-primary inline-block px-5 py-2.5 text-xs font-semibold">
+          <p class="text-sm text-gray-600 max-w-md mx-auto">{{ errorMessage }}</p>
+          <RouterLink to="/" class="stitch-button-primary inline-block px-5 py-2.5 text-sm font-semibold">
             Kembali ke Beranda
           </RouterLink>
         </div>
@@ -197,7 +197,7 @@ const formattedContent = computed(() => {
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
               <div class="space-y-1 text-center sm:text-left">
                 <h2 class="text-base sm:text-lg font-bold text-[#171717]">Get Link Download File</h2>
-                <p class="text-xs sm:text-sm text-[#707070] max-w-lg">
+                <p class="text-sm sm:text-sm text-[#707070] max-w-lg">
                   {{ (isCountingDown || isUnlocked) ? 'Silakan gulir / scroll halaman artikel ini ke bawah untuk mengambil link download.' : 'Klik tombol di samping, lalu silakan gulir / scroll halaman ke bawah.' }}
                 </p>
               </div>
@@ -207,12 +207,12 @@ const formattedContent = computed(() => {
                 <button
                   v-if="!isCountingDown && !isUnlocked"
                   @click="startCountdown"
-                  class="stitch-button-primary w-full sm:w-auto px-6 py-3 text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95"
+                  class="stitch-button-primary w-full sm:w-auto px-6 py-3 text-sm sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-95"
                 >
                   <span>⚡ GET LINK DOWNLOAD</span>
                 </button>
 
-                <div v-else class="px-5 py-2.5 bg-emerald-50 text-emerald-700 rounded-full text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 border border-emerald-200 shadow-xs">
+                <div v-else class="px-5 py-2.5 bg-emerald-50 text-emerald-700 rounded-full text-sm sm:text-sm font-semibold flex items-center justify-center gap-2 border border-emerald-200 shadow-xs">
                   <svg class="w-4 h-4 text-emerald-600 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                   </svg>
@@ -222,7 +222,7 @@ const formattedContent = computed(() => {
             </div>
 
             <!-- Premium Bypasser Notice -->
-            <div v-if="isPremium" class="p-2.5 bg-amber-50 rounded-full text-xs text-amber-900 text-center font-medium">
+            <div v-if="isPremium" class="p-2.5 bg-amber-50 rounded-full text-sm text-amber-900 text-center font-medium">
               👑 Status Premium Aktif — Mengalihkan langsung ke link file...
             </div>
           </div>
@@ -241,7 +241,7 @@ const formattedContent = computed(() => {
             
             <!-- Article Header Block -->
             <header class="space-y-4 pb-6 border-b border-[#f0f0f0]">
-              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-[#2563eb]/10">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm bg-[#2563eb]/10">
                 <span class="font-mono-eyebrow text-[#2563eb]">{{ getCategoryName(article.category) }}</span>
               </div>
 
@@ -258,7 +258,7 @@ const formattedContent = computed(() => {
                 <img :src="getAuthorAvatar(article.author)" :alt="getAuthorName(article.author)" class="w-10 h-10 rounded-full object-cover border border-[#e4e4e7]" />
                 <div>
                   <div class="font-bold text-gray-900 text-sm">{{ getAuthorName(article.author) }}</div>
-                  <div class="text-xs text-gray-500 flex items-center gap-2 font-mono">
+                  <div class="text-sm text-gray-500 flex items-center gap-2 font-mono">
                     <span>{{ getFormattedDate(article.published_at || article.created_at) }}</span>
                     <span>•</span>
                     <span class="text-[#2563eb] font-semibold">{{ article.read_time || '5 min read' }}</span>
@@ -305,7 +305,7 @@ const formattedContent = computed(() => {
               </div>
 
               <!-- State 1: Before Countdown Started (Clean instruction, NO manual button) -->
-              <div v-if="!isCountingDown && !isUnlocked" class="p-4 bg-white rounded-xl text-xs sm:text-sm text-[#707070] max-w-md mx-auto space-y-2 border border-[#e4e4e7]">
+              <div v-if="!isCountingDown && !isUnlocked" class="p-4 bg-white rounded-xl text-sm sm:text-sm text-[#707070] max-w-md mx-auto space-y-2 border border-[#e4e4e7]">
                 <p class="leading-relaxed">
                   Silakan klik tombol <strong class="text-[#2563eb]">"GET LINK DOWNLOAD"</strong> di bagian atas halaman untuk memproses dan membuka link file secara otomatis.
                 </p>
@@ -316,7 +316,7 @@ const formattedContent = computed(() => {
                 <div class="font-mono text-4xl font-extrabold text-[#2563eb] tracking-tight">
                   {{ countdownSeconds }}s
                 </div>
-                <p class="text-xs sm:text-sm font-mono text-[#707070]">
+                <p class="text-sm sm:text-sm font-mono text-[#707070]">
                   Mohon tunggu {{ countdownSeconds }} detik... Tombol download sedang disiapkan.
                 </p>
                 <!-- Animated Progress Bar -->
@@ -338,7 +338,7 @@ const formattedContent = computed(() => {
                 >
                   <span>📥 Download File Sekarang →</span>
                 </a>
-                <p class="text-xs sm:text-sm text-emerald-700 font-semibold">
+                <p class="text-sm sm:text-sm text-emerald-700 font-semibold">
                   ✓ Link download aman terverifikasi. Klik tombol di atas untuk mulai mengunduh.
                 </p>
               </div>
