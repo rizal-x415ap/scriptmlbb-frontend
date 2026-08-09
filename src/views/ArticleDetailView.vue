@@ -1502,16 +1502,6 @@ const handleConfirmDelete = async () => {
                     <span>{{ (item.views_count || 120).toLocaleString() }} views</span>
                   </div>
                 </div>
-
-                <!-- Thumbnail -->
-                <div class="w-14 h-14 shrink-0 rounded-lg overflow-hidden bg-[#f4f4f5]">
-                  <img
-                    :src="item.cover_image"
-                    :alt="item.title"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                  />
-                </div>
               </RouterLink>
             </div>
 
