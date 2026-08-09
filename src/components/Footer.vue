@@ -132,7 +132,6 @@ const isExternalLink = (url) => {
               <a
                 v-if="isExternalLink(siteSettings.footerCol3Link1Url)"
                 :href="siteSettings.footerCol3Link1Url"
-                target="_blank"
                 rel="noopener noreferrer"
                 class="hover:text-[#2563eb] transition-colors"
               >
@@ -151,7 +150,6 @@ const isExternalLink = (url) => {
               <a
                 v-if="isExternalLink(siteSettings.footerCol3Link2Url)"
                 :href="siteSettings.footerCol3Link2Url"
-                target="_blank"
                 rel="noopener noreferrer"
                 class="hover:text-[#2563eb] transition-colors"
               >
@@ -170,7 +168,6 @@ const isExternalLink = (url) => {
               <a
                 v-if="isExternalLink(siteSettings.footerCol3Link3Url)"
                 :href="siteSettings.footerCol3Link3Url"
-                target="_blank"
                 rel="noopener noreferrer"
                 class="hover:text-[#2563eb] transition-colors"
               >
@@ -189,7 +186,6 @@ const isExternalLink = (url) => {
               <a
                 v-if="isExternalLink(siteSettings.footerCol3Link4Url)"
                 :href="siteSettings.footerCol3Link4Url"
-                target="_blank"
                 rel="noopener noreferrer"
                 class="hover:text-[#2563eb] transition-colors"
               >
