@@ -169,11 +169,11 @@ const handleLogout = () => {
             </div>
             <div class="flex justify-between py-2 border-b border-emerald-200/60">
               <span class="text-[#707070]">Status Iklan:</span>
-              <span class="font-semibold text-emerald-700">🚫 Bebas Iklan (Sembunyi)</span>
+              <span class="font-semibold text-emerald-700">🚫 Bebas Iklan </span>
             </div>
             <div class="flex justify-between py-2">
               <span class="text-[#707070]">Status Download:</span>
-              <span class="font-semibold text-emerald-700">⚡ Direct Download (Tanpa Shortener)</span>
+              <span class="font-semibold text-emerald-700">⚡ Direct Download </span>
             </div>
           </div>
 
