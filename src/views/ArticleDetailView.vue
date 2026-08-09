@@ -158,7 +158,7 @@ const formattedContent = computed(() => {
   // 3. Format blockquotes and code blocks
   raw = raw.replace(/^>\s+(.*$)/gim, '<blockquote>$1</blockquote>')
   raw = raw.replace(/<blockquote([^>]*)>([\s\S]*?)<\/blockquote>/gim, (match, attrs, innerContent) => {
-    return `<blockquote class="border-l-4 border-[#2563eb] bg-[#f0f6ff] text-[#1e293b] pl-5 pr-4 py-3 my-6 rounded-r-xl italic shadow-sm font-medium leading-relaxed">${innerContent}</blockquote>`
+    return `<blockquote class="border-l-3 border-[#2563eb] bg-[#f8fafc] text-[#334155] pl-5 pr-4 py-3 my-6 rounded-r-lg italic text-base sm:text-lg leading-relaxed">${innerContent}</blockquote>`
   })
   raw = raw.replace(/```([\s\S]*?)```/gim, '<div class="rounded-[6px] bg-[#1c1c1c] text-[#fafafa] p-6 border border-white/10 overflow-x-auto my-6 font-mono text-sm"><pre><code>$1</code></pre></div>')
 

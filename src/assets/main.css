@@ -303,17 +303,17 @@
 
 /* Editorial Article Content Body Blockquote Styling */
 .article-content-body blockquote {
-  border-left: 4px solid #2563eb !important;
-  background-color: #f0f6ff !important;
-  color: #1e293b !important;
-  padding: 0.875rem 1.25rem !important;
+  border-left: 3px solid #2563eb !important;
+  background-color: #f8fafc !important;
+  color: #334155 !important;
+  padding: 0.75rem 1rem 0.75rem 1.25rem !important;
   margin-top: 1.5rem !important;
   margin-bottom: 1.5rem !important;
-  border-top-right-radius: 0.75rem !important;
-  border-bottom-right-radius: 0.75rem !important;
+  border-top-right-radius: 0.5rem !important;
+  border-bottom-right-radius: 0.5rem !important;
   font-style: italic !important;
-  font-weight: 500 !important;
-  line-height: 1.625 !important;
+  font-weight: 400 !important;
+  line-height: 1.65 !important;
 }
 
 .article-content-body blockquote p {
