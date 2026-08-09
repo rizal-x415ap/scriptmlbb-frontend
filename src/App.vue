@@ -39,12 +39,12 @@ onMounted(() => {
       <!-- Sticky Announcement Bar at Very Top -->
       <div
         v-if="siteSettings.showAnnouncementBar"
-        class="bg-[#171717] text-white py-2 text-xs font-mono border-b border-white/10"
+        class="bg-[#f5f6f7] text-white py-2 text-xs font-mono border-b border-white/10"
       >
         <div class="max-w-[1280px] w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
           <div class="flex items-center gap-2.5 truncate">
-            <span class="w-2 h-2 rounded-full bg-[#2563eb] animate-pulse shrink-0"></span>
-            <span class="truncate font-medium text-white/90">{{ siteSettings.announcementText }}</span>
+            <span class="w-2 h-2 rounded-full text-[#2563eb] animate-pulse shrink-0"></span>
+            <span class="truncate font-bold text-[#d97706]">{{ siteSettings.announcementText }}</span>
           </div>
 
           <!-- External URL (e.g. https://t.me/..., https://...) -->
@@ -55,8 +55,9 @@ onMounted(() => {
             rel="noopener noreferrer"
             class="shrink-0 font-semibold text-[#60a5fa] hover:text-[#93c5fd] hover:underline flex items-center gap-1 transition-colors"
           >
-            <span>Join Now</span>
-            <span>→</span>
+            <span 
+            class="shrink-0 px-3 py-1 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white transition-colors text-[11px] font-semibold cursor-pointer"
+            >Join Now</span>
           </a>
 
           <!-- Internal Route (e.g. /article/..., /archive) -->

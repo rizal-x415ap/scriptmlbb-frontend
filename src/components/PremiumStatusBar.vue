@@ -28,7 +28,7 @@ const handleLogout = () => {
     v-if="isPremium"
     class="bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 text-white py-2 px-4 text-xs font-mono shadow-md border-b border-amber-400/40 relative z-50"
   >
-    <div class="max-w-[1280px] w-full mx-auto flex items-center justify-between gap-3">
+    <div class="max-w-[1280px] w-full mx-auto px-4 sm:px-6 lg:px-8  flex items-center justify-between gap-3">
       <div class="flex items-center gap-2 truncate">
         <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-white text-[10px] font-bold shrink-0">
           👑
