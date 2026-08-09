@@ -207,11 +207,52 @@ onMounted(() => {
   isLoading.value = true
   fetchCategoryOptions()
   fetchArchiveData(1, false)
+
+  const pageUrl = '/archive'
+  const absUrl = getAbsoluteUrl(pageUrl)
+
+  const jsonLdSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${absUrl}#webpage`,
+        'url': absUrl,
+        'name': siteSettings.archiveTitle || 'Arsip Artikel & Catatan Teknis',
+        'description': siteSettings.archiveSubtitle || 'Filter seluruh koleksi artikel teknis, catatan arsitektur sistem, dan panduan software.',
+        'publisher': {
+          '@type': 'Organization',
+          'name': siteSettings.brandLogoText || 'Script MLBB',
+          'url': getAbsoluteUrl('/')
+        }
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${absUrl}#breadcrumb`,
+        'itemListElement': [
+          {
+            '@type': 'ListItem',
+            'position': 1,
+            'name': 'Beranda',
+            'item': getAbsoluteUrl('/')
+          },
+          {
+            '@type': 'ListItem',
+            'position': 2,
+            'name': 'Arsip Artikel',
+            'item': absUrl
+          }
+        ]
+      }
+    ]
+  }
+
   setSeoMeta({
     title: siteSettings.archiveTitle || 'Arsip Artikel & Catatan Teknis',
     description: siteSettings.archiveSubtitle || 'Filter seluruh koleksi artikel teknis, catatan arsitektur sistem, dan panduan software.',
-    url: '/archive',
-    type: 'website'
+    url: pageUrl,
+    type: 'website',
+    jsonLdSchema
   })
 })
 </script>

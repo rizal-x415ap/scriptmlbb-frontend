@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { siteSettings } from '../services/settingsStore.js'
-import { setSeoMeta } from '../services/seo.js'
+import { setSeoMeta, getAbsoluteUrl } from '../services/seo.js'
 
 // Target Email (Dynamic from siteSettings with fallback)
 const contactEmail = computed(() => siteSettings.contactEmail || 'rizal@scriptmlbb.com')
@@ -81,11 +81,51 @@ const copyEmail = () => {
 }
 
 onMounted(() => {
+  const pageUrl = '/contact'
+  const absUrl = getAbsoluteUrl(pageUrl)
+
+  const jsonLdSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'ContactPage',
+        '@id': `${absUrl}#webpage`,
+        'url': absUrl,
+        'name': 'Hubungi Kami - Script MLBB',
+        'description': `Hubungi tim kami melalui formulir kontak atau kirimkan email langsung ke ${contactEmail.value}.`,
+        'publisher': {
+          '@type': 'Organization',
+          'name': siteSettings.brandLogoText || 'Script MLBB',
+          'url': getAbsoluteUrl('/')
+        }
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${absUrl}#breadcrumb`,
+        'itemListElement': [
+          {
+            '@type': 'ListItem',
+            'position': 1,
+            'name': 'Beranda',
+            'item': getAbsoluteUrl('/')
+          },
+          {
+            '@type': 'ListItem',
+            'position': 2,
+            'name': 'Hubungi Kami',
+            'item': absUrl
+          }
+        ]
+      }
+    ]
+  }
+
   setSeoMeta({
     title: 'Hubungi Kami - Script MLBB',
     description: `Hubungi tim kami melalui formulir kontak atau kirimkan email langsung ke ${contactEmail.value}.`,
-    url: '/contact',
-    type: 'website'
+    url: pageUrl,
+    type: 'website',
+    jsonLdSchema
   })
 })
 </script>

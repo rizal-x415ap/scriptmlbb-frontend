@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
-import { setSeoMeta } from '../services/seo.js'
+import { setSeoMeta, getAbsoluteUrl } from '../services/seo.js'
 import { siteSettings } from '../services/settingsStore.js'
 
 // Form State
@@ -49,12 +49,8 @@ const calculateWr = () => {
 
   if (currentWrVal >= targetWrVal) {
     resultData.value = {
-      type: 'info',
-      message: `Win Rate kamu saat ini (${currentWrVal}%) sudah mencapai atau melampaui target Win Rate (${targetWrVal}%).`,
-      winsNeeded: 0,
-      totalMatches: matches,
-      currentWr: currentWrVal,
-      targetWr: targetWrVal
+      type: 'error',
+      message: 'Target Win Rate Anda harus lebih besar daripada Win Rate Anda saat ini.'
     }
     isCalculated.value = true
     return
@@ -62,35 +58,32 @@ const calculateWr = () => {
 
   if (targetWrVal >= 100) {
     resultData.value = {
-      type: 'warning',
-      message: 'Win Rate 100% tidak mungkin dicapai jika kamu pernah mengalami kekalahan setidaknya 1 kali.',
-      winsNeeded: Infinity
+      type: 'error',
+      message: 'Secara matematis, tidak mungkin mencapai Win Rate 100% jika sudah pernah mengalami kekalahan.'
     }
     isCalculated.value = true
     return
   }
 
-  // Formula Calculation:
-  // Current wins W = matches * (currentWrVal / 100)
-  // Required wins X = (targetWrVal * matches - 100 * W) / (100 - targetWrVal)
-  const currentWins = matches * (currentWrVal / 100)
-  const requiredWinsExact = (targetWrVal * matches - 100 * currentWins) / (100 - targetWrVal)
-  const requiredWins = Math.ceil(requiredWinsExact)
-  const finalTotalMatches = matches + requiredWins
-  const finalWins = Math.round(currentWins + requiredWins)
-  const finalCalculatedWr = ((finalWins / finalTotalMatches) * 100).toFixed(2)
+  // Formula: (TargetWR * Matches - CurrentWR * Matches) / (100 - TargetWR)
+  const currentWins = (currentWrVal / 100) * matches
+  const winsNeeded = Math.ceil(((targetWrVal * matches) - (100 * currentWins)) / (100 - targetWrVal))
 
-  resultData.value = {
-    type: 'success',
-    winsNeeded: requiredWins,
-    initialMatches: matches,
-    initialWr: currentWrVal,
-    targetWr: targetWrVal,
-    finalMatches: finalTotalMatches,
-    finalWins: finalWins,
-    finalWr: finalCalculatedWr,
-    message: `Kamu memerlukan **${requiredWins} kemenangan beruntun (Win Streak)** tanpa kalah untuk mencapai Win Rate **${targetWrVal}%**.`
+  if (winsNeeded <= 0 || !isFinite(winsNeeded)) {
+    resultData.value = {
+      type: 'error',
+      message: 'Terjadi kesalahan perhitungan. Silakan periksa kembali angka input Anda.'
+    }
+  } else {
+    resultData.value = {
+      type: 'success',
+      winsNeeded,
+      targetWr: targetWrVal,
+      initialMatches: matches,
+      initialWr: currentWrVal
+    }
   }
+
   isCalculated.value = true
 }
 
@@ -113,11 +106,53 @@ const copyResultText = () => {
 }
 
 onMounted(() => {
+  const pageUrl = '/hitung-wr'
+  const absUrl = getAbsoluteUrl(pageUrl)
+
+  const jsonLdSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebApplication',
+        '@id': `${absUrl}#webapp`,
+        'name': 'Kalkulator Win Rate Mobile Legends (MLBB)',
+        'url': absUrl,
+        'description': 'Kalkulator WR MLBB otomatis untuk menghitung jumlah win streak kemenangan tanpa kalah yang dibutuhkan untuk mencapai target Win Rate Mobile Legends.',
+        'applicationCategory': 'GameApplication',
+        'operatingSystem': 'All',
+        'offers': {
+          '@type': 'Offer',
+          'price': '0',
+          'priceCurrency': 'IDR'
+        }
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${absUrl}#breadcrumb`,
+        'itemListElement': [
+          {
+            '@type': 'ListItem',
+            'position': 1,
+            'name': 'Beranda',
+            'item': getAbsoluteUrl('/')
+          },
+          {
+            '@type': 'ListItem',
+            'position': 2,
+            'name': 'Kalkulator WR MLBB',
+            'item': absUrl
+          }
+        ]
+      }
+    ]
+  }
+
   setSeoMeta({
     title: 'Kalkulator Win Rate Mobile Legends (MLBB) - Hitung WR',
     description: 'Hitung berapa jumlah kemenangan tanpa kalah (Win Streak) yang dibutuhkan untuk mencapai target Win Rate (WR) Mobile Legends kamu.',
-    url: '/hitung-wr',
-    type: 'website'
+    url: pageUrl,
+    type: 'website',
+    jsonLdSchema
   })
 })
 </script>

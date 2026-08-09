@@ -33,17 +33,45 @@ const fetchPageDetail = async () => {
       page.value = data
       const description = data.meta_description || data.excerpt || cleanExcerptText(data.content, 160)
       const pageUrl = `/page/${data.slug}`
+      const absPageUrl = getAbsoluteUrl(pageUrl)
+      const isAbout = data.slug.includes('about') || data.slug.includes('tentang')
+      const isContact = data.slug.includes('contact') || data.slug.includes('kontak')
+      const pageType = isAbout ? 'AboutPage' : (isContact ? 'ContactPage' : 'WebPage')
 
-      const webPageSchema = {
+      const jsonLdSchema = {
         '@context': 'https://schema.org',
-        '@type': 'WebPage',
-        'name': data.title,
-        'description': description,
-        'url': getAbsoluteUrl(pageUrl),
-        'publisher': {
-          '@type': 'Organization',
-          'name': siteSettings.brandLogoText || 'Script MLBB'
-        }
+        '@graph': [
+          {
+            '@type': pageType,
+            '@id': `${absPageUrl}#webpage`,
+            'url': absPageUrl,
+            'name': data.title,
+            'description': description,
+            'publisher': {
+              '@type': 'Organization',
+              'name': siteSettings.brandLogoText || 'Script MLBB',
+              'url': getAbsoluteUrl('/')
+            }
+          },
+          {
+            '@type': 'BreadcrumbList',
+            '@id': `${absPageUrl}#breadcrumb`,
+            'itemListElement': [
+              {
+                '@type': 'ListItem',
+                'position': 1,
+                'name': 'Beranda',
+                'item': getAbsoluteUrl('/')
+              },
+              {
+                '@type': 'ListItem',
+                'position': 2,
+                'name': data.title,
+                'item': absPageUrl
+              }
+            ]
+          }
+        ]
       }
 
       setSeoMeta({
@@ -51,7 +79,7 @@ const fetchPageDetail = async () => {
         description: description,
         url: pageUrl,
         type: 'website',
-        jsonLdSchema: webPageSchema
+        jsonLdSchema
       })
     } else {
       router.replace('/')

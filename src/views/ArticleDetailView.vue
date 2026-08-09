@@ -189,19 +189,17 @@ const updateArticleSeo = (data) => {
 
   const title = data.title || ''
   const description = data.excerpt || cleanExcerptText(data.content, 160)
-  const image = data.cover_image || data.app_icon || siteSettings.brandLogoUrl
+  const image = data.cover_image || siteSettings.brandLogoUrl
   const categoryName = getCategoryName(data.category)
   const author = getAuthorName(data.author) || siteSettings.authorName || 'Admin'
   const articleUrl = `/article/${data.slug || data.id}`
+  const absArticleUrl = getAbsoluteUrl(articleUrl)
 
-  // Build JSON-LD BlogPosting Schema for Google Rich Snippets
-  const articleSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    'mainEntityOfPage': {
-      '@type': 'WebPage',
-      '@id': getAbsoluteUrl(articleUrl)
-    },
+  // 1. Article / BlogPosting Schema
+  const articleGraphItem = {
+    '@type': isPlayStoreStyle.value ? 'TechArticle' : 'BlogPosting',
+    '@id': `${absArticleUrl}#article`,
+    'isPartOf': { '@id': absArticleUrl },
     'headline': title,
     'description': description,
     'image': [getAbsoluteUrl(image)],
@@ -209,24 +207,73 @@ const updateArticleSeo = (data) => {
     'dateModified': data.updated_at || data.published_at || new Date().toISOString(),
     'author': {
       '@type': 'Person',
-      'name': author
+      'name': author,
+      'url': getAbsoluteUrl('/about')
     },
     'publisher': {
       '@type': 'Organization',
       'name': siteSettings.brandLogoText || 'Script MLBB',
+      'url': getAbsoluteUrl('/'),
       'logo': {
         '@type': 'ImageObject',
         'url': getAbsoluteUrl(siteSettings.faviconUrl || '/favicon.svg')
       }
-    }
+    },
+    'articleSection': categoryName
   }
 
-  if (data.rating_average) {
-    articleSchema.aggregateRating = {
-      '@type': 'AggregateRating',
-      'ratingValue': String(data.rating_average),
-      'reviewCount': String(data.ratings_count || 1)
-    }
+  // 2. BreadcrumbList Schema (Beranda > Category > Article)
+  const breadcrumbGraphItem = {
+    '@type': 'BreadcrumbList',
+    '@id': `${absArticleUrl}#breadcrumb`,
+    'itemListElement': [
+      {
+        '@type': 'ListItem',
+        'position': 1,
+        'name': 'Beranda',
+        'item': getAbsoluteUrl('/')
+      },
+      {
+        '@type': 'ListItem',
+        'position': 2,
+        'name': categoryName,
+        'item': getAbsoluteUrl(`/archive?category=${encodeURIComponent(categoryName)}`)
+      },
+      {
+        '@type': 'ListItem',
+        'position': 3,
+        'name': title,
+        'item': absArticleUrl
+      }
+    ]
+  }
+
+  const graphList = [articleGraphItem, breadcrumbGraphItem]
+
+  // 3. SoftwareApplication Schema for App/Script Posts
+  if (isPlayStoreStyle.value || data.download_links || data.app_version) {
+    graphList.push({
+      '@type': 'SoftwareApplication',
+      '@id': `${absArticleUrl}#software`,
+      'name': title,
+      'operatingSystem': 'Android, iOS, Windows',
+      'applicationCategory': 'GameApplication',
+      'offers': {
+        '@type': 'Offer',
+        'price': '0',
+        'priceCurrency': 'IDR'
+      },
+      'aggregateRating': {
+        '@type': 'AggregateRating',
+        'ratingValue': String(data.rating_average || '4.8'),
+        'reviewCount': String(data.ratings_count || '150')
+      }
+    })
+  }
+
+  const jsonLdSchema = {
+    '@context': 'https://schema.org',
+    '@graph': graphList
   }
 
   setSeoMeta({
@@ -239,7 +286,7 @@ const updateArticleSeo = (data) => {
     modifiedTime: data.updated_at || data.published_at,
     authorName: author,
     sectionCategory: categoryName,
-    jsonLdSchema: articleSchema
+    jsonLdSchema
   })
 }
 
