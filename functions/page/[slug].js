@@ -55,6 +55,51 @@ export async function onRequest(context) {
     // 5. Replace canonical link tag in place
     html = html.replace(/<link\s+rel="canonical"\s+href=".*?"\s*\/?>/i, `<link rel="canonical" href="${escapeHtml(url.href)}" />`)
 
+    // 6. Replace default static JSON-LD script with dynamic Page @graph schema in raw HTML (for Ctrl+U & Search Engine Scrapers)
+    const isAbout = slug.includes('about') || slug.includes('tentang')
+    const isContact = slug.includes('contact') || slug.includes('kontak')
+    const pageType = isAbout ? 'AboutPage' : (isContact ? 'ContactPage' : 'WebPage')
+
+    const ssrJsonLd = {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': pageType,
+          '@id': `${url.href}#webpage`,
+          'url': url.href,
+          'name': title,
+          'description': description,
+          'publisher': {
+            '@type': 'Organization',
+            'name': 'Script MLBB',
+            'url': url.origin
+          }
+        },
+        {
+          '@type': 'BreadcrumbList',
+          '@id': `${url.href}#breadcrumb`,
+          'itemListElement': [
+            {
+              '@type': 'ListItem',
+              'position': 1,
+              'name': 'Beranda',
+              'item': url.origin
+            },
+            {
+              '@type': 'ListItem',
+              'position': 2,
+              'name': title,
+              'item': url.href
+            }
+          ]
+        }
+      ]
+    }
+
+    const jsonLdScriptRegex = /<script\s+type="application\/ld\+json">[\s\S]*?<\/script>/i
+    const newJsonLdScript = `<script type="application/ld+json">\n${JSON.stringify(ssrJsonLd, null, 2)}\n</script>`
+    html = html.replace(jsonLdScriptRegex, newJsonLdScript)
+
     return new Response(html, {
       headers: {
         'Content-Type': 'text/html; charset=UTF-8',

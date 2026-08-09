@@ -17,6 +17,46 @@ export async function onRequest(context) {
     html = html.replace(/<meta\s+property="og:description"\s+content=".*?"\s*\/?>/i, `<meta property="og:description" content="${escapeHtml(description)}" />`)
     html = html.replace(/<link\s+rel="canonical"\s+href=".*?"\s*\/?>/i, `<link rel="canonical" href="${escapeHtml(request.url)}" />`)
 
+    const ssrJsonLd = {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'CollectionPage',
+          '@id': `${request.url}#webpage`,
+          'url': request.url,
+          'name': title,
+          'description': description,
+          'publisher': {
+            '@type': 'Organization',
+            'name': 'Script MLBB',
+            'url': new URL(request.url).origin
+          }
+        },
+        {
+          '@type': 'BreadcrumbList',
+          '@id': `${request.url}#breadcrumb`,
+          'itemListElement': [
+            {
+              '@type': 'ListItem',
+              'position': 1,
+              'name': 'Beranda',
+              'item': new URL(request.url).origin
+            },
+            {
+              '@type': 'ListItem',
+              'position': 2,
+              'name': 'Arsip Artikel',
+              'item': request.url
+            }
+          ]
+        }
+      ]
+    }
+
+    const jsonLdScriptRegex = /<script\s+type="application\/ld\+json">[\s\S]*?<\/script>/i
+    const newJsonLdScript = `<script type="application/ld+json">\n${JSON.stringify(ssrJsonLd, null, 2)}\n</script>`
+    html = html.replace(jsonLdScriptRegex, newJsonLdScript)
+
     return new Response(html, {
       headers: {
         'Content-Type': 'text/html; charset=UTF-8',

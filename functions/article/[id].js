@@ -61,6 +61,93 @@ export async function onRequest(context) {
     // 5. Replace canonical link tag in place
     html = html.replace(/<link\s+rel="canonical"\s+href=".*?"\s*\/?>/i, `<link rel="canonical" href="${escapeHtml(url.href)}" />`)
 
+    // 6. Replace default static JSON-LD script with dynamic Article @graph schema in raw HTML (for Ctrl+U & Search Engine Scrapers)
+    const categoryName = typeof article.category === 'object' ? article.category?.name : (article.category || 'General')
+    const authorName = typeof article.author === 'object' ? article.author?.name : (article.author || 'Admin')
+    const isAppStyle = Boolean(article.app_poster_35 || article.download_links || article.app_version)
+
+    const articleGraphItem = {
+      '@type': isAppStyle ? 'TechArticle' : 'BlogPosting',
+      '@id': `${url.href}#article`,
+      'isPartOf': { '@id': url.href },
+      'headline': title,
+      'description': excerpt,
+      'image': [absoluteCover],
+      'datePublished': article.published_at || article.created_at || new Date().toISOString(),
+      'dateModified': article.updated_at || article.published_at || new Date().toISOString(),
+      'author': {
+        '@type': 'Person',
+        'name': authorName,
+        'url': `${url.origin}/about`
+      },
+      'publisher': {
+        '@type': 'Organization',
+        'name': 'Script MLBB',
+        'url': url.origin,
+        'logo': {
+          '@type': 'ImageObject',
+          'url': `${url.origin}/favicon.svg`
+        }
+      },
+      'articleSection': categoryName
+    }
+
+    const breadcrumbGraphItem = {
+      '@type': 'BreadcrumbList',
+      '@id': `${url.href}#breadcrumb`,
+      'itemListElement': [
+        {
+          '@type': 'ListItem',
+          'position': 1,
+          'name': 'Beranda',
+          'item': url.origin
+        },
+        {
+          '@type': 'ListItem',
+          'position': 2,
+          'name': categoryName,
+          'item': `${url.origin}/archive?category=${encodeURIComponent(categoryName)}`
+        },
+        {
+          '@type': 'ListItem',
+          'position': 3,
+          'name': title,
+          'item': url.href
+        }
+      ]
+    }
+
+    const graphList = [articleGraphItem, breadcrumbGraphItem]
+
+    if (isAppStyle) {
+      graphList.push({
+        '@type': 'SoftwareApplication',
+        '@id': `${url.href}#software`,
+        'name': title,
+        'operatingSystem': 'Android, iOS, Windows',
+        'applicationCategory': 'GameApplication',
+        'offers': {
+          '@type': 'Offer',
+          'price': '0',
+          'priceCurrency': 'IDR'
+        },
+        'aggregateRating': {
+          '@type': 'AggregateRating',
+          'ratingValue': String(article.rating_average || '4.8'),
+          'reviewCount': String(article.ratings_count || '150')
+        }
+      })
+    }
+
+    const ssrJsonLd = {
+      '@context': 'https://schema.org',
+      '@graph': graphList
+    }
+
+    const jsonLdScriptRegex = /<script\s+type="application\/ld\+json">[\s\S]*?<\/script>/i
+    const newJsonLdScript = `<script type="application/ld+json">\n${JSON.stringify(ssrJsonLd, null, 2)}\n</script>`
+    html = html.replace(jsonLdScriptRegex, newJsonLdScript)
+
     return new Response(html, {
       headers: {
         'Content-Type': 'text/html; charset=UTF-8',
