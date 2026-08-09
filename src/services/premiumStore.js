@@ -59,10 +59,11 @@ export function loadPremiumStatus() {
       return false
     }
 
-    if (savedToken === 'FREE1DAY') {
+    // Handle free ad-unlock tokens (FREE1HOUR, FREE1DAY, etc.) — verify locally by expiry only
+    if (savedToken.startsWith('FREE')) {
       if (savedExpires && new Date(savedExpires) > new Date()) {
         isPremium.value = true
-        premiumToken.value = 'FREE1DAY'
+        premiumToken.value = savedToken
         premiumExpiresAt.value = savedExpires
         isVerifyingPremium.value = false
         return true
