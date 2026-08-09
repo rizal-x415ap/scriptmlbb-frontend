@@ -150,12 +150,20 @@ const navLinks = [
       <!-- Mobile Search & Drawer -->
       <div v-if="isMobileMenuOpen" class="md:hidden py-4 border-t border-[#f0f0f0] space-y-3.5">
         <form @submit.prevent="handleSearchSubmit" class="px-2">
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Cari artikel, script skin..."
-            class="w-full px-4 py-2.5 text-sm bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] placeholder-[#a1a1aa] focus:outline-none focus:border-[#2563eb]"
-          />
+          <div class="relative">
+            <!-- Search Icon -->
+            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#a1a1aa] pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            </svg>
+            <input
+              v-model="searchQuery"
+              type="search"
+              inputmode="search"
+              enterkeyhint="search"
+              placeholder="Cari artikel, script skin..."
+              class="w-full pl-10 pr-4 py-2.5 text-sm bg-[#f4f4f5] border border-transparent rounded-full text-[#171717] placeholder-[#a1a1aa] focus:outline-none focus:border-[#2563eb]"
+            />
+          </div>
         </form>
         <div class="space-y-1.5 px-1">
           <RouterLink
