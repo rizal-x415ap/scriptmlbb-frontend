@@ -1373,7 +1373,7 @@ const handleConfirmDelete = async () => {
                           />
                           <span class="text-sm font-bold text-[#171717]">{{ reply.author_name }}</span>
                           <span
-                            v-if="reply.is_author_reply || reply.author_name === siteSettings.authorName || reply.author_name === 'Rizal Efendi' || reply.author_name === 'Admin (Author)'"
+                            v-if="reply.is_author_reply || reply.author_name === siteSettings.authorName || reply.author_name === 'Rizal Efendi'"
                             class="inline-flex items-center text-[#2563eb] shrink-0"
                             title="Penulis Terverifikasi"
                           >
