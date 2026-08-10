@@ -2,7 +2,7 @@
 import { ref, computed, reactive, onMounted, watch } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { ApiService } from '../services/api.js'
-import { siteSettings } from '../services/settingsStore.js'
+import { siteSettings, isAdminLoggedIn } from '../services/settingsStore.js'
 import { isBookmarked as checkIsBookmarked, toggleBookmark as toggleBookmarkStore } from '../services/bookmarkStore.js'
 import { isArticleLiked, addLikedArticle, removeLikedArticle } from '../services/likedStore.js'
 import ArticleDetailSkeleton from '../components/ArticleDetailSkeleton.vue'
@@ -457,9 +457,40 @@ const parsedDownloadLinks = computed(() => {
 
 // Comments State
 
+const isAdminSessionActive = () => {
+  if (typeof window === 'undefined') return false
+  return Boolean(
+    isAdminLoggedIn.value ||
+    localStorage.getItem('admin_token') ||
+    localStorage.getItem('blog_admin_token')
+  )
+}
+
+const isCommentVerified = (commentObj) => {
+  if (!commentObj) return false
+
+  const raw = commentObj || {}
+  const hasExplicitVerifiedFlag = Boolean(
+    raw.is_verified ||
+    raw.is_author_reply ||
+    raw.author_is_admin ||
+    raw.is_admin ||
+    raw.author_type === 'admin'
+  )
+
+  const authorName = String(raw.author_name || raw.name || '').trim().toLowerCase()
+  const siteAuthorName = String(siteSettings.authorName || '').trim().toLowerCase()
+  const nameMatchesAuthor = Boolean(authorName && (authorName === siteAuthorName || authorName.includes('rizal') || authorName.includes('admin')))
+
+  const isReply = Boolean(raw.parent_id !== undefined && raw.parent_id !== null) || Boolean(raw.parentId !== undefined && raw.parentId !== null)
+  const isAdminReply = hasExplicitVerifiedFlag || (isAdminSessionActive() && isReply)
+
+  return Boolean(isAdminReply || nameMatchesAuthor)
+}
+
 // Helper to parse comment if content or object is stored as raw JSON string
 const parseCommentData = (commentObj) => {
-  if (!commentObj) return { author_name: 'Pengguna', content: '', rating: 5 }
+  if (!commentObj) return { author_name: 'Pengguna', content: '', rating: 5, is_verified: false }
 
   let name = commentObj.author_name || commentObj.name || 'Pengguna'
   let email = commentObj.author_email || commentObj.email || ''
@@ -491,6 +522,7 @@ const parseCommentData = (commentObj) => {
     content: text,
     rating: rating,
     created_at: commentObj.created_at || new Date().toISOString(),
+    is_verified: isCommentVerified(commentObj),
     replies: Array.isArray(commentObj.replies) ? commentObj.replies.map(parseCommentData) : []
   }
 }
@@ -643,6 +675,11 @@ const handleAddComment = async (parentId = null) => {
       created_at: new Date().toISOString(),
       status: 'approved',
       replies: []
+    }
+
+    if (parentId && isAdminSessionActive()) {
+      savedCommentObj.is_author_reply = true
+      savedCommentObj.is_verified = true
     }
 
     if (!savedCommentObj.rating && !parentId) {
@@ -1439,6 +1476,15 @@ const handleConfirmDelete = async () => {
                         <div class="text-sm font-bold text-[#171717] flex items-center gap-1.5">
                           <span>{{ comment.author_name }}</span>
                           <span v-if="comment.rating" class="text-amber-500 font-normal">★ {{ comment.rating }}.0</span>
+                          <span
+                            v-if="comment.is_verified"
+                            class="inline-flex items-center text-[#2563eb] shrink-0"
+                            title="Terverifikasi"
+                          >
+                            <svg class="w-4 h-4 text-[#2563eb]" fill="currentColor" viewBox="0 0 20 20">
+                              <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                          </span>
                         </div>
                         <div class="text-[10px] text-[#707070] font-mono">
                           {{ getFormattedDate(comment.created_at || comment.date) }}
@@ -1522,7 +1568,7 @@ const handleConfirmDelete = async () => {
                           />
                           <span class="text-sm font-bold text-[#171717]">{{ reply.author_name }}</span>
                           <span
-                            v-if="reply.is_author_reply || reply.author_name === siteSettings.authorName || reply.author_name === 'Rizal Efendi'"
+                            v-if="reply.is_verified"
                             class="inline-flex items-center text-[#2563eb] shrink-0"
                             title="Penulis Terverifikasi"
                           >
