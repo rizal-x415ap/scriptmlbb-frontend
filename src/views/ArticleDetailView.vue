@@ -26,6 +26,41 @@ const isLiked = ref(false)
 const likesCount = ref(0)
 const isBookmarked = computed(() => article.value ? checkIsBookmarked(article.value.id || article.value.slug) : false)
 const isCopied = ref(false)
+const showSharePopup = ref(false)
+
+const shareUrl = computed(() => {
+  if (typeof window !== 'undefined') {
+    return window.location.href
+  }
+  if (article.value) {
+    return getAbsoluteUrl(`/article/${article.value.slug || article.value.id}`)
+  }
+  return ''
+})
+
+const getShareUrl = (platform) => {
+  const pageUrl = encodeURIComponent(shareUrl.value || '')
+  const titleText = encodeURIComponent(article.value?.title ? `Baca artikel: ${article.value.title}` : 'Baca artikel ini')
+
+  switch (platform) {
+    case 'whatsapp':
+      return `https://wa.me/?text=${titleText}%20${pageUrl}`
+    case 'telegram':
+      return `https://t.me/share/url?url=${pageUrl}&text=${titleText}`
+    case 'facebook':
+      return `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`
+    case 'x':
+      return `https://x.com/intent/tweet?text=${titleText}&url=${pageUrl}`
+    default:
+      return shareUrl.value || ''
+  }
+}
+
+const shareTo = (platform) => {
+  const url = getShareUrl(platform)
+  if (!url) return
+  window.open(url, '_blank', 'noopener,noreferrer,width=600,height=650')
+}
 
 // Helpers for API Data Normalization (Laravel API returns category & author objects)
 const getCategoryName = (cat) => {
@@ -353,11 +388,10 @@ const toggleBookmark = () => {
 }
 
 const copyShareLink = () => {
-  navigator.clipboard?.writeText?.(window.location.href)
+  const textToCopy = shareUrl.value || window.location.href
+  navigator.clipboard?.writeText?.(textToCopy)
   isCopied.value = true
-  setTimeout(() => {
-    isCopied.value = false
-  }, 2000)
+  showSharePopup.value = false
 }
 
 const isPlayStoreStyle = computed(() => {
@@ -756,9 +790,9 @@ const handleConfirmDelete = async () => {
 
           <!-- Share Button -->
           <button
-            @click="copyShareLink"
-            class="px-3 sm:px-4 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer"
-            :class="isCopied ? 'bg-emerald-600 text-white' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'"
+            @click="showSharePopup = true"
+            class="px-3 sm:px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ease-out flex items-center gap-1 cursor-pointer active:scale-[0.98]"
+            :class="isCopied ? 'bg-blue-600 text-white shadow-sm' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -766,6 +800,121 @@ const handleConfirmDelete = async () => {
             <span class="hidden sm:inline">{{ isCopied ? 'Tautan Disalin!' : 'Bagikan' }}</span>
             <span class="sm:hidden">{{ isCopied ? 'Disalin' : 'Bagikan' }}</span>
           </button>
+        </div>
+      </div>
+
+      <div v-if="showSharePopup" class="fixed inset-0 z-[999] flex items-center justify-center p-3 bg-slate-950/20 backdrop-blur-sm w-screen min-h-screen">
+        <div class="w-full max-w-xl overflow-hidden rounded-[24px] border border-slate-200/60 bg-white/95 shadow-xl shadow-slate-900/10">
+          <div class="relative px-5 pt-5 pb-4">
+            <div class="space-y-1">
+              <p class="text-base font-semibold text-slate-900">Bagikan Artikel</p>
+              <p class="text-sm text-slate-500 leading-6">Pilih aplikasi untuk mengirim tautan dengan cepat.</p>
+            </div>
+            <button
+              type="button"
+              @click="showSharePopup = false"
+              class="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-200"
+              aria-label="Tutup popup berbagi"
+            >
+              <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="h-px bg-slate-200/80"></div>
+
+          <div class="grid grid-cols-1 gap-2 p-4 sm:grid-cols-2">
+            <button
+              type="button"
+              @click="shareTo('whatsapp')"
+              class="group flex items-center gap-3 rounded-2xl border border-slate-200/80 bg-slate-50 px-4 py-3 text-left transition hover:border-slate-300 hover:bg-white"
+            >
+              <svg viewBox="0 0 360 362" fill="#25D366" class="h-5 w-5 flex-shrink-0">
+                <path fill-rule="evenodd" d="M307.546 52.566C273.709 18.684 228.706.017 180.756 0 81.951 0 1.538 80.404 1.504 179.235c-.017 31.594 8.242 62.432 23.928 89.609L0 361.736l95.024-24.925c26.179 14.285 55.659 21.805 85.655 21.814h.077c98.788 0 179.21-80.413 179.244-179.244.017-47.898-18.608-92.926-52.454-126.807v-.008Zm-126.79 275.788h-.06c-26.73-.008-52.952-7.194-75.831-20.765l-5.44-3.231-56.391 14.791 15.05-54.981-3.542-5.638c-14.912-23.721-22.793-51.139-22.776-79.286.035-82.14 66.867-148.973 149.051-148.973 39.793.017 77.198 15.53 105.328 43.695 28.131 28.157 43.61 65.596 43.593 105.398-.035 82.149-66.867 148.982-148.982 148.982v.008Zm81.719-111.577c-4.478-2.243-26.497-13.073-30.606-14.568-4.108-1.496-7.09-2.243-10.073 2.243-2.982 4.487-11.568 14.577-14.181 17.559-2.613 2.991-5.226 3.361-9.704 1.117-4.477-2.243-18.908-6.97-36.02-22.226-13.313-11.878-22.304-26.54-24.916-31.027-2.613-4.486-.275-6.91 1.959-9.136 2.011-2.011 4.478-5.234 6.721-7.847 2.244-2.613 2.983-4.486 4.478-7.469 1.496-2.991.748-5.603-.369-7.847-1.118-2.243-10.073-24.289-13.812-33.253-3.636-8.732-7.331-7.546-10.073-7.692-2.613-.13-5.595-.155-8.586-.155-2.991 0-7.839 1.118-11.947 5.604-4.108 4.486-15.677 15.324-15.677 37.361s16.047 43.344 18.29 46.335c2.243 2.991 31.585 48.225 76.51 67.632 10.684 4.615 19.029 7.374 25.535 9.437 10.727 3.412 20.49 2.931 28.208 1.779 8.604-1.289 26.498-10.838 30.228-21.298 3.73-10.46 3.73-19.433 2.613-21.298-1.117-1.865-4.108-2.991-8.586-5.234l.008-.017Z" clip-rule="evenodd"/>
+              </svg>
+              <div class="space-y-0.5">
+                <p class="text-sm font-semibold text-slate-900">WhatsApp</p>
+                <p class="text-[11px] text-slate-500">Bagikan cepat</p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              @click="shareTo('telegram')"
+              class="group flex items-center gap-3 rounded-2xl border border-slate-200/80 bg-slate-50 px-4 py-3 text-left transition hover:border-slate-300 hover:bg-white"
+            >
+              <svg viewBox="0 0 256 256" preserveAspectRatio="xMidYMid" class="h-5 w-5 flex-shrink-0">
+                <defs>
+                  <linearGradient id="telegram__a" x1="50%" x2="50%" y1="0%" y2="100%">
+                    <stop offset="0%" stop-color="#2AABEE"/>
+                    <stop offset="100%" stop-color="#229ED9"/>
+                  </linearGradient>
+                </defs>
+                <path fill="url(#telegram__a)" d="M128 0C94.06 0 61.48 13.494 37.5 37.49A128.038 128.038 0 0 0 0 128c0 33.934 13.5 66.514 37.5 90.51C61.48 242.506 94.06 256 128 256s66.52-13.494 90.5-37.49c24-23.996 37.5-56.576 37.5-90.51 0-33.934-13.5-66.514-37.5-90.51C194.52 13.494 161.94 0 128 0Z"/>
+                <path fill="#FFF" d="M57.94 126.648c37.32-16.256 62.2-26.974 74.64-32.152 35.56-14.786 42.94-17.354 47.76-17.441 1.06-.017 3.42.245 4.96 1.49 1.28 1.05 1.64 2.47 1.82 3.467.16.996.38 3.266.2 5.038-1.92 20.24-10.26 69.356-14.5 92.026-1.78 9.592-5.32 12.808-8.74 13.122-7.44.684-13.08-4.912-20.28-9.63-11.26-7.386-17.62-11.982-28.56-19.188-12.64-8.328-4.44-12.906 2.76-20.386 1.88-1.958 34.64-31.748 35.26-34.45.08-.338.16-1.598-.6-2.262-.74-.666-1.84-.438-2.64-.258-1.14.256-19.12 12.152-54 35.686-5.1 3.508-9.72 5.218-13.88 5.128-4.56-.098-13.36-2.584-19.9-4.708-8-2.606-14.38-3.984-13.82-8.41.28-2.304 3.46-4.662 9.52-7.072Z"/>
+              </svg>
+              <div class="space-y-0.5">
+                <p class="text-sm font-semibold text-slate-900">Telegram</p>
+                <p class="text-[11px] text-slate-500">Kirim ke channel/chat</p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              @click="shareTo('facebook')"
+              class="group flex items-center gap-3 rounded-2xl border border-slate-200/80 bg-slate-50 px-4 py-3 text-left transition hover:border-slate-300 hover:bg-white"
+            >
+              <svg viewBox="0 0 666.667 666.667" class="h-5 w-5 flex-shrink-0">
+                <defs>
+                  <clipPath id="facebook_icon__a" clipPathUnits="userSpaceOnUse">
+                    <path d="M0 700h700V0H0Z"/>
+                  </clipPath>
+                </defs>
+                <g clip-path="url(#facebook_icon__a)" transform="matrix(1.33333 0 0 -1.33333 -133.333 800)">
+                  <path d="M0 0c0 138.071-111.929 250-250 250S-500 138.071-500 0c0-117.245 80.715-215.622 189.606-242.638v166.242h-51.552V0h51.552v32.919c0 85.092 38.508 124.532 122.048 124.532 15.838 0 43.167-3.105 54.347-6.211V81.986c-5.901.621-16.149.932-28.882.932-40.993 0-56.832-15.528-56.832-55.9V0h81.659l-14.028-76.396h-67.631v-171.773C-95.927-233.218 0-127.818 0 0" style="fill:#0866ff;fill-opacity:1;fill-rule:nonzero;stroke:none" transform="translate(600 350)"/>
+                  <path d="m0 0 14.029 76.396H-67.63v27.019c0 40.372 15.838 55.899 56.831 55.899 12.733 0 22.981-.31 28.882-.931v69.253c-11.18 3.106-38.509 6.212-54.347 6.212-83.539 0-122.048-39.441-122.048-124.533V76.396h-51.552V0h51.552v-166.242a250.559 250.559 0 0 1 60.394-7.362c10.254 0 20.358.632 30.288 1.831V0Z" style="fill:#fff;fill-opacity:1;fill-rule:nonzero;stroke:none" transform="translate(447.918 273.604)"/>
+                </g>
+              </svg>
+              <div class="space-y-0.5">
+                <p class="text-sm font-semibold text-slate-900">Facebook</p>
+                <p class="text-[11px] text-slate-500">Bagikan ke profil</p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              @click="shareTo('x')"
+              class="group flex items-center gap-3 rounded-2xl border border-slate-200/80 bg-slate-50 px-4 py-3 text-left transition hover:border-slate-300 hover:bg-white"
+            >
+              <svg viewBox="0 0 1200 1227" class="h-5 w-5 flex-shrink-0">
+                <path fill="#000" d="M714.163 519.284 1160.89 0h-105.86L667.137 450.887 357.328 0H0l468.492 681.821L0 1226.37h105.866l409.625-476.152 327.181 476.152H1200L714.137 519.284h.026ZM569.165 687.828l-47.468-67.894-377.686-540.24h162.604l304.797 435.991 47.468 67.894 396.2 566.721H892.476L569.165 687.854v-.026Z"/>
+              </svg>
+              <div class="space-y-0.5">
+                <p class="text-sm font-semibold text-slate-900">X</p>
+                <p class="text-[11px] text-slate-500">Tweet / Repost</p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              @click="copyShareLink"
+              :class="[
+                'group col-span-1 sm:col-span-2 flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition duration-200 ease-out active:scale-[0.98]',
+                isCopied ? 'border-blue-200 bg-blue-50/90' : 'border-slate-200/80 bg-slate-50 hover:border-slate-300 hover:bg-white'
+              ]"
+            >
+              <svg id="copyIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5 text-blue-600 flex-shrink-0">
+                <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <div class="space-y-0.5">
+                <p class="text-sm font-semibold text-slate-900">Salin Link</p>
+                <p class="text-[11px] text-slate-500">{{ isCopied ? 'Link tersalin' : 'Salin ke clipboard' }}</p>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -857,7 +1006,7 @@ const handleConfirmDelete = async () => {
                       <span>Link Download Script</span>
                     </a>
                     <button
-                      @click="copyShareLink"
+                      @click="showSharePopup = true"
                       class="w-full sm:w-auto px-4 py-3 stitch-button-secondary text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
