@@ -946,7 +946,7 @@ const handleConfirmDelete = async () => {
                     <div class="flex-1 space-y-3 min-w-0 w-full text-left pr-2 sm:pr-0">
                       <!-- Title Inside Card Next to Image -->
                       <div>
-                        <h3 class="text-base sm:text-lg lg:text-xl font-bold text-[#171717] leading-snug break-all pr-0">
+                        <h3 class="text-base sm:text-lg lg:text-xl font-bold text-[#171717] leading-snug pr-0">
                           {{ article.title }}
                         </h3>
                       </div>
@@ -959,7 +959,7 @@ const handleConfirmDelete = async () => {
                         <span
                           v-for="(feature, fIdx) in appFeaturesList"
                           :key="fIdx"
-                          class="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-medium bg-white text-[#1d4ed8] border border-[#2563eb]/25"
+                          class="px-2 py-0.5 rounded-full text-[10px] sm:text-[12px] font-medium bg-white text-[#1d4ed8] border border-[#2563eb]/25"
                         >
                           {{ feature.startsWith('✓') ? feature : '✓ ' + feature }}
                         </span>
@@ -982,7 +982,7 @@ const handleConfirmDelete = async () => {
                         <RouterLink
                           v-if="link.isShortener"
                           :to="link.url"
-                          class="flex items-center gap-2.5 text-sm sm:text-base font-bold text-[#2563eb] hover:text-[#1d4ed8] active:text-[#1e40af] hover:underline transition-colors py-1 group cursor-pointer"
+                          class="flex items-center gap-2.5 text-sm sm:text-sm font-bold text-[#2563eb] hover:text-[#1d4ed8] active:text-[#1e40af] hover:underline transition-colors py-1 group cursor-pointer"
                         >
                           <svg class="w-4.5 h-4.5 sm:w-5 sm:h-5 shrink-0 transition-transform group-hover:translate-y-0.5 text-[#2563eb] group-hover:text-[#1d4ed8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
