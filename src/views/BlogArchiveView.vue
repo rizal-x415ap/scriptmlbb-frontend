@@ -6,7 +6,7 @@ import { siteSettings } from '../services/settingsStore.js'
 import { isBookmarked as checkIsBookmarked, toggleBookmark as toggleBookmarkStore } from '../services/bookmarkStore.js'
 import { isArticleLiked, addLikedArticle, removeLikedArticle } from '../services/likedStore.js'
 import ArticleCardSkeleton from '../components/ArticleCardSkeleton.vue'
-import { setSeoMeta } from '../services/seo.js'
+import { setSeoMeta, getAbsoluteUrl } from '../services/seo.js'
 
 const props = defineProps({
   searchQuery: {
