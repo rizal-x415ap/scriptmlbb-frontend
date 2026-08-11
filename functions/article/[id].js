@@ -119,25 +119,6 @@ export async function onRequest(context) {
 
     const graphList = [articleGraphItem, breadcrumbGraphItem]
 
-    if (isAppStyle) {
-      graphList.push({
-        '@type': 'SoftwareApplication',
-        '@id': `${url.href}#software`,
-        'name': title,
-        'operatingSystem': 'Android, iOS, Windows',
-        'applicationCategory': 'GameApplication',
-        'offers': {
-          '@type': 'Offer',
-          'price': '0',
-          'priceCurrency': 'IDR'
-        },
-        'aggregateRating': {
-          '@type': 'AggregateRating',
-          'ratingValue': String(article.rating_average || '4.8'),
-          'reviewCount': String(article.ratings_count || '150')
-        }
-      })
-    }
 
     const ssrJsonLd = {
       '@context': 'https://schema.org',
