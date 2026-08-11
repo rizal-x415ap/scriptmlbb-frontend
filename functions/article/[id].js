@@ -120,23 +120,38 @@ export async function onRequest(context) {
     const graphList = [articleGraphItem, breadcrumbGraphItem]
 
     if (isAppStyle) {
-      graphList.push({
-        '@type': 'SoftwareApplication',
-        '@id': `${url.href}#software`,
+      // 1. Ambil deskripsi bersih tanpa tag HTML (Google mewajibkan deskripsi untuk Product)
+      const itemDescription = (article.meta_description || article.excerpt || title)
+        .replace(/<[^>]*>?/gm, '')
+        .trim();
+
+      // 2. Buat objek Schema berbasis Product
+      const schemaProduct = {
+        '@type': 'Product',
+        '@id': `${url.href}#product`,
         'name': title,
-        'operatingSystem': 'Android, iOS, Windows',
-        'applicationCategory': 'GameApplication',
+        'description': itemDescription || title,
         'offers': {
           '@type': 'Offer',
           'price': '0',
-          'priceCurrency': 'IDR'
-        },
-        'aggregateRating': {
-          '@type': 'AggregateRating',
-          'ratingValue': String(article.rating_average || '4.8'),
-          'reviewCount': String(article.ratings_count || '150')
+          'priceCurrency': 'IDR',
+          'availability': 'https://schema.org/InStock'
         }
-      })
+      };
+
+      // 3. Hanya tambahkan aggregateRating jika rating benar-benar ada dan bernilai > 0
+      const reviewCountNum = Number(article.ratings_count || 0);
+      const ratingValueNum = Number(article.rating_average || 0);
+
+      if (reviewCountNum > 0 && ratingValueNum > 0) {
+        schemaProduct['aggregateRating'] = {
+          '@type': 'AggregateRating',
+          'ratingValue': String(ratingValueNum),
+          'reviewCount': String(reviewCountNum)
+        };
+      }
+
+      graphList.push(schemaProduct);
     }
 
     const ssrJsonLd = {
