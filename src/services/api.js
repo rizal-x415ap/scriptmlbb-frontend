@@ -92,6 +92,44 @@ export const ApiService = {
     return json
   },
 
+  // Fetch Topics List (Independent Endpoint with SWR cache)
+  async getTopics() {
+    const cached = getSwrCache('topics')
+    const fetchPromise = fetch(`${API_BASE_URL}/topics`, { headers: getHeaders() })
+      .then(res => res.ok ? res.json() : null)
+      .then(json => {
+        const topics = json?.data || []
+        if (topics.length > 0) setSwrCache('topics', topics)
+        return topics
+      })
+      .catch(() => [])
+
+    if (cached) {
+      fetchPromise.catch(() => {})
+      return cached
+    }
+    return await fetchPromise
+  },
+
+  // Fetch Popular Articles (Top 5 by views with SWR cache)
+  async getPopularArticles() {
+    const cached = getSwrCache('popular_articles')
+    const fetchPromise = fetch(`${API_BASE_URL}/articles/popular`, { headers: getHeaders() })
+      .then(res => res.ok ? res.json() : null)
+      .then(json => {
+        const articles = json?.data || []
+        if (articles.length > 0) setSwrCache('popular_articles', articles)
+        return articles
+      })
+      .catch(() => [])
+
+    if (cached) {
+      fetchPromise.catch(() => {})
+      return cached
+    }
+    return await fetchPromise
+  },
+
   // Fetch Home Feed Data (Supports Category Filtering & Pagination)
   async getHomeFeed(page = 1, category = 'All') {
     const catQuery = category && category !== 'All' ? `&category=${encodeURIComponent(category)}` : ''

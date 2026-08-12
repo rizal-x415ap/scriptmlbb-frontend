@@ -10,11 +10,8 @@ const router = useRouter()
 const isMobileMenuOpen = ref(false)
 const searchQuery = ref('')
 
-const emit = defineEmits(['search'])
-
 const handleSearchSubmit = () => {
   const query = searchQuery.value.trim()
-  emit('search', query)
   
   router.push({
     path: '/archive',

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import Navbar from './components/Navbar.vue'
 import Footer from './components/Footer.vue'
@@ -7,12 +7,6 @@ import PremiumStatusBar from './components/PremiumStatusBar.vue'
 import PremiumPopup from './components/PremiumPopup.vue'
 import { siteSettings, loadSiteSettings } from './services/settingsStore.js'
 import { isPremium, loadPremiumStatus } from './services/premiumStore.js'
-
-const searchQuery = ref('')
-
-const handleSearch = (query) => {
-  searchQuery.value = query
-}
 
 const isExternalLink = (url) => {
   if (!url) return false
@@ -73,12 +67,12 @@ onMounted(() => {
       </div>
 
       <!-- Top Navbar -->
-      <Navbar @search="handleSearch" />
+      <Navbar />
     </div>
 
     <!-- Main Content View -->
     <main class="flex-grow max-w-[1280px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <RouterView :searchQuery="searchQuery" />
+      <RouterView />
     </main>
 
     <!-- Footer -->

@@ -99,9 +99,9 @@ const fetchArchiveData = async (page = 1, append = false) => {
 // Fetch Category Filter Options from Backend API Topics
 const fetchCategoryOptions = async () => {
   try {
-    const feedData = await ApiService.getHomeFeed(1)
-    if (Array.isArray(feedData?.topics) && feedData.topics.length > 0) {
-      const cats = feedData.topics.map(t => t.name).filter(Boolean)
+    const topics = await ApiService.getTopics()
+    if (Array.isArray(topics) && topics.length > 0) {
+      const cats = topics.map(t => t.name).filter(Boolean)
       availableCategories.value = ['All', ...new Set(cats)]
     }
   } catch (e) {}

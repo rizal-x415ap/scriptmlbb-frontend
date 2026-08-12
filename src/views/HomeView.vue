@@ -60,13 +60,8 @@ const categories = computed(() => {
   return ['All', ...sortedCategories]
 })
 
-// Dynamic Most Read Articles (Sorted by views_count from MySQL)
-const mostReadArticles = computed(() => {
-  if (!Array.isArray(articles.value)) return []
-  return [...articles.value]
-    .sort((a, b) => (b.views_count || b.likes_count || 0) - (a.views_count || a.likes_count || 0))
-    .slice(0, 4)
-})
+// Popular Articles from dedicated API (Top 5 by views_count)
+const mostReadArticles = ref([])
 
 // Featured Section Category Filter & Horizontal Slider Ref
 const selectedFeaturedCategory = ref('All')
@@ -229,12 +224,22 @@ const loadHomeFeed = async (page = 1, category = 'All') => {
       topSliderArticles.value = (data?.feed || []).slice(0, 5)
     }
 
-    if (Array.isArray(data?.topics) && data.topics.length > 0) {
-      dynamicTopics.value = data.topics
-      data.topics.forEach(t => {
-        if (t.name) allCategoriesList.value.push(t.name)
-      })
-    }
+    // Fetch independent endpoints for Topics & Popular Articles
+    ApiService.getTopics().then(topics => {
+      if (Array.isArray(topics) && topics.length > 0) {
+        dynamicTopics.value = topics
+        topics.forEach(t => {
+          if (t.name) allCategoriesList.value.push(t.name)
+        })
+      }
+    }).catch(() => {})
+
+    ApiService.getPopularArticles().then(popular => {
+      if (Array.isArray(popular)) {
+        mostReadArticles.value = popular
+      }
+    }).catch(() => {})
+
     if (data?.pagination) {
       currentPage.value = data.pagination.current_page || 1
       lastPage.value = data.pagination.last_page || 1
@@ -322,14 +327,7 @@ watch(() => siteSettings.featuredPostCategory, async (newCat) => {
 
 // Filtered Articles Computed Property (Featured articles pinned at top)
 const filteredArticles = computed(() => {
-  const list = articles.value.filter(article => {
-    const matchesSearch = !props.searchQuery ||
-      article.title.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
-      (article.excerpt && article.excerpt.toLowerCase().includes(props.searchQuery.toLowerCase()))
-    return matchesSearch
-  })
-
-  return list.sort((a, b) => {
+  return [...articles.value].sort((a, b) => {
     const aFeat = (a.is_featured === true || a.is_featured === 1 || a.is_featured === '1') ? 1 : 0
     const bFeat = (b.is_featured === true || b.is_featured === 1 || b.is_featured === '1') ? 1 : 0
     return bFeat - aFeat
@@ -642,10 +640,10 @@ const toggleBookmark = (item) => {
               :to="'/article/' + (item.slug || item.id)"
               class="flex items-center gap-3 py-3 group border-b border-[#f0f0f0] last:border-0"
             >
-              <!-- Rank Number -->
+              <!-- Rank Number (Deep Navy -> Vivid Blue Gradient 01 -> 05) -->
               <span
                 class="text-2xl font-black font-mono shrink-0 leading-none w-7 text-center"
-                :class="index === 0 ? 'text-[#2563eb]' : 'text-[#e4e4e7]'"
+                :class="['text-[#1e3a8a]', 'text-[#1e40af]', 'text-[#1d4ed8]', 'text-[#2563eb]', 'text-[#3b82f6]'][index] || 'text-[#3b82f6]'"
               >{{ String(index + 1).padStart(2, '0') }}</span>
 
               <!-- Content -->

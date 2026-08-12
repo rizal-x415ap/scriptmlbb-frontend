@@ -143,38 +143,21 @@ const getCleanCommentContent = (rawContent) => {
   return rawContent
 }
 
-const sidebarArticles = ref([])
+const mostReadArticles = ref([])
+const computedTopics = ref([])
 
-const loadSidebarArticles = async () => {
+const loadSidebarWidgets = async () => {
   try {
-    const res = await ApiService.getHomeFeed(1)
-    if (Array.isArray(res?.feed)) {
-      sidebarArticles.value = res.feed
-    }
+    const [popular, topics] = await Promise.all([
+      ApiService.getPopularArticles(),
+      ApiService.getTopics()
+    ])
+    if (Array.isArray(popular)) mostReadArticles.value = popular.slice(0, 3)
+    if (Array.isArray(topics)) computedTopics.value = topics
   } catch (e) {
     // Fail silently
   }
 }
-
-const mostReadArticles = computed(() => {
-  return [...sidebarArticles.value]
-    .sort((a, b) => (b.views_count || 0) - (a.views_count || 0))
-    .slice(0, 5)
-})
-
-const computedTopics = computed(() => {
-  const counts = {}
-  sidebarArticles.value.forEach(art => {
-    const catName = getCategoryName(art.category)
-    if (catName && catName !== 'All') {
-      counts[catName] = (counts[catName] || 0) + 1
-    }
-  })
-  return Object.keys(counts).map(name => ({
-    name,
-    count: counts[name]
-  })).sort((a, b) => b.count - a.count).slice(0, 8)
-})
 
 // Render dynamic HTML / Markdown content
 const formattedContent = computed(() => {
@@ -347,7 +330,7 @@ const loadArticle = async () => {
 
 onMounted(() => {
   loadArticle()
-  loadSidebarArticles()
+  loadSidebarWidgets()
 })
 
 watch(() => route.params.id, () => {
@@ -1670,54 +1653,6 @@ const handleConfirmDelete = async () => {
             type="sidebar"
           />
 
-          <!-- Most Read Articles Bento Gadget -->
-          <div v-if="siteSettings.showMostReadWidget && mostReadArticles.length > 0" class="space-y-3">
-            <!-- Widget Header -->
-            <div class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-[#2563eb] shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-              </svg>
-              <span class="text-xs font-bold text-[#171717] uppercase tracking-widest">Terpopuler</span>
-            </div>
-
-            <!-- Article Ranked List -->
-            <div class="space-y-0">
-              <RouterLink
-                v-for="(item, index) in mostReadArticles"
-                :key="item.id"
-                :to="'/article/' + (item.slug || item.id)"
-                class="flex items-center gap-3 py-3 group border-b border-[#f0f0f0] last:border-0"
-              >
-                <!-- Rank Number -->
-                <span
-                  class="text-2xl font-black font-mono shrink-0 leading-none w-7 text-center"
-                  :class="index === 0 ? 'text-[#2563eb]' : 'text-[#e4e4e7]'"
-                >{{ String(index + 1).padStart(2, '0') }}</span>
-
-                <!-- Content -->
-                <div class="flex-1 min-w-0 space-y-0.5">
-                  <h4 class="text-sm font-semibold text-[#171717] line-clamp-2 leading-snug group-hover:text-[#2563eb] transition-colors">
-                    {{ item.title }}
-                  </h4>
-                  <div class="flex items-center gap-1.5 text-[11px] text-[#a1a1aa] font-mono">
-                    <svg class="w-3 h-3 text-[#a1a1aa] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    <span>{{ (item.views_count || 120).toLocaleString() }} views</span>
-                  </div>
-                </div>
-              </RouterLink>
-            </div>
-
-            <!-- Footer -->
-            <RouterLink to="/archive" class="flex items-center justify-center gap-1.5 w-full py-2 rounded-full bg-[#f4f4f5] hover:bg-[#2563eb]/10 text-xs font-semibold text-[#707070] hover:text-[#2563eb] transition-all">
-              <span>Lihat Semua Artikel</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </RouterLink>
-          </div>
-
           <!-- Publisher / Profile Gadget -->
           <div v-if="siteSettings.showAuthorWidget" class="space-y-4 pb-6 border-b border-[#f0f0f0]">
             <div class="flex items-center gap-4">
@@ -1750,6 +1685,54 @@ const handleConfirmDelete = async () => {
                 <span>Ikuti {{ siteSettings.authorInstagramHandle || 'Penulis' }}</span>
               </a>
             </div>
+          </div>
+
+          <!-- Most Read Articles Bento Gadget -->
+          <div v-if="siteSettings.showMostReadWidget && mostReadArticles.length > 0" class="space-y-3 pb-6 border-b border-[#f0f0f0]">
+            <!-- Widget Header -->
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-[#2563eb] shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              </svg>
+              <span class="text-xs font-bold text-[#171717] uppercase tracking-widest">Terpopuler</span>
+            </div>
+
+            <!-- Article Ranked List -->
+            <div class="space-y-0">
+              <RouterLink
+                v-for="(item, index) in mostReadArticles"
+                :key="item.id"
+                :to="'/article/' + (item.slug || item.id)"
+                class="flex items-center gap-3 py-3 group border-b border-[#f0f0f0] last:border-0"
+              >
+                <!-- Rank Number (Deep Navy -> Vivid Blue Gradient 01 -> 03) -->
+                <span
+                  class="text-2xl font-black font-mono shrink-0 leading-none w-7 text-center"
+                  :class="['text-[#1e3a8a]', 'text-[#1d4ed8]', 'text-[#2563eb]'][index] || 'text-[#2563eb]'"
+                >{{ String(index + 1).padStart(2, '0') }}</span>
+
+                <!-- Content -->
+                <div class="flex-1 min-w-0 space-y-0.5">
+                  <h4 class="text-sm font-semibold text-[#171717] line-clamp-2 leading-snug group-hover:text-[#2563eb] transition-colors">
+                    {{ item.title }}
+                  </h4>
+                  <div class="flex items-center gap-1.5 text-[11px] text-[#a1a1aa] font-mono">
+                    <svg class="w-3 h-3 text-[#a1a1aa] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span>{{ (item.views_count || 120).toLocaleString() }} views</span>
+                  </div>
+                </div>
+              </RouterLink>
+            </div>
+
+            <!-- Footer -->
+            <RouterLink to="/archive" class="flex items-center justify-center gap-1.5 w-full py-2 rounded-full bg-[#f4f4f5] hover:bg-[#2563eb]/10 text-xs font-semibold text-[#707070] hover:text-[#2563eb] transition-all">
+              <span>Lihat Semua Artikel</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </RouterLink>
           </div>
 
           <!-- Topik Populer Gadget -->
