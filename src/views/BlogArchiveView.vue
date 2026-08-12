@@ -146,6 +146,17 @@ const getFormattedDate = (date) => {
   return date
 }
 
+const formatViews = (val) => {
+  const num = Number(val) || 0
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1).replace('.0', '') + 'm'
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1).replace('.0', '') + 'k'
+  }
+  return num.toString()
+}
+
 const checkIsItemBookmarked = (item) => {
   if (!item) return false
   return checkIsBookmarked(item.id || item.slug)
@@ -380,50 +391,74 @@ onMounted(() => {
             <article
               v-for="item in archiveDataset"
               :key="item.id"
-              class="py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group"
+              class="py-5 flex flex-row items-center justify-between gap-4 sm:gap-6 group"
             >
-              <div class="space-y-2 flex-1">
+              <!-- Sisi Kiri: Kategori, Judul, Tanggal & Tombol Aksi -->
+              <div class="flex flex-col justify-between flex-1 min-w-0 space-y-2">
                 <!-- Kategori & Tanggal -->
                 <div class="flex items-center gap-3">
                   <span class="font-mono-eyebrow text-[#2563eb]">
                     {{ getCategoryName(item.category) }}
                   </span>
-                  <span v-if="getFormattedDate(item.published_at || item.created_at)" class="text-sm text-[#707070] font-mono">
+                  <span v-if="getFormattedDate(item.published_at || item.created_at)" class="text-xs sm:text-sm text-[#707070] font-mono">
                     {{ getFormattedDate(item.published_at || item.created_at) }}
                   </span>
                 </div>
 
                 <!-- Judul Artikel -->
-                <RouterLink :to="'/article/' + (item.slug || item.id)" class="block pt-0.5">
+                <RouterLink :to="'/article/' + (item.slug || item.id)" class="block">
                   <h3 class="text-base sm:text-lg font-semibold text-[#171717] leading-snug group-hover:text-[#2563eb] transition-colors">
                     {{ item.title }}
                   </h3>
                 </RouterLink>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-2 pt-1">
+                  <button
+                    @click="toggleLike(item)"
+                    class="px-3 py-1 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                    :class="checkIsItemLiked(item) ? 'bg-rose-50 text-rose-600' : 'bg-[#f4f4f5] text-[#707070] hover:text-[#171717] hover:bg-[#e4e4e7]'"
+                  >
+                    <svg class="w-3.5 h-3.5" :fill="checkIsItemLiked(item) ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    <span>{{ item.likes_count || 0 }}</span>
+                  </button>
+
+                  <button
+                    @click="toggleBookmark(item)"
+                    class="p-1.5 rounded-full text-xs sm:text-sm transition-colors cursor-pointer"
+                    :class="checkIsItemBookmarked(item) ? 'bg-amber-50 text-amber-600' : 'bg-[#f4f4f5] text-[#707070] hover:text-[#171717] hover:bg-[#e4e4e7]'"
+                  >
+                    <svg class="w-3.5 h-3.5" :fill="checkIsItemBookmarked(item) ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                  </button>
+                </div>
               </div>
 
-              <!-- Action Buttons -->
-              <div class="flex items-center gap-2 self-end sm:self-center pt-2 sm:pt-0">
-                <button
-                  @click="toggleLike(item)"
-                  class="px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-                  :class="checkIsItemLiked(item) ? 'bg-rose-50 text-rose-600' : 'bg-[#f4f4f5] text-[#707070] hover:text-[#171717] hover:bg-[#e4e4e7]'"
-                >
-                  <svg class="w-3.5 h-3.5" :fill="checkIsItemLiked(item) ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              <!-- Sisi Kanan: Thumbnail Image (Rasio 1:1 Aspect Square with Floating Views Badge) -->
+              <RouterLink
+                v-if="item.cover_image"
+                :to="'/article/' + (item.slug || item.id)"
+                class="w-20 sm:w-28 aspect-square shrink-0 rounded-[14px] overflow-hidden bg-[#f4f4f5] relative block"
+              >
+                <img
+                  :src="item.cover_image"
+                  :alt="item.title"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <!-- Floating Views Badge (Pojok Kanan Atas) -->
+                <div v-if="item.views_count !== undefined" class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-[#171717]/80 text-white backdrop-blur-md border border-white/20 flex items-center gap-1 shadow-xs z-10 pointer-events-none">
+                  <svg class="w-3 h-3 text-[#2563eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
-                  <span>{{ item.likes_count }}</span>
-                </button>
-
-                <button
-                  @click="toggleBookmark(item)"
-                  class="p-1.5 rounded-full text-sm transition-colors cursor-pointer"
-                  :class="checkIsItemBookmarked(item) ? 'bg-amber-50 text-amber-600' : 'bg-[#f4f4f5] text-[#707070] hover:text-[#171717] hover:bg-[#e4e4e7]'"
-                >
-                  <svg class="w-3.5 h-3.5" :fill="checkIsItemBookmarked(item) ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                  </svg>
-                </button>
-              </div>
+                  <span>{{ formatViews(item.views_count) }}</span>
+                </div>
+              </RouterLink>
             </article>
           </div>
 
