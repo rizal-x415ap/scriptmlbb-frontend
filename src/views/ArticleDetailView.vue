@@ -1705,10 +1705,10 @@ const handleConfirmDelete = async () => {
                 :to="'/article/' + (item.slug || item.id)"
                 class="flex items-center gap-3 py-3 group border-b border-[#f0f0f0] last:border-0"
               >
-                <!-- Rank Number (Deep Navy -> Vivid Blue Gradient 01 -> 03) -->
+                <!-- Rank Number (Bright Blue -> Dark Slate Gradient 01 -> 03) -->
                 <span
                   class="text-2xl font-black font-mono shrink-0 leading-none w-7 text-center"
-                  :class="['text-[#1e3a8a]', 'text-[#1d4ed8]', 'text-[#2563eb]'][index] || 'text-[#2563eb]'"
+                  :class="['text-[#2563eb]', 'text-[#1d4ed8]', 'text-[#1e40af]'][index] || 'text-[#1e40af]'"
                 >{{ String(index + 1).padStart(2, '0') }}</span>
 
                 <!-- Content -->
