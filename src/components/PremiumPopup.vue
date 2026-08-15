@@ -13,6 +13,10 @@ const successMessage = ref('')
 const isVerifyingAd = ref(false)
 const adTimerSeconds = ref(15)
 const isAdUnlocked = ref(false)
+const showAdModal = ref(false)
+const hasClickedBanner = ref(false)
+const adScriptContainerRef = ref(null)
+
 let adInterval = null
 let interactionTriggered = false
 
@@ -63,6 +67,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (adInterval) clearInterval(adInterval)
+  window.removeEventListener('blur', onWindowBlurForAd)
   removeActivityListeners()
 })
 
@@ -100,35 +105,126 @@ const handleActivate = async () => {
   }
 }
 
-// Start 15-Second Ad Click Verification Logic
-const startAdVerification = () => {
-  if (isVerifyingAd.value || isAdUnlocked.value) return
-
-  // Open target sponsor ad link in new tab
-  const targetAdUrl = siteSettings.premiumFreeAdUrl || siteSettings.announcementLink || 'https://scriptmlbb.com'
-  window.open(targetAdUrl, '_blank')
-
-  isVerifyingAd.value = true
-  adTimerSeconds.value = 15
+// Start 15s Timer ONLY after user clicks banner or window loses focus (iframe click)
+const startBannerTimerAfterClick = () => {
+  if (hasClickedBanner.value) return
+  hasClickedBanner.value = true
 
   if (adInterval) clearInterval(adInterval)
-
   adInterval = setInterval(() => {
     if (adTimerSeconds.value > 0) {
       adTimerSeconds.value -= 1
     }
     if (adTimerSeconds.value <= 0) {
-      clearInterval(adInterval)
-      adInterval = null
-      isVerifyingAd.value = false
-      isAdUnlocked.value = true
-
-      // Activate 1-Hour Free Premium
-      activateFreeDayPremium()
-      successMessage.value = '🎉 Selamat! Status Premium 1 Jam Gratis berhasil diaktifkan!'
-      window.location.reload()
+      completeAdVerification()
     }
   }, 1000)
+}
+
+// Window Blur Detection when Ad Modal is active (detects user click on ad iframe)
+const onWindowBlurForAd = () => {
+  if (isVerifyingAd.value && showAdModal.value && !hasClickedBanner.value) {
+    startBannerTimerAfterClick()
+  }
+}
+
+const renderBannerScript = () => {
+  if (!adScriptContainerRef.value) return
+  adScriptContainerRef.value.innerHTML = ''
+  const contentStr = String(siteSettings.premiumFreeAdScript || '').trim()
+  if (!contentStr) return
+
+  const parser = new DOMParser()
+  const parsedDoc = parser.parseFromString(contentStr, 'text/html')
+
+  const nodes = [
+    ...Array.from(parsedDoc.head.childNodes),
+    ...Array.from(parsedDoc.body.childNodes)
+  ]
+
+  nodes.forEach((node) => {
+    if (node.nodeType === Node.ELEMENT_NODE && node.tagName.toLowerCase() === 'script') {
+      const newScript = document.createElement('script')
+      Array.from(node.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.textContent = node.textContent
+      adScriptContainerRef.value.appendChild(newScript)
+    } else if (node.nodeType === Node.ELEMENT_NODE || (node.nodeType === Node.TEXT_NODE && node.textContent.trim())) {
+      adScriptContainerRef.value.appendChild(node.cloneNode(true))
+    }
+  })
+}
+
+const handleBannerContainerClick = () => {
+  if (isVerifyingAd.value && showAdModal.value && !hasClickedBanner.value) {
+    startBannerTimerAfterClick()
+  }
+}
+
+const completeAdVerification = () => {
+  if (adInterval) {
+    clearInterval(adInterval)
+    adInterval = null
+  }
+  window.removeEventListener('blur', onWindowBlurForAd)
+  isVerifyingAd.value = false
+  isAdUnlocked.value = true
+  showAdModal.value = false
+
+  // Activate 1-Hour Free Premium
+  activateFreeDayPremium()
+  successMessage.value = '🎉 Selamat! Status Premium 1 Jam Gratis berhasil diaktifkan!'
+  setTimeout(() => {
+    window.location.reload()
+  }, 800)
+}
+
+const closeAdModal = () => {
+  if (adInterval) {
+    clearInterval(adInterval)
+    adInterval = null
+  }
+  window.removeEventListener('blur', onWindowBlurForAd)
+  isVerifyingAd.value = false
+  hasClickedBanner.value = false
+  showAdModal.value = false
+}
+
+// Start 15-Second Ad Click Verification Logic
+const startAdVerification = () => {
+  if (isVerifyingAd.value || isAdUnlocked.value) return
+
+  const mode = siteSettings.premiumFreeAdMode || 'direct_link'
+
+  if (mode === 'banner_script') {
+    showAdModal.value = true
+    isVerifyingAd.value = true
+    hasClickedBanner.value = false
+    adTimerSeconds.value = 15
+
+    window.addEventListener('blur', onWindowBlurForAd)
+
+    setTimeout(() => {
+      renderBannerScript()
+    }, 100)
+  } else {
+    // Mode Direct Link (Open in new tab + 15s Timer)
+    const targetAdUrl = siteSettings.premiumFreeAdUrl || siteSettings.announcementLink || 'https://scriptmlbb.com'
+    window.open(targetAdUrl, '_blank')
+
+    isVerifyingAd.value = true
+    adTimerSeconds.value = 15
+
+    if (adInterval) clearInterval(adInterval)
+
+    adInterval = setInterval(() => {
+      if (adTimerSeconds.value > 0) {
+        adTimerSeconds.value -= 1
+      }
+      if (adTimerSeconds.value <= 0) {
+        completeAdVerification()
+      }
+    }, 1000)
+  }
 }
 </script>
 
@@ -290,6 +386,84 @@ const startAdVerification = () => {
             </form>
           </div>
 
+        </div>
+      </div>
+    </div>
+  </Transition>
+
+  <!-- STACKED BANNER AD MODAL POPUP (z-[10000]) -->
+  <Transition name="fade">
+    <div
+      v-if="showAdModal"
+      class="fixed inset-0 z-[10000] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto"
+    >
+      <div class="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-amber-300 overflow-hidden transform transition-all my-auto">
+        <!-- Header -->
+        <div class="p-4 sm:p-5 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-700 text-white flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-white animate-ping"></span>
+            <div>
+              <h4 class="font-extrabold text-sm sm:text-base tracking-tight">📢 Banner Iklan Sponsor</h4>
+              <p class="text-[11px] text-amber-100 font-mono">
+                {{ hasClickedBanner ? 'Memverifikasi kunjungan iklan...' : 'Klik banner di bawah untuk mulai timer 15s' }}
+              </p>
+            </div>
+          </div>
+          <div class="px-3 py-1 rounded-full bg-black/30 text-white text-xs font-mono font-bold border border-white/20">
+            ⏱️ {{ hasClickedBanner ? adTimerSeconds + 's' : '15s' }}
+          </div>
+        </div>
+
+        <!-- Banner Script Body Container -->
+        <div class="p-5 sm:p-6 space-y-4 text-center bg-gray-50/50">
+          <div
+            v-if="!hasClickedBanner"
+            class="p-3 bg-amber-100 text-amber-900 rounded-xl border border-amber-300 text-xs font-bold animate-pulse flex items-center justify-center gap-2"
+          >
+            <span>👇</span>
+            <span>Silakan KLIK BANNER IKLAN di bawah ini untuk memulai hitungan 15 detik!</span>
+          </div>
+          <div
+            v-else
+            class="p-3 bg-emerald-50 text-emerald-900 rounded-xl border border-emerald-300 text-xs font-bold flex items-center justify-center gap-2"
+          >
+            <span class="w-2 h-2 rounded-full bg-emerald-600 animate-ping"></span>
+            <span>Iklan Berhasil Diklik! Mohon tunggu {{ adTimerSeconds }} detik...</span>
+          </div>
+
+          <!-- Injected Ad Script Container -->
+          <div
+            ref="adScriptContainerRef"
+            @click="handleBannerContainerClick"
+            class="min-h-[180px] flex items-center justify-center p-3 rounded-2xl bg-white border-2 border-dashed transition-all cursor-pointer overflow-hidden relative"
+            :class="hasClickedBanner ? 'border-emerald-400 bg-emerald-50/20' : 'border-amber-400 hover:border-amber-600 bg-amber-50/10'"
+          >
+            <!-- Fallback when script is empty -->
+            <div v-if="!siteSettings.premiumFreeAdScript" class="text-xs text-gray-500 font-mono py-8">
+              [Klik Di Sini / Banner Iklan Sponsor]
+            </div>
+          </div>
+
+          <!-- Live Progress Bar -->
+          <div class="space-y-1.5 pt-2">
+            <div class="flex justify-between text-[11px] font-mono font-bold text-amber-950">
+              <span>{{ hasClickedBanner ? 'Hitungan Mundur Verification' : 'Status: Menunggu Klik Banner' }}</span>
+              <span>{{ hasClickedBanner ? Math.round(((15 - adTimerSeconds) / 15) * 100) + '%' : '0%' }}</span>
+            </div>
+            <div class="w-full h-2.5 bg-amber-200/60 rounded-full overflow-hidden">
+              <div
+                class="h-full bg-amber-600 rounded-full transition-all duration-1000 ease-linear"
+                :style="{ width: hasClickedBanner ? ((15 - adTimerSeconds) / 15 * 100) + '%' : '0%' }"
+              ></div>
+            </div>
+          </div>
+
+          <button
+            @click="closeAdModal"
+            class="w-full py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold rounded-xl transition-all cursor-pointer mt-2"
+          >
+            Tutup Iklan
+          </button>
         </div>
       </div>
     </div>

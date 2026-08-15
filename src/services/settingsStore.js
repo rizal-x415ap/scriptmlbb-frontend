@@ -99,7 +99,9 @@ const defaultSettings = {
   bodyCloseScriptContent: '',
   // Premium Subscription Settings
   premiumBuyUrl: 'https://wa.me/6285262335849?text=Min%20Saya%20mau%20beli%20token%20Script%20MLBB',
-  premiumMonthlyPrice: '5.000'
+  premiumMonthlyPrice: '5.000',
+  premiumFreeAdMode: 'direct_link',
+  premiumFreeAdScript: ''
 }
 
 export const siteSettings = reactive({ ...defaultSettings })
